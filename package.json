@@ -6,16 +6,20 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
     "@google/genai": "latest",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
     "lucide-react": "^0.468.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",

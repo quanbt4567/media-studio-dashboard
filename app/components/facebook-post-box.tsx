@@ -24,6 +24,10 @@ export interface CreatePostBoxProps {
   onImageChange?: (image?: File) => void;
   onSubmit?: (post: CreatePostData) => void;
   className?: string;
+  /** When true, the text area is read-only (e.g. Media Creator role). */
+  textReadOnly?: boolean;
+  /** When true, image upload controls are hidden (e.g. Content Creator role). */
+  hideImageControls?: boolean;
 }
 
 const emojis = ['😀', '😂', '😍', '🎉', '👍', '❤️'];
@@ -39,6 +43,8 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
   onImageChange,
   onSubmit,
   className = '',
+  textReadOnly = false,
+  hideImageControls = false,
 }) => {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [internalImage, setInternalImage] = useState<File>();
@@ -131,8 +137,9 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
           placeholder={placeholder}
           aria-label="Post content"
           rows={2}
+          readOnly={textReadOnly}
           style={{ overflowY: 'hidden' }}
-          className="min-h-10 flex-1 resize-none rounded-lg bg-slate-100 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:ring-2 focus:ring-primary/30 dark:bg-neutral-700 dark:text-white dark:placeholder:text-neutral-300"
+          className={`min-h-10 flex-1 resize-none rounded-lg px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-500 dark:placeholder:text-neutral-300 ${textReadOnly ? "cursor-default bg-slate-50 text-slate-600 dark:bg-neutral-800 dark:text-neutral-300" : "bg-slate-100 text-slate-900 focus:ring-2 focus:ring-primary/30 dark:bg-neutral-700 dark:text-white"}`}
         />
       </div>
 
@@ -163,24 +170,28 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
             onChange={handleImageChange}
             className="hidden"
           />
-          <button
-            type="button"
-            onClick={() => imageInputRef.current?.click()}
-            aria-label="Add an image"
-            className="rounded-full p-2 text-green-600 hover:bg-slate-100 dark:hover:bg-neutral-700"
-          >
-            <span aria-hidden="true">🖼️</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsEmojiPickerOpen((isOpen) => !isOpen)}
-            aria-label="Add an emoji"
-            aria-expanded={isEmojiPickerOpen}
-            className="rounded-full p-2 text-yellow-500 hover:bg-slate-100 dark:hover:bg-neutral-700"
-          >
-            <span aria-hidden="true">😊</span>
-          </button>
-          {isEmojiPickerOpen && (
+          {!hideImageControls && (
+            <button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              aria-label="Add an image"
+              className="rounded-full p-2 text-green-600 hover:bg-slate-100 dark:hover:bg-neutral-700"
+            >
+              <span aria-hidden="true">🖼️</span>
+            </button>
+          )}
+          {!textReadOnly && (
+            <button
+              type="button"
+              onClick={() => setIsEmojiPickerOpen((isOpen) => !isOpen)}
+              aria-label="Add an emoji"
+              aria-expanded={isEmojiPickerOpen}
+              className="rounded-full p-2 text-yellow-500 hover:bg-slate-100 dark:hover:bg-neutral-700"
+            >
+              <span aria-hidden="true">😊</span>
+            </button>
+          )}
+          {isEmojiPickerOpen && !textReadOnly && (
             <div className="absolute bottom-11 left-0 flex gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-lg dark:border-neutral-600 dark:bg-neutral-700">
               {emojis.map((emoji) => (
                 <button
@@ -204,9 +215,11 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
           Post
         </button>
       </div>
-      <label onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} className="mt-3 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-500 transition hover:border-primary hover:bg-slate-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
-        <span aria-hidden="true">🖼️</span><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-      </label>
+      {!hideImageControls && (
+        <label onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} className="mt-3 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-500 transition hover:border-primary hover:bg-slate-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
+          <span aria-hidden="true">🖼️</span><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+        </label>
+      )}
     </form>
   );
 };

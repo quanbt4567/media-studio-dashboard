@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { getRecentPagePosts } from "@/app/lib/page-posts";
 
 export async function POST(request: Request) {
   try {
@@ -20,6 +21,22 @@ export async function POST(request: Request) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
+
+    // Auto-learn tone of voice: feed the 5 most recent Fanpage posts to Gemini
+    // as few-shot examples. Fails open — generation still works without them.
+    let toneExamples = "";
+    try {
+      const recentPosts = await getRecentPagePosts(5);
+      if (recentPosts.length > 0) {
+        toneExamples =
+          `\n\nTONE OF VOICE EXAMPLES — the ${recentPosts.length} most recent posts from this club's Facebook page. ` +
+          `Match their tone, emoji habits, and formatting closely:\n` +
+          recentPosts.map((post, index) => `${index + 1}. ${post}`).join("\n");
+      }
+    } catch (toneError) {
+      console.warn("Tone-of-voice fetch failed, generating without examples.", toneError);
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
       contents: `Write one polished Facebook post for a university club about: ${cleanTopic}. Keep it warm, concise, and specific. Include 2-4 fitting emojis, a clear call to action, and 3-5 relevant hashtags. Return only the post copy, with natural paragraph breaks.`,
@@ -46,7 +63,7 @@ export async function POST(request: Request) {
 OUTPUT FORMAT CONSTRAINTS:
 - Keep the generated post concise, under 300 words.
 - Do not include any malicious links, spam, or controversial political/religious statements.
-- Always output clean Markdown format without raw HTML tags.`,
+- Always output clean Markdown format without raw HTML tags.${toneExamples}`,
       },
     });
 

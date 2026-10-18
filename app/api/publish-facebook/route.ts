@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
+import { getSessionUser } from "@/app/lib/session";
 
 export async function POST(request: Request) {
+  // Defense in depth: middleware already blocks non-admins, verify again here.
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+  if (sessionUser.role !== "admin") {
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  }
+
   try {
     const contentType = request.headers.get("content-type") || "";
     let message: unknown;
