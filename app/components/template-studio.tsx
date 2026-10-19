@@ -411,6 +411,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   const [savedFlash, setSavedFlash] = useState(false);
   const [showBgLibrary, setShowBgLibrary] = useState(false);
   const [showElLibrary, setShowElLibrary] = useState(false);
+  /** Element library mode: "add" inserts a new image, "replace" swaps the selected one. */
+  const [elLibraryMode, setElLibraryMode] = useState<"add" | "replace">("add");
   /** Saved design templates (mẫu thiết kế dùng lại). */
   const [designTemplates, setDesignTemplates] = useState<DesignTemplate[]>([]);
   const [showTplPicker, setShowTplPicker] = useState(false);
@@ -476,6 +478,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   function deleteSelected() {
     if (!selectedId) return;
+    if (selected?.locked) return;
     pushHistory();
     setElements((prev) => prev.filter((el) => el.id !== selectedId));
     setSelectedId(null);
@@ -483,7 +486,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function duplicateSelected() {
-    if (!selected) return;
+    if (!selected || selected.locked) return;
     pushHistory();
     const copy: CanvasElement = { ...selected, id: uid("el"), x: selected.x + 40, y: selected.y + 40 };
     setElements((prev) => [...prev, copy]);
@@ -491,7 +494,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function moveLayer(dir: 1 | -1) {
-    if (!selectedId) return;
+    if (!selectedId || selected?.locked) return;
     pushHistory();
     setElements((prev) => {
       const i = prev.findIndex((el) => el.id === selectedId);
@@ -859,6 +862,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const strips = getDiamondStrips();
     setBg(tpl.bg.kind === "image" ? { kind: "image", src: tpl.bg.src } : { kind: "gradient", from: tpl.bg.from, to: tpl.bg.to });
     const next = tpl.elements.map((el) => {
+      const marker = el.src;
       let src = el.src;
       if (src === "__diamond-top__") src = strips.top;
       if (src === "__diamond-bottom__") src = strips.bottom;
@@ -868,9 +872,16 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       if (src === "__ribbon__") src = getSolid(1080, 104, "#141b5e");
       if (src === "__gold-bar__") src = getSolid(72, 10, "#ffb300");
       if (src === "__vbar__") src = getSolid(8, 330, "#ffffff");
-      return { ...el, id: uid("el"), src };
+      // Brand header (ribbon + logos): locked so it can't be selected, moved
+      // or deleted by accident.
+      const locked =
+        marker === "__ribbon__" || marker === "__bcn-logo__" || marker === "__khoa-cntt-logo__";
+      return { ...el, id: uid("el"), src, ...(locked ? { locked: true } : {}) };
     });
-    setElements(next);
+    // Header always stays on top: replacing or resizing the photo can never
+    // cover or break the template header again.
+    const ordered = [...next.filter((el) => !el.locked), ...next.filter((el) => el.locked)];
+    setElements(ordered);
     setAppliedBuiltInId(tpl.id);
     setSelectedId(null);
     setEditingId(null);
@@ -1031,7 +1042,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             <ImagePlus size={13} /> + Ảnh
           </button>
           <input ref={elFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleElFile(e.target.files?.[0])} />
-          <button type="button" onClick={() => setShowElLibrary(true)} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
+          <button type="button" onClick={() => { setElLibraryMode("add"); setShowElLibrary(true); }} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
             <Images size={13} /> Từ thư viện
           </button>
           <span className="mx-1 h-5 w-px bg-[var(--line)]" />
@@ -1078,10 +1089,10 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               return (
                 <div
                   key={el.id}
-                  onPointerDown={(e) => onElPointerDown(e, el)}
-                  onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text") { pushHistory(); setEditingId(el.id); } }}
+                  onPointerDown={(e) => { if (!el.locked) onElPointerDown(e, el); }}
+                  onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text" && !el.locked) { pushHistory(); setEditingId(el.id); } }}
                   className="absolute"
-                  style={{ left: el.x, top: el.y, width: el.w, cursor: "move", outline: isSel ? "2px solid #1877F2" : "none", outlineOffset: 2 }}
+                  style={{ left: el.x, top: el.y, width: el.w, cursor: el.locked ? "default" : "move", outline: isSel ? "2px solid #1877F2" : "none", outlineOffset: 2 }}
                 >
                   {el.type === "text" ? (
                     isEditing ? (
@@ -1130,16 +1141,30 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 <button type="button" onClick={() => moveLayer(1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↑ Lớp trên</button>
                 <button type="button" onClick={() => moveLayer(-1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↓ Lớp dưới</button>
                 {selected.type === "image" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      replaceImgRef.current = selected.id;
-                      elFileRef.current?.click();
-                    }}
-                    className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
-                  >
-                    <RefreshCw size={12} /> Thay ảnh
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        replaceImgRef.current = selected.id;
+                        elFileRef.current?.click();
+                      }}
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                    >
+                      <RefreshCw size={12} /> Thay ảnh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        replaceImgRef.current = selected.id;
+                        setElLibraryMode("replace");
+                        setShowElLibrary(true);
+                      }}
+                      title="Thay ảnh đang chọn bằng ảnh từ thư viện dùng chung"
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                    >
+                      <Images size={12} /> Thư viện
+                    </button>
+                  </>
                 )}
                 <button type="button" onClick={deleteSelected} className="flex items-center gap-1 rounded-lg border border-[#f3c2b8] px-2.5 py-1.5 text-[11px] font-bold text-[#a74331] hover:bg-[#fff0ec]">
                   <Trash2 size={12} /> Xóa
@@ -1324,10 +1349,21 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowElLibrary(false)}>
           <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-extrabold">Chèn ảnh từ thư viện</h3>
-              <button type="button" onClick={() => setShowElLibrary(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
+              <h3 className="text-lg font-extrabold">{elLibraryMode === "replace" ? "Thay ảnh từ thư viện" : "Chèn ảnh từ thư viện"}</h3>
+              <button type="button" onClick={() => { setShowElLibrary(false); setElLibraryMode("add"); replaceImgRef.current = null; }} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
             </div>
-            <MediaLibrary onPick={(item) => { addImageElement(item.dataUrl); setShowElLibrary(false); }} />
+            <MediaLibrary onPick={(item) => {
+              const targetId = elLibraryMode === "replace" ? replaceImgRef.current : null;
+              replaceImgRef.current = null;
+              setElLibraryMode("add");
+              setShowElLibrary(false);
+              if (targetId) {
+                pushHistory();
+                updateEl(targetId, { src: item.dataUrl });
+              } else {
+                addImageElement(item.dataUrl);
+              }
+            }} />
           </div>
         </div>
       )}

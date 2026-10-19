@@ -13,7 +13,7 @@
  * only the final read/write goes through here.
  */
 
-export type StoreName = "posts" | "media" | "settings" | "formats" | "notifications" | "design-templates";
+export type StoreName = "posts" | "media" | "settings" | "formats" | "notifications" | "design-templates" | "chat";
 
 const SUPABASE_TABLE = "msd_store";
 

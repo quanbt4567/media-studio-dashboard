@@ -30,6 +30,12 @@ export interface CanvasElement {
    * placeholder text ([...]) in headline/body slots from the post content.
    */
   role?: "kicker" | "headline" | "body";
+  /**
+   * Locked brand elements (template header: ribbon + logos). Locked elements
+   * can't be selected, moved, or deleted — replacing/resizing the photo can
+   * never break the template header again.
+   */
+  locked?: boolean;
 }
 
 export type DesignBg = { kind: "gradient"; from: string; to: string } | { kind: "image"; src: string };

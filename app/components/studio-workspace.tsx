@@ -20,6 +20,8 @@ import Generator from "./generator";
 import IdeaGenerator from "./idea-generator";
 import MediaLibrary from "./media-library";
 import NotificationBell from "./notification-bell";
+import ChatWidget from "./chat-widget";
+import ActivityFeed from "./activity-feed";
 import SettingsPanel from "./settings-panel";
 
 type Tab = "studio" | "ideas" | "calendar" | "media" | "analytics" | "settings";
@@ -214,6 +216,8 @@ export default function StudioWorkspace() {
             </p>
           )}
 
+          <ActivityFeed posts={posts} onSelectPost={handleSelectPost} />
+
           {tab === "studio" && (
             <Generator
               posts={posts}
@@ -245,6 +249,7 @@ export default function StudioWorkspace() {
           {tab === "settings" && role === "admin" && <SettingsPanel />}
         </div>
       </section>
+      <ChatWidget />
     </main>
   );
 }

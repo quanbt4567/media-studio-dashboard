@@ -10,6 +10,8 @@ import type { Role } from "./roles";
 export interface AppNotification {
   id: string;
   forRole: Role;
+  /** When set, only this user sees it (DMs). Otherwise role-scoped. */
+  forUser?: string;
   message: string;
   postId?: string;
   createdAt: string;
@@ -29,7 +31,7 @@ export async function readNotifications(): Promise<AppNotification[]> {
 
 export async function readNotificationsFor(role: Role, username: string): Promise<{ items: AppNotification[]; unread: number }> {
   const all = await readNotifications();
-  const items = all.filter((n) => n.forRole === role);
+  const items = all.filter((n) => n.forRole === role || n.forUser === username);
   return { items, unread: items.filter((n) => !n.readBy.includes(username)).length };
 }
 
@@ -43,6 +45,28 @@ export async function notify(roles: Role[], message: string, postId?: string): P
       forRole,
       message,
       postId,
+      createdAt: now,
+      readBy: [],
+    }));
+    await writeStore("notifications", [...fresh, ...all].slice(0, MAX_KEEP));
+  } catch (err) {
+    console.warn("Could not write notification:", err);
+  }
+}
+
+/** Emit a notification to specific users (DMs). Needs each user's role for scoping. */
+export async function notifyUsers(
+  targets: { username: string; role: Role }[],
+  message: string,
+): Promise<void> {
+  try {
+    const all = await readNotifications();
+    const now = new Date().toISOString();
+    const fresh: AppNotification[] = targets.map(({ username, role }) => ({
+      id: uid(),
+      forRole: role,
+      forUser: username,
+      message,
       createdAt: now,
       readBy: [],
     }));
