@@ -5,6 +5,19 @@
  */
 import { resolveApiKeyCandidates } from "./settings-store";
 
+/** Short, key-safe detail for the fallback message so the team can report the real cause. */
+function describeRaw(error: unknown): string {
+  const status =
+    typeof error === "object" && error !== null
+      ? (error as { status?: number }).status
+      : undefined;
+  let raw = error instanceof Error ? error.message : String(error ?? "");
+  // Never leak key-like tokens into a user-facing message.
+  raw = raw.replace(/[A-Za-z0-9_\-]{24,}/g, "<da-an>");
+  const detail = status ? `mã lỗi ${status}` : raw.slice(0, 120).trim();
+  return detail ? ` (${detail})` : "";
+}
+
 export function geminiErrorMessage(error: unknown): string {
   const status =
     typeof error === "object" && error !== null
@@ -27,7 +40,7 @@ export function geminiErrorMessage(error: unknown): string {
   if (/fetch failed|network|ENOTFOUND|ECONNREFUSED/i.test(raw)) {
     return "Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.";
   }
-  return "Không gọi được Gemini lúc này. Thử lại sau ít phút.";
+  return `Không gọi được Gemini lúc này${describeRaw(error)}. Thử lại sau ít phút.`;
 }
 
 /** Message shown when no Gemini key exists in Settings or env. */

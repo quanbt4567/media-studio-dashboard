@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { DM_Mono, Manrope } from "next/font/google";
+import { JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
-const mono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
+const manrope = Manrope({ subsets: ["latin", "vietnamese"], variable: "--font-manrope" });
+const mono = JetBrains_Mono({ subsets: ["latin", "vietnamese"], weight: ["400", "500"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_CLUB_NAME || "BCN"} | Media desk`,
