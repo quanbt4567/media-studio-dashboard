@@ -401,7 +401,8 @@ export default function Generator({
       setError("Gắn hình ảnh hoặc video trước khi gửi duyệt.");
       return;
     }
-    await savePost({ status: "Review Pending" });
+    const saved = await savePost({ status: "Review Pending" });
+    if (saved) setStatus("Review Pending");
   }
 
   const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
