@@ -37,6 +37,9 @@ export function geminiErrorMessage(error: unknown): string {
   if (status === 429) {
     return "Đã hết quota Gemini miễn phí. Đợi vài phút rồi thử lại.";
   }
+  if (status === 503) {
+    return "Gemini đang quá tải (503). Đợi 1-2 phút rồi thử lại.";
+  }
   if (/fetch failed|network|ENOTFOUND|ECONNREFUSED/i.test(raw)) {
     return "Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.";
   }
@@ -56,9 +59,19 @@ export function isGeminiAuthError(error: unknown): boolean {
   return status === 400 || status === 401 || status === 403;
 }
 
+/** Statuses worth retrying with a short backoff (transient, not auth). */
+const RETRYABLE_STATUS = new Set([429, 503]);
+
+function statusOf(error: unknown): number | undefined {
+  return typeof error === "object" && error !== null
+    ? (error as { status?: number }).status
+    : undefined;
+}
+
 /**
  * Run a Gemini call with the Settings key first, automatically retrying once
- * with the .env key if the first key is rejected. Returns the translated
+ * with the .env key if the first key is rejected. Transient 429/503 errors
+ * are retried with backoff before giving up. Returns the translated
  * Vietnamese error message on failure.
  */
 export async function withGeminiKeys<T>(
@@ -70,13 +83,22 @@ export async function withGeminiKeys<T>(
   }
   let lastError: unknown = null;
   for (const apiKey of candidates) {
-    try {
-      return { ok: true, value: await fn(apiKey) };
-    } catch (error) {
-      lastError = error;
-      // Only auth rejections are worth retrying with the next key.
-      if (!isGeminiAuthError(error)) break;
+    // Up to 3 attempts per key for transient overload/rate-limit errors.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return { ok: true, value: await fn(apiKey) };
+      } catch (error) {
+        lastError = error;
+        const status = statusOf(error);
+        if (status !== undefined && RETRYABLE_STATUS.has(status) && attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
+          continue;
+        }
+        break;
+      }
     }
+    // Only auth rejections are worth retrying with the next key.
+    if (!isGeminiAuthError(lastError)) break;
   }
   return { ok: false, error: geminiErrorMessage(lastError) };
 }
