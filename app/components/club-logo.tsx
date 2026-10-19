@@ -18,7 +18,7 @@ interface ClubLogoProps {
  */
 export default function ClubLogo({ size = "md" }: ClubLogoProps) {
   const [imgOk, setImgOk] = useState(true);
-  const name = process.env.NEXT_PUBLIC_CLUB_NAME || "clubhouse";
+  const name = process.env.NEXT_PUBLIC_CLUB_NAME || "BCN";
   const tagline = process.env.NEXT_PUBLIC_CLUB_TAGLINE || "media desk";
   const box = size === "lg" ? "h-11 w-11 text-base" : "h-9 w-9 text-sm";
   const titleSize = size === "lg" ? "text-base" : "text-sm";

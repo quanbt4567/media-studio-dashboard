@@ -1,7 +1,8 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Ntf {
   id: string;
@@ -25,6 +26,8 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
   const [items, setItems] = useState<Ntf[]>([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   async function load() {
     try {
@@ -47,6 +50,12 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
 
   async function toggle() {
     const next = !open;
+    if (next && btnRef.current) {
+      // Anchor the panel under the bell, measured in viewport coords so the
+      // portal (rendered at document.body) lands in the right place.
+      const r = btnRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) });
+    }
     setOpen(next);
     if (next && unread > 0) {
       // Opening the panel marks everything as read.
@@ -68,6 +77,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
   return (
     <div className="relative">
       <button
+        ref={btnRef}
         type="button"
         onClick={toggle}
         aria-label="Thông báo"
@@ -81,10 +91,13 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
           </span>
         )}
       </button>
-      {open && (
+      {open && typeof document !== "undefined" && createPortal(
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-80 overflow-y-auto rounded-2xl border border-[var(--line)] bg-white p-2 shadow-[0_24px_60px_rgba(22,37,34,.18)]">
+          <div className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-[70] max-h-[70vh] w-80 overflow-y-auto rounded-2xl border border-[var(--line)] bg-white p-2 shadow-[0_24px_60px_rgba(22,37,34,.18)]"
+            style={{ top: pos.top, right: pos.right }}
+          >
             <p className="px-2.5 py-2 text-xs font-extrabold">🔔 Thông báo</p>
             {items.length === 0 ? (
               <p className="px-2.5 pb-3 pt-1 text-center text-xs text-[var(--muted)]">Chưa có thông báo nào.</p>
@@ -103,7 +116,8 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
               ))
             )}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

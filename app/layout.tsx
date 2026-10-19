@@ -6,7 +6,7 @@ const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 const mono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: `${process.env.NEXT_PUBLIC_CLUB_NAME || "Clubhouse"} | Media desk`,
+  title: `${process.env.NEXT_PUBLIC_CLUB_NAME || "BCN"} | Media desk`,
   description: "A focused media management workspace for university clubs.",
 };
 
