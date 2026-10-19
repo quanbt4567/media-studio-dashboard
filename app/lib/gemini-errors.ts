@@ -74,6 +74,16 @@ function statusOf(error: unknown): number | undefined {
  * are retried with backoff before giving up. Returns the translated
  * Vietnamese error message on failure.
  */
+const GEMINI_ATTEMPT_TIMEOUT_MS = 20000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`Gemini không phản hồi sau ${ms / 1000}s`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 export async function withGeminiKeys<T>(
   fn: (apiKey: string) => Promise<T>,
 ): Promise<{ ok: true; value: T } | { ok: false; error: string }> {
@@ -83,14 +93,16 @@ export async function withGeminiKeys<T>(
   }
   let lastError: unknown = null;
   for (const apiKey of candidates) {
-    // Up to 3 attempts per key for transient overload/rate-limit errors.
-    for (let attempt = 0; attempt < 3; attempt++) {
+    // Up to 2 attempts per key for transient overload/rate-limit errors.
+    // Each attempt has its own timeout so a hanging call fails fast instead
+    // of blocking the UI for a minute.
+    for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        return { ok: true, value: await fn(apiKey) };
+        return { ok: true, value: await withTimeout(fn(apiKey), GEMINI_ATTEMPT_TIMEOUT_MS) };
       } catch (error) {
         lastError = error;
         const status = statusOf(error);
-        if (status !== undefined && RETRYABLE_STATUS.has(status) && attempt < 2) {
+        if (status !== undefined && RETRYABLE_STATUS.has(status) && attempt < 1) {
           await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
           continue;
         }
