@@ -636,9 +636,20 @@ export default function Generator({
         />
       </div>
       {postsLoading ? <p className="py-4 text-center text-xs text-[var(--muted)]">Đang tải bài viết...</p> : posts.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-6 text-center text-xs text-[var(--muted)]">
-          {role === "content" ? "Chưa có bài nào — bấm “Bài mới” để bắt đầu bản nháp đầu tiên." : "Chưa có bài nào — đang chờ team nội dung tạo bản nháp đầu tiên."}
-        </p>
+        <div className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-6 text-center">
+          <p className="text-xs text-[var(--muted)]">
+            {role === "content" ? "Chưa có bài viết nào." : "Chưa có bài nào — đang chờ team nội dung tạo bản nháp đầu tiên."}
+          </p>
+          {role === "content" && (
+            <button
+              type="button"
+              onClick={createNewPost}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[var(--ink)] px-4 py-2 text-xs font-extrabold text-white transition hover:opacity-90"
+            >
+              <Plus size={14} /> Bài mới
+            </button>
+          )}
+        </div>
       ) : visiblePosts.length === 0 ? (
         <p className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-6 text-center text-xs text-[var(--muted)]">
           Không tìm thấy bài nào khớp. <button type="button" onClick={() => { setStatusFilter(null); setSearchQuery(""); }} className="font-extrabold text-[var(--ink)] underline">Xóa lọc</button>
