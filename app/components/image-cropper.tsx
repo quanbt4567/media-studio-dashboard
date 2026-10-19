@@ -25,7 +25,6 @@ export default function ImageCropper({
   onClose: () => void;
 }) {
   const [nat, setNat] = useState<{ w: number; h: number } | null>(null);
-  const boxRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ x: number; y: number; fx: number; fy: number } | null>(null);
   const focalRef = useRef({ fx: focalX, fy: focalY });
   focalRef.current = { fx: focalX, fy: focalY };
@@ -36,44 +35,39 @@ export default function ImageCropper({
     img.src = src;
   }, [src]);
 
-  // Displayed box: fit the frame's aspect ratio inside the modal.
-  const aspect = frameW / frameH;
-  // Cover metrics at display size.
-  function metrics(cw: number, ch: number) {
-    if (!nat) return null;
-    const scale = Math.max(cw / nat.w, ch / nat.h);
-    const dw = nat.w * scale;
-    const dh = nat.h * scale;
-    return { dw, dh };
-  }
+  // Deterministic display box derived from the frame's aspect ratio —
+  // no DOM measuring, so it can never collapse or mis-scale.
+  const aspect = frameW > 0 && frameH > 0 ? frameW / frameH : 1;
+  const boxH = 300;
+  const boxW = Math.min(520, Math.max(120, boxH * aspect));
 
-  function onPointerDown(e: React.PointerEvent) {
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  const scale = nat ? Math.max(boxW / nat.w, boxH / nat.h) : 1;
+  const dw = nat ? nat.w * scale : 0;
+  const dh = nat ? nat.h * scale : 0;
+  const left = (boxW - dw) * focalX;
+  const top = (boxH - dh) * focalY;
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     dragRef.current = { x: e.clientX, y: e.clientY, fx: focalRef.current.fx, fy: focalRef.current.fy };
   }
 
-  function onPointerMove(e: React.PointerEvent) {
+  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
     const drag = dragRef.current;
-    const box = boxRef.current;
-    if (!drag || !box || !nat) return;
-    const rect = box.getBoundingClientRect();
-    const m = metrics(rect.width, rect.height);
-    if (!m) return;
-    const rangeX = m.dw - rect.width;
-    const rangeY = m.dh - rect.height;
+    if (!drag || !nat) return;
+    const rangeX = dw - boxW;
+    const rangeY = dh - boxH;
     const fx = rangeX > 0 ? drag.fx - (e.clientX - drag.x) / rangeX : 0.5;
     const fy = rangeY > 0 ? drag.fy - (e.clientY - drag.y) / rangeY : 0.5;
     onChange(Math.min(1, Math.max(0, fx)), Math.min(1, Math.max(0, fy)));
   }
 
-  function onPointerUp() {
+  function endDrag() {
     dragRef.current = null;
   }
 
-  const m = boxRef.current && nat ? metrics(boxRef.current.clientWidth, boxRef.current.clientHeight) : null;
-
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
         className="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -88,36 +82,35 @@ export default function ImageCropper({
           </button>
         </div>
 
-        <div
-          ref={boxRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          className="relative mx-auto w-full max-w-[520px] touch-none select-none overflow-hidden rounded-xl bg-[#111] shadow-inner"
-          style={{ aspectRatio: `${aspect}`, cursor: "grab" }}
-        >
-          {nat && m && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={src}
-              alt=""
-              draggable={false}
-              className="pointer-events-none absolute max-w-none"
-              style={{
-                width: m.dw,
-                height: m.dh,
-                left: (boxRef.current!.clientWidth - m.dw) * focalX,
-                top: (boxRef.current!.clientHeight - m.dh) * focalY,
-              }}
-            />
-          )}
-          {/* frame guides */}
-          <div className="pointer-events-none absolute inset-0 rounded-xl border-2 border-white/70" />
-          <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="border border-white/25" />
-            ))}
+        <div className="flex justify-center">
+          <div
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            className="relative touch-none select-none overflow-hidden rounded-xl bg-[#111] shadow-inner"
+            style={{ width: boxW, height: boxH, cursor: nat ? "grab" : "default" }}
+          >
+            {!nat && (
+              <p className="absolute inset-0 flex items-center justify-center text-xs text-white/60">Đang tải ảnh…</p>
+            )}
+            {nat && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={src}
+                alt=""
+                draggable={false}
+                className="pointer-events-none absolute max-w-none"
+                style={{ width: dw, height: dh, left, top }}
+              />
+            )}
+            {/* frame guides */}
+            <div className="pointer-events-none absolute inset-0 rounded-xl border-2 border-white/70" />
+            <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} className="border border-white/25" />
+              ))}
+            </div>
           </div>
         </div>
 
