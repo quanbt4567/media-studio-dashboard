@@ -13,6 +13,7 @@
     "@google/genai": "latest",
     "@vercel/kv": "^3.0.0",
     "@vercel/blob": "^1.1.1",
+    "@supabase/supabase-js": "^2.47.0",
     "bcryptjs": "^2.4.3",
     "jose": "^5.9.6",
     "lucide-react": "^0.468.0",

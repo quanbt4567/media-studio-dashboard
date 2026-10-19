@@ -1,0 +1,41 @@
+# Publish due posts every 5 minutes.
+#
+# Why this exists: the Vercel Hobby plan only allows DAILY cron jobs, but the
+# app needs a 5-minute schedule for auto-publishing (see vercel.json). This
+# workflow calls the same endpoint Vercel Cron would call, authenticated with
+# the CRON_SECRET repository secret.
+#
+# Setup (one time): repo → Settings → Secrets and variables → Actions →
+#   New repository secret → Name: CRON_SECRET, Value: <same value as the
+#   CRON_SECRET env var on Vercel / in .env.local>.
+#
+# Note: GitHub auto-disables scheduled workflows after 60 days without any
+# repository activity. Push a commit (or re-enable in the Actions tab) if
+# that happens.
+
+name: Publish due posts
+
+on:
+  schedule:
+    # Every 5 minutes (UTC — the schedule itself is timezone-independent).
+    - cron: "*/5 * * * *"
+  # Manual trigger for testing: Actions tab → "Publish due posts" → Run workflow.
+  workflow_dispatch:
+
+jobs:
+  publish-due:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger publish-due
+        run: |
+          code=$(curl -s -o /tmp/publish-due.json -w "%{http_code}" --max-time 50 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://media-studio-dashboard-six.vercel.app/api/publish-due)
+          echo "HTTP $code"
+          cat /tmp/publish-due.json
+          echo
+          if [ "$code" != "200" ]; then
+            echo "publish-due did not return 200"
+            exit 1
+          fi
