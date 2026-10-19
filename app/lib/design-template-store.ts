@@ -24,6 +24,12 @@ export interface CanvasElement {
   src?: string;
   /** Corner radius (px, at 1080 canvas scale) for image elements. */
   radius?: number;
+  /**
+   * Semantic slot for AI auto-fill ("AI điền nội dung"): which template text
+   * this element holds. Only built-in templates set this; the filler replaces
+   * placeholder text ([...]) in headline/body slots from the post content.
+   */
+  role?: "kicker" | "headline" | "body";
 }
 
 export type DesignBg = { kind: "gradient"; from: string; to: string } | { kind: "image"; src: string };

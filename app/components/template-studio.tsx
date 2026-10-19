@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Camera, Download, ImagePlus, Images, LayoutTemplate, Megaphone, Palette, Plus, Quote, RefreshCw, Save, Sparkles, Trash2, Type, Users, type LucideIcon } from "lucide-react";
+import { CalendarDays, Camera, Download, ImagePlus, Images, LayoutTemplate, LoaderCircle, Megaphone, Palette, Plus, Quote, Redo2, RefreshCw, Save, Sparkles, Trash2, Type, Undo2, Users, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type CanvasElement,
@@ -16,6 +16,10 @@ interface EditorProps {
   postImage?: string;
   canDesign: boolean;
   onSave: (dataUrl: string) => void;
+  /** Built-in template id suggested by AI (highlighted in the picker). */
+  suggestedTemplateId?: string;
+  /** AI visual brief text for the designer (shown as a banner). */
+  visualBrief?: string;
 }
 
 const FONTS = [
@@ -206,8 +210,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
       { type: "image", x: 64, y: 648, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_MEGAPHONE },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "THÔNG BÁO", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên thông báo]", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Nội dung chi tiết]", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên thông báo]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Nội dung chi tiết]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
       { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
       { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
@@ -226,8 +230,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
       { type: "image", x: 64, y: 648, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_CALENDAR },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "SỰ KIỆN SẮP TỚI", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên sự kiện]", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Thời gian] · [Địa điểm]", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên sự kiện]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Thời gian] · [Địa điểm]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
       { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
       { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
@@ -246,8 +250,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
       { type: "image", x: 64, y: 648, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_CAMERA },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "RECAP", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên hoạt động]", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Điểm nổi bật]", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên hoạt động]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Điểm nổi bật]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
       { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
       { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
@@ -266,8 +270,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
       { type: "image", x: 64, y: 648, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_USERS },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "TUYỂN CỘNG TÁC VIÊN", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Vị trí cần tuyển]", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Mô tả & quyền lợi] · [Link đăng ký]", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Vị trí cần tuyển]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Mô tả & quyền lợi] · [Link đăng ký]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
       { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
       { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
@@ -283,8 +287,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 500, y: 210, w: 80, h: 80, src: ICON_QUOTE },
-      { type: "text", x: 110, y: 330, w: 860, h: 360, text: "\u201c[C\u00e2u n\u00f3i hay]\u201d", fontSize: 56, color: "#ffffff", bold: true, italic: true, align: "center", fontFamily: "playfair" },
-      { type: "text", x: 110, y: 706, w: 860, h: 60, text: "\u2014 [T\u00ean ng\u01b0\u1eddi n\u00f3i]", fontSize: 32, color: "#ffb300", bold: true, align: "center", fontFamily: "system" },
+      { type: "text", x: 110, y: 330, w: 860, h: 360, text: "\u201c[C\u00e2u n\u00f3i hay]\u201d", role: "headline", fontSize: 56, color: "#ffffff", bold: true, italic: true, align: "center", fontFamily: "playfair" },
+      { type: "text", x: 110, y: 706, w: 860, h: 60, text: "\u2014 [T\u00ean ng\u01b0\u1eddi n\u00f3i]", role: "body", fontSize: 32, color: "#ffb300", bold: true, align: "center", fontFamily: "system" },
       { type: "image", x: 504, y: 792, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
       { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
@@ -303,8 +307,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
         { type: "image", x: 440, y: 200, w: 200, h: 200, src: MODERN_GLASS_CIRCLE },
         { type: "image", x: 485, y: 245, w: 110, h: 110, src: MODERN_ICON_SPARKLES },
         { type: "text", x: 140, y: 448, w: 800, h: 40, text: "BAN CÔNG NGHỆ · IUH", fontSize: 28, color: "#ffb300", bold: true, align: "center", fontFamily: "system" },
-        { type: "text", x: 90, y: 500, w: 900, h: 190, text: "[Tiêu đề chính]", fontSize: 72, color: "#ffffff", bold: true, align: "center", fontFamily: "display" },
-        { type: "text", x: 140, y: 710, w: 800, h: 130, text: "[Nội dung chi tiết — ngắn gọn, súc tích]", fontSize: 30, color: "rgba(255,255,255,0.72)", align: "center", fontFamily: "system" },
+        { type: "text", x: 90, y: 500, w: 900, h: 190, text: "[Tiêu đề chính]", role: "headline", fontSize: 72, color: "#ffffff", bold: true, align: "center", fontFamily: "display" },
+        { type: "text", x: 140, y: 710, w: 800, h: 130, text: "[Nội dung chi tiết — ngắn gọn, súc tích]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.72)", align: "center", fontFamily: "system" },
         { type: "image", x: 140, y: 872, w: 800, h: 148, src: MODERN_GLASS_CARD, radius: 24 },
         { type: "text", x: 170, y: 898, w: 740, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 24, color: "#ffffff", bold: true, align: "center", fontFamily: "system" },
         { type: "text", x: 170, y: 936, w: 740, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "center", fontFamily: "system" },
@@ -322,6 +326,12 @@ const BUILT_IN_ICONS: Record<string, LucideIcon> = {
   "bcn-quote": Quote,
   "bcn-modern": Sparkles,
 };
+
+/** A canvas snapshot for undo/redo. */
+interface CanvasSnapshot {
+  bg: Bg;
+  elements: CanvasElement[];
+}
 
 function uid(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
@@ -385,7 +395,7 @@ async function compressForLibrary(dataUrl: string): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.85);
 }
 
-export default function TemplateStudio({ postContent, postImage, canDesign, onSave }: EditorProps) {
+export default function TemplateStudio({ postContent, postImage, canDesign, onSave, suggestedTemplateId, visualBrief }: EditorProps) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -407,6 +417,14 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   const [tplName, setTplName] = useState("");
   const [savingTpl, setSavingTpl] = useState(false);
   const [tplNote, setTplNote] = useState("");
+  const [fillingAI, setFillingAI] = useState(false);
+  const [appliedBuiltInId, setAppliedBuiltInId] = useState<string | null>(null);
+  // --- undo/redo: refs hold history so keyboard shortcuts never go stale ---
+  const pastRef = useRef<CanvasSnapshot[]>([]);
+  const futureRef = useRef<CanvasSnapshot[]>([]);
+  const [histVer, setHistVer] = useState(0);
+  const stateRef = useRef({ bg, elements });
+  stateRef.current = { bg, elements };
 
   const stageWrapRef = useRef<HTMLDivElement>(null);
   const bgFileRef = useRef<HTMLInputElement>(null);
@@ -458,6 +476,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   function deleteSelected() {
     if (!selectedId) return;
+    pushHistory();
     setElements((prev) => prev.filter((el) => el.id !== selectedId));
     setSelectedId(null);
     setEditingId(null);
@@ -465,6 +484,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   function duplicateSelected() {
     if (!selected) return;
+    pushHistory();
     const copy: CanvasElement = { ...selected, id: uid("el"), x: selected.x + 40, y: selected.y + 40 };
     setElements((prev) => [...prev, copy]);
     setSelectedId(copy.id);
@@ -472,6 +492,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   function moveLayer(dir: 1 | -1) {
     if (!selectedId) return;
+    pushHistory();
     setElements((prev) => {
       const i = prev.findIndex((el) => el.id === selectedId);
       const j = i + dir;
@@ -483,6 +504,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function addText() {
+    pushHistory();
     const el: CanvasElement = {
       id: uid("el"), type: "text", x: 140, y: 480, w: 800, h: 160,
       text: "Nhấn đúp để sửa chữ", fontSize: 56, color: "#ffffff", bold: true, align: "center", fontFamily: "system",
@@ -492,12 +514,14 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function addImageElement(src: string) {
+    pushHistory();
     const el: CanvasElement = { id: uid("el"), type: "image", x: 240, y: 300, w: 600, h: 600, src };
     setElements((prev) => [...prev, el]);
     setSelectedId(el.id);
   }
 
   function applyPreset(kind: "title" | "announce" | "quote") {
+    pushHistory();
     const lines = postContent.split("\n").map((l) => l.trim()).filter(Boolean);
     const head = (lines[0] ?? "Tiêu đề").slice(0, 90);
     const rest = lines.slice(1, 4).join(" ").slice(0, 180);
@@ -531,7 +555,9 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const startY = e.clientY;
     const ox = el.x;
     const oy = el.y;
+    let pushed = false;
     const move = (ev: PointerEvent) => {
+      if (!pushed) { pushed = true; pushHistory(); }
       const s = scaleRef.current;
       updateEl(el.id, { x: ox + (ev.clientX - startX) / s, y: oy + (ev.clientY - startY) / s });
     };
@@ -549,7 +575,9 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const startW = el.w;
     const startH = el.h;
     const startFs = el.fontSize ?? 48;
+    let pushed = false;
     const move = (ev: PointerEvent) => {
+      if (!pushed) { pushed = true; pushHistory(); }
       const dw = (ev.clientX - startX) / scaleRef.current;
       const nw = Math.max(60, startW + dw);
       const ratio = nw / startW;
@@ -574,6 +602,17 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         if (tag !== "input" && tag !== "textarea") deleteSelected();
       }
       if (e.key === "Escape") { setSelectedId(null); setEditingId(null); }
+    // Undo/redo via refs so the handler never goes stale.
+    const tag2 = (document.activeElement?.tagName ?? "").toLowerCase();
+    const typing = tag2 === "input" || tag2 === "textarea";
+    if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "z") {
+      e.preventDefault();
+      if (e.shiftKey) redoRef.current(); else undoRef.current();
+    }
+    if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "y") {
+      e.preventDefault();
+      redoRef.current();
+    }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -731,32 +770,119 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   /** Load a built-in universal template onto the canvas. */
+  // --- undo/redo -----------------------------------------------------------
+  function snapshot(): CanvasSnapshot {
+    const { bg: b, elements: els } = stateRef.current;
+    return { bg: b, elements: els.map((el) => ({ ...el })) };
+  }
+  /** Save the current canvas so the next destructive change can be undone. */
+  function pushHistory() {
+    pastRef.current = [...pastRef.current.slice(-29), snapshot()];
+    futureRef.current = [];
+    setHistVer((v) => v + 1);
+  }
+  function undo() {
+    const prev = pastRef.current[pastRef.current.length - 1];
+    if (!prev) return;
+    futureRef.current = [snapshot(), ...futureRef.current].slice(0, 30);
+    pastRef.current = pastRef.current.slice(0, -1);
+    setBg(prev.bg);
+    setElements(prev.elements.map((el) => ({ ...el })));
+    setSelectedId(null);
+    setEditingId(null);
+    setHistVer((v) => v + 1);
+  }
+  function redo() {
+    const nxt = futureRef.current[0];
+    if (!nxt) return;
+    pastRef.current = [...pastRef.current.slice(-29), snapshot()];
+    futureRef.current = futureRef.current.slice(1);
+    setBg(nxt.bg);
+    setElements(nxt.elements.map((el) => ({ ...el })));
+    setSelectedId(null);
+    setEditingId(null);
+    setHistVer((v) => v + 1);
+  }
+  const undoRef = useRef(undo);
+  undoRef.current = undo;
+  const redoRef = useRef(redo);
+  redoRef.current = redo;
+
+  // --- AI auto-fill ----------------------------------------------------------
+  const isPlaceholder = (t?: string) => !!t && t.includes("[") && t.includes("]");
+  /**
+   * Fill headline/body placeholders from the post content via Gemini.
+   * Only touches slots the user hasn't edited (still placeholders).
+   */
+  async function fillTemplateWithAI(els: CanvasElement[], kind: string) {
+    const targets = els.filter(
+      (el) => el.type === "text" && (el.role === "headline" || el.role === "body") && isPlaceholder(el.text),
+    );
+    if (targets.length === 0) return;
+    if (!postContent.trim()) {
+      setTplNote("Chưa có nội dung bài viết để AI điền.");
+      return;
+    }
+    setFillingAI(true);
+    setTplNote("");
+    try {
+      const res = await fetch("/api/template-fill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: postContent, kind }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "AI điền nội dung thất bại.");
+      const headline = String(data.headline || "").trim();
+      const body = String(data.body || "").trim();
+      if (!headline && !body) throw new Error("AI không trích xuất được nội dung.");
+      setElements((prev) =>
+        prev.map((el) => {
+          if (el.type !== "text" || !isPlaceholder(el.text)) return el;
+          if (el.role === "headline" && headline) return { ...el, text: headline };
+          if (el.role === "body" && body)
+            return { ...el, text: kind === "bcn-quote" ? `— ${body}` : body };
+          return el;
+        }),
+      );
+      setTplNote("✓ AI đã điền nội dung từ bài viết (chỉ các ô còn trống).");
+    } catch (err) {
+      setTplNote(err instanceof Error ? err.message : "AI điền nội dung thất bại.");
+    } finally {
+      setFillingAI(false);
+    }
+  }
+
   function applyBuiltIn(tpl: BuiltInTemplate) {
     if (!window.confirm(`Dùng mẫu “${tpl.name}”? Bố cục hiện tại sẽ bị thay thế.`)) return;
+    pushHistory();
     const strips = getDiamondStrips();
     setBg(tpl.bg.kind === "image" ? { kind: "image", src: tpl.bg.src } : { kind: "gradient", from: tpl.bg.from, to: tpl.bg.to });
-    setElements(
-      tpl.elements.map((el) => {
-        let src = el.src;
-        if (src === "__diamond-top__") src = strips.top;
-        if (src === "__diamond-bottom__") src = strips.bottom;
-        if (src === "__photo-slot__") src = getPhotoPlaceholder(el.w, el.h);
-        if (src === "__bcn-logo__") src = BCN_LOGO;
-        if (src === "__khoa-cntt-logo__") src = KHOA_CNTT_LOGO;
-        if (src === "__ribbon__") src = getSolid(1080, 104, "#141b5e");
-        if (src === "__gold-bar__") src = getSolid(72, 10, "#ffb300");
-        if (src === "__vbar__") src = getSolid(8, 330, "#ffffff");
-        return { ...el, id: uid("el"), src };
-      }),
-    );
+    const next = tpl.elements.map((el) => {
+      let src = el.src;
+      if (src === "__diamond-top__") src = strips.top;
+      if (src === "__diamond-bottom__") src = strips.bottom;
+      if (src === "__photo-slot__") src = getPhotoPlaceholder(el.w, el.h);
+      if (src === "__bcn-logo__") src = BCN_LOGO;
+      if (src === "__khoa-cntt-logo__") src = KHOA_CNTT_LOGO;
+      if (src === "__ribbon__") src = getSolid(1080, 104, "#141b5e");
+      if (src === "__gold-bar__") src = getSolid(72, 10, "#ffb300");
+      if (src === "__vbar__") src = getSolid(8, 330, "#ffffff");
+      return { ...el, id: uid("el"), src };
+    });
+    setElements(next);
+    setAppliedBuiltInId(tpl.id);
     setSelectedId(null);
     setEditingId(null);
     setShowTplPicker(false);
+    // Automation: AI fills headline/body placeholders from the post content.
+    if (postContent.trim()) void fillTemplateWithAI(next, tpl.id);
   }
 
   /** Load a template onto the canvas (fresh element ids, keeps placeholder text). */
   async function applyDesignTemplate(tpl: DesignTemplate) {
     if (!window.confirm(`Dùng mẫu “${tpl.name}”? Bố cục hiện tại sẽ bị thay thế.`)) return;
+    pushHistory();
     setBg(tpl.bg.kind === "image" ? { kind: "image", src: tpl.bg.src } : { kind: "gradient", from: tpl.bg.from, to: tpl.bg.to });
     setElements(tpl.elements.map((el) => ({ ...el, id: uid("el") })));
     setSelectedId(null);
@@ -783,6 +909,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
+      pushHistory();
       setBg({ kind: "image", src: dataUrl });
       fetch("/api/media", {
         method: "POST",
@@ -800,6 +927,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       const dataUrl = reader.result as string;
       const targetId = replaceImgRef.current;
       replaceImgRef.current = null;
+      pushHistory();
       if (targetId) {
         updateEl(targetId, { src: dataUrl });
       } else {
@@ -880,7 +1008,22 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
       {/* Stage */}
       <div>
+        {visualBrief && (
+          <div className="mb-2 flex items-start gap-2 rounded-xl border border-[#bce4c5] bg-[#f2f9f3] px-3 py-2">
+            <Sparkles size={14} className="mt-0.5 shrink-0 text-[#28733f]" />
+            <p className="text-xs leading-relaxed text-[var(--ink)]">
+              <strong>AI gợi ý visual:</strong> {visualBrief}
+            </p>
+          </div>
+        )}
         <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          <button type="button" onClick={undo} disabled={pastRef.current.length === 0} title="Hoàn tác (Ctrl+Z)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--ink)] disabled:opacity-40">
+            <Undo2 size={13} />
+          </button>
+          <button type="button" onClick={redo} disabled={futureRef.current.length === 0} title="Làm lại (Ctrl+Y)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--ink)] disabled:opacity-40">
+            <Redo2 size={13} />
+          </button>
+          <span className="mx-1 h-5 w-px bg-[var(--line)]" />
           <button type="button" onClick={addText} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
             <Type size={13} /> + Chữ
           </button>
@@ -910,6 +1053,15 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           >
             <LayoutTemplate size={13} /> Mẫu thiết kế
           </button>
+          <button
+            type="button"
+            onClick={() => void fillTemplateWithAI(elements, appliedBuiltInId ?? "")}
+            disabled={fillingAI || !postContent.trim()}
+            title="AI tự điền tiêu đề & nội dung từ bài viết vào các ô còn trống"
+            className="flex items-center gap-1.5 rounded-xl border border-dashed border-[var(--ink)] bg-white px-3 py-1.5 text-xs font-extrabold text-[var(--ink)] hover:bg-[#f2f4ec] disabled:opacity-40"
+          >
+            {fillingAI ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />} AI điền nội dung
+          </button>
         </div>
 
         <div ref={stageWrapRef} className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[#e8ebe4]" onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
@@ -927,7 +1079,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 <div
                   key={el.id}
                   onPointerDown={(e) => onElPointerDown(e, el)}
-                  onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text") setEditingId(el.id); }}
+                  onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text") { pushHistory(); setEditingId(el.id); } }}
                   className="absolute"
                   style={{ left: el.x, top: el.y, width: el.w, cursor: "move", outline: isSel ? "2px solid #1877F2" : "none", outlineOffset: 2 }}
                 >
@@ -1058,7 +1210,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 key={p.name}
                 type="button"
                 title={p.name}
-                onClick={() => setBg({ kind: "gradient", from: p.from, to: p.to })}
+                onClick={() => { pushHistory(); setBg({ kind: "gradient", from: p.from, to: p.to }); }}
                 className={`h-9 flex-1 rounded-lg border-2 ${bg.kind === "gradient" && bg.from === p.from ? "border-[var(--ink)]" : "border-transparent"}`}
                 style={{ background: `linear-gradient(135deg, ${p.from}, ${p.to})` }}
               />
@@ -1101,7 +1253,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={aiResult} alt="AI background" className="h-20 w-full rounded-lg object-cover" />
                 <div className="mt-1.5 flex gap-1.5">
-                  <button type="button" onClick={() => { setBg({ kind: "image", src: aiResult }); setAiResult(null); }} className="flex-1 rounded-lg bg-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold text-white">Đặt làm nền</button>
+                  <button type="button" onClick={() => { pushHistory(); setBg({ kind: "image", src: aiResult }); setAiResult(null); }} className="flex-1 rounded-lg bg-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold text-white">Đặt làm nền</button>
                   <button type="button" onClick={() => { addImageElement(aiResult); setAiResult(null); }} className="flex-1 rounded-lg border border-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold">+ Thêm vào canvas</button>
                 </div>
               </div>
@@ -1164,7 +1316,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               <h3 className="text-lg font-extrabold">Chọn nền từ thư viện</h3>
               <button type="button" onClick={() => setShowBgLibrary(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
             </div>
-            <MediaLibrary onPick={(item) => { setBg({ kind: "image", src: item.dataUrl }); setShowBgLibrary(false); }} />
+            <MediaLibrary onPick={(item) => { pushHistory(); setBg({ kind: "image", src: item.dataUrl }); setShowBgLibrary(false); }} />
           </div>
         </div>
       )}
@@ -1191,7 +1343,12 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {BUILT_IN_TEMPLATES.map((tpl) => (
                 <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[#fafbf7]">
-                  <div className="aspect-square w-full overflow-hidden">
+                  <div className="relative aspect-square w-full overflow-hidden">
+                    {tpl.id === suggestedTemplateId && (
+                      <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[10px] font-extrabold text-[#3a2c00]">
+                        <Sparkles size={11} /> AI gợi ý
+                      </span>
+                    )}
                     {tpl.bg.kind === "gradient" ? (
                       <div
                         className="flex h-full w-full items-center justify-center p-3 text-center"

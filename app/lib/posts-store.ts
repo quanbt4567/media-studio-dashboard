@@ -60,6 +60,15 @@ export interface Post {
    * designer lane (text-only post). Exempts the visual gates.
    */
   visualSkipped?: boolean;
+  /**
+   * AI-suggested visual brief for the designer (from /api/visual-brief):
+   * what image to add/shoot. Shown in the ticket and the studio.
+   */
+  visualBrief?: string;
+  /** Built-in template id suggested by AI for this post. */
+  suggestedTemplateId?: string;
+  /** One-line reason why the template was suggested. */
+  suggestedTemplateReason?: string;
   status: PostStatus;
   /** When the post should go out (ISO datetime). Set by content/admin. */
   scheduledAt?: string;
@@ -177,6 +186,10 @@ export interface PostUpdate {
   clearVideo?: boolean;
   /** Writer-only: send straight to admin, skipping the designer lane. */
   visualSkipped?: boolean;
+  /** AI visual brief + suggested template (writer handoff). */
+  visualBrief?: string;
+  suggestedTemplateId?: string;
+  suggestedTemplateReason?: string;
   status?: PostStatus;
   clearImage?: boolean;
   scheduledAt?: string;

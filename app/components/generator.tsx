@@ -87,6 +87,9 @@ export default function Generator({
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   /** Optional note the writer attaches when handing a post off. */
   const [handoffNote, setHandoffNote] = useState("");
+  /** AI visual brief for the designer (image idea + suggested template). */
+  const [visualBrief, setVisualBrief] = useState<{ imageBrief: string; templateId: string; templateReason: string } | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
   /** Saved post formats (mẫu bài viết), writer only. */
   const [formats, setFormats] = useState<{ id: string; name: string; content: string; createdBy: string; useCount: number }[]>([]);
   const [showFormats, setShowFormats] = useState(false);
@@ -283,15 +286,66 @@ export default function Generator({
     }
   }
 
+  /** Built-in template id → display name (mirrors template-studio). */
+  function templateName(id: string): string {
+    return (
+      {
+        "bcn-announce": "Thông báo",
+        "bcn-event": "Sự kiện",
+        "bcn-recap": "Recap",
+        "bcn-recruit": "Tuyển thành viên",
+        "bcn-quote": "Trích dẫn",
+        "bcn-modern": "Hiện đại",
+      } as Record<string, string>
+    )[id] ?? id;
+  }
+
+  /** Ask AI for a visual brief (image idea + best template) for the designer. */
+  async function fetchVisualBrief() {    if (!postContent.trim() || briefLoading) return;
+    setBriefLoading(true);
+    try {
+      const res = await fetch("/api/visual-brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: postContent }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "AI gợi ý thất bại.");
+      setVisualBrief(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "AI gợi ý thất bại.");
+    } finally {
+      setBriefLoading(false);
+    }
+  }
+
   /** Writer → designer: needs a visual. Clears any fast-lane exemption. */
   async function handleSendToDesigner() {
     const note = handoffNote.trim();
     setPostContent(postContent);
     setStatus("Waiting Media");
-    const saved = await savePost({ content: postContent, status: "Waiting Media", visualSkipped: false });
+    const saved = await savePost({
+      content: postContent,
+      status: "Waiting Media",
+      visualSkipped: false,
+      ...(visualBrief
+        ? {
+            visualBrief: visualBrief.imageBrief,
+            suggestedTemplateId: visualBrief.templateId,
+            suggestedTemplateReason: visualBrief.templateReason,
+          }
+        : {}),
+    });
     if (!saved) return;
     if (note) await postHandoffComment(saved.id, `→ Nhắn designer: ${note}`);
+    if (visualBrief) {
+      await postHandoffComment(
+        saved.id,
+        `→ AI gợi ý visual: ${visualBrief.imageBrief} (Mẫu gợi ý: ${templateName(visualBrief.templateId)} — ${visualBrief.templateReason})`,
+      );
+    }
     setHandoffNote("");
+    setVisualBrief(null);
   }
 
   /** Writer → admin directly: text-only fast lane, skips the designer. */
@@ -742,6 +796,36 @@ export default function Generator({
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <button
                       type="button"
+                      onClick={fetchVisualBrief}
+                      disabled={briefLoading || !postContent.trim()}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--ink)] bg-white px-4 py-2 text-xs font-extrabold text-[var(--ink)] transition hover:bg-[#f2f4ec] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {briefLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                      {briefLoading ? "AI đang nghĩ…" : "AI gợi ý visual cho designer"}
+                    </button>
+                  </div>
+                  {visualBrief && (
+                    <div className="mt-2 rounded-xl border border-[#bce4c5] bg-[#f2f9f3] p-3 text-left">
+                      <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#28733f]">
+                        <Sparkles size={12} /> Gợi ý cho designer
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-[var(--ink)]">{visualBrief.imageBrief}</p>
+                      <p className="mt-1.5 text-[11px] text-[var(--muted)]">
+                        Mẫu phù hợp: <strong className="text-[var(--ink)]">{templateName(visualBrief.templateId)}</strong>
+                        {visualBrief.templateReason ? ` — ${visualBrief.templateReason}` : ""}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setVisualBrief(null)}
+                        className="mt-1 text-[11px] font-bold text-[var(--muted)] underline hover:text-[var(--ink)]"
+                      >
+                        Bỏ gợi ý này
+                      </button>
+                    </div>
+                  )}
+                  <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
                       onClick={handleSendToDesigner}
                       disabled={saving || !postContent.trim()}
                       className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--ink)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
@@ -872,6 +956,8 @@ export default function Generator({
             postImage={ticketImage}
             canDesign={permissions.canUploadMedia}
             onSave={handleStudioSave}
+            suggestedTemplateId={activePost.suggestedTemplateId}
+            visualBrief={activePost.visualBrief}
           />
         </div>
       )}
