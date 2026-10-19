@@ -17,23 +17,32 @@ interface PostStats {
   metricsUpdatedAt?: string;
 }
 
-async function fetchPostStats(fbPostId: string, token: string): Promise<{ likes: number; comments: number; shares: number } | null> {
+async function fetchPostStats(fbPostId: string, token: string): Promise<{ stats: { likes: number; comments: number; shares: number } | null; error?: string }> {
   try {
     const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?fields=likes.summary(true),comments.summary(true),shares&access_token=${encodeURIComponent(token)}`;
     const res = await fetch(url);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      let detail = `HTTP ${res.status}`;
+      try {
+        const errBody = (await res.json()) as { error?: { message?: string; code?: number } };
+        if (errBody?.error?.message) detail += ` — ${errBody.error.message}`;
+      } catch { /* ignore parse errors */ }
+      return { stats: null, error: detail };
+    }
     const data = (await res.json()) as {
       likes?: { summary?: { total_count?: number } };
       comments?: { summary?: { total_count?: number } };
       shares?: { count?: number };
     };
     return {
-      likes: data.likes?.summary?.total_count ?? 0,
-      comments: data.comments?.summary?.total_count ?? 0,
-      shares: data.shares?.count ?? 0,
+      stats: {
+        likes: data.likes?.summary?.total_count ?? 0,
+        comments: data.comments?.summary?.total_count ?? 0,
+        shares: data.shares?.count ?? 0,
+      },
     };
-  } catch {
-    return null;
+  } catch (err) {
+    return { stats: null, error: err instanceof Error ? err.message : "Network error" };
   }
 }
 
@@ -120,6 +129,7 @@ export async function GET() {
   const published = posts.filter((p) => p.status === "Published");
 
   const stats: PostStats[] = [];
+  const statsErrors: { postId: string; error: string }[] = [];
   const facebookConfigured = Boolean(token);
 
   // Page-level numbers (followers + recent Page posts, whatever published them).
@@ -134,8 +144,10 @@ export async function GET() {
     let metricsUpdatedAt = post.metrics?.updatedAt;
 
     if (token && post.facebookPostId) {
-      const fresh = await fetchPostStats(post.facebookPostId, token);
-      if (fresh) {
+      const { stats: fresh, error: statsError } = await fetchPostStats(post.facebookPostId, token);
+      if (statsError) {
+        statsErrors.push({ postId: post.id, error: `Không lấy được số liệu Facebook (${statsError}). Kiểm tra token/quyền của Page.` });
+      } else if (fresh) {
         ({ likes, comments, shares } = fresh);
         metricsUpdatedAt = new Date().toISOString();
         await updatePost(
@@ -186,6 +198,7 @@ export async function GET() {
     totalPublished: published.length,
     bestHour,
     stats,
+    statsErrors,
     page,
     pagePosts,
   });

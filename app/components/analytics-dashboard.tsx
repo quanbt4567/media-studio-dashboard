@@ -41,6 +41,7 @@ export default function AnalyticsDashboard() {
   const [pagePosts, setPagePosts] = useState<PagePostStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [statsErrors, setStatsErrors] = useState<{ postId: string; error: string }[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,6 +51,7 @@ export default function AnalyticsDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not load analytics.");
       setStats(data.stats || []);
+      setStatsErrors(data.statsErrors || []);
       setBestHour(data.bestHour ?? null);
       setTotalPublished(data.totalPublished || 0);
       setFacebookConfigured(data.facebookConfigured !== false);
@@ -93,6 +95,13 @@ export default function AnalyticsDashboard() {
         </p>
       )}
       {error && <p className="mb-4 text-sm font-bold text-[#b8543c]">{error}</p>}
+      {statsErrors.length > 0 && (
+        <div className="mb-4 rounded-xl border border-[#f3c2b8] bg-[#fff0ec] px-4 py-3">
+          {statsErrors.map((e) => (
+            <p key={e.postId} className="text-xs font-bold leading-relaxed text-[#a74331]">⚠️ {e.error}</p>
+          ))}
+        </div>
+      )}
 
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
