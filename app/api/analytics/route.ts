@@ -19,7 +19,10 @@ interface PostStats {
 
 async function fetchPostStats(fbPostId: string, token: string): Promise<{ stats: { likes: number; comments: number; shares: number } | null; error?: string }> {
   try {
-    const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?fields=likes.summary(true),comments.summary(true),shares&access_token=${encodeURIComponent(token)}`;
+    // Note: the `shares` field no longer exists on PagePost in recent Graph API
+    // versions (removed) — requesting it fails the whole call with (#100).
+    // Shares default to 0; likes + comments remain accurate.
+    const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?fields=likes.summary(true),comments.summary(true)&access_token=${encodeURIComponent(token)}`;
     const res = await fetch(url);
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
@@ -32,13 +35,12 @@ async function fetchPostStats(fbPostId: string, token: string): Promise<{ stats:
     const data = (await res.json()) as {
       likes?: { summary?: { total_count?: number } };
       comments?: { summary?: { total_count?: number } };
-      shares?: { count?: number };
     };
     return {
       stats: {
         likes: data.likes?.summary?.total_count ?? 0,
         comments: data.comments?.summary?.total_count ?? 0,
-        shares: data.shares?.count ?? 0,
+        shares: 0,
       },
     };
   } catch (err) {
