@@ -177,10 +177,12 @@ export async function GET() {
   stats.sort((a, b) => b.engagement - a.engagement);
 
   // Best posting hour heuristic: average engagement by hour of day.
+  // Hours are computed in Vietnam time (UTC+7) — the server runs on UTC,
+  // so getHours() alone would be 7 hours behind for the team.
   const byHour: Record<number, { total: number; count: number }> = {};
   for (const s of stats) {
     if (!s.publishedAt) continue;
-    const hour = new Date(s.publishedAt).getHours();
+    const hour = (new Date(s.publishedAt).getUTCHours() + 7) % 24;
     byHour[hour] = byHour[hour] || { total: 0, count: 0 };
     byHour[hour].total += s.engagement;
     byHour[hour].count += 1;
