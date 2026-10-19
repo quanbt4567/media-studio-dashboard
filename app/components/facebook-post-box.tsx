@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { Clapperboard, ImagePlus, Library, Smile } from 'lucide-react';
 
 export interface CreatePostData {
   content: string;
@@ -194,7 +195,7 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
               aria-label="Add an image"
               className="rounded-full p-2 text-green-600 hover:bg-slate-100 dark:hover:bg-neutral-700"
             >
-              <span aria-hidden="true">🖼️</span>
+              <ImagePlus size={18} aria-hidden="true" />
             </button>
           )}
           {!textReadOnly && (
@@ -205,7 +206,7 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
               aria-expanded={isEmojiPickerOpen}
               className="rounded-full p-2 text-yellow-500 hover:bg-slate-100 dark:hover:bg-neutral-700"
             >
-              <span aria-hidden="true">😊</span>
+              <Smile size={18} aria-hidden="true" />
             </button>
           )}
           {isEmojiPickerOpen && !textReadOnly && (
@@ -237,7 +238,7 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
       {!hideImageControls && (
         <div className="mt-3 flex gap-2">
           <label onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} className="flex flex-1 cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-500 transition hover:border-primary hover:bg-slate-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
-            <span aria-hidden="true">🖼️</span><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+            <ImagePlus size={18} aria-hidden="true" /><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           </label>
           {onBrowseLibrary && (
             <button
@@ -246,7 +247,7 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
               title="Lấy ảnh từ thư viện dùng chung"
               className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:border-primary hover:text-primary dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
             >
-              📚 Thư viện
+              <Library size={14} /> Thư viện
             </button>
           )}
           {onVideoSelect && (
@@ -254,7 +255,7 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
               title="Upload video (lưu trên Vercel Blob)"
               className={`flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:border-primary hover:text-primary dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 ${videoUploading ? "pointer-events-none opacity-50" : ""}`}
             >
-              🎬 {videoUploading ? "Đang tải…" : "Video"}
+              <Clapperboard size={14} /> {videoUploading ? "Đang tải…" : "Video"}
               <input
                 type="file"
                 accept="video/mp4,video/quicktime,video/webm,video/x-m4v"

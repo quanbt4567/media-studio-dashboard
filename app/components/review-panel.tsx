@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, MessageSquare, Send, Undo2, X } from "lucide-react";
+import { Check, Lock, MessageSquare, Send, Undo2, X, Zap } from "lucide-react";
 import { useState } from "react";
 import type { Post } from "../lib/posts-store";
 
@@ -103,7 +103,7 @@ export default function ReviewPanel({
             <>
               <p className="mb-2 text-xs font-extrabold">Duyệt nhanh — một chạm, không cần Zalo</p>
               {post.visualSkipped && (
-                <p className="mb-2 rounded-lg bg-[#fff8e6] px-2.5 py-2 text-[11px] font-bold text-[#8b5d16]">⚡ Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
+                <p className="mb-2 rounded-lg bg-[#fff8e6] px-2.5 py-2 text-[11px] font-bold text-[#8b5d16]"><Zap size={12} className="mr-1 inline-block align-[-2px]" /> Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
               )}
               <textarea
                 value={reviewNote}
@@ -182,7 +182,7 @@ export default function ReviewPanel({
       </div>
       {post.status === "Published" ? (
         <p className="rounded-xl bg-[#eef1e8] px-3 py-2.5 text-center text-[11px] font-bold text-[var(--muted)]">
-          🔒 Bài đã xuất bản — chỉ xem lại, không thể bình luận thêm.
+          <Lock size={12} className="mr-1 inline-block align-[-2px]" /> Bài đã xuất bản — chỉ xem lại, không thể bình luận thêm.
         </p>
       ) : (
       <div className="flex gap-2">

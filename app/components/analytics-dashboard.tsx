@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Heart, MessageCircle, RefreshCw, Share2 } from "lucide-react";
+import { BarChart3, FileText, Heart, MessageCircle, RefreshCw, Share2, TriangleAlert, Trophy } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 interface PostStats {
@@ -98,7 +98,7 @@ export default function AnalyticsDashboard() {
       {statsErrors.length > 0 && (
         <div className="mb-4 rounded-xl border border-[#f3c2b8] bg-[#fff0ec] px-4 py-3">
           {statsErrors.map((e) => (
-            <p key={e.postId} className="text-xs font-bold leading-relaxed text-[#a74331]">⚠️ {e.error}</p>
+            <p key={e.postId} className="text-xs font-bold leading-relaxed text-[#a74331]"><TriangleAlert size={13} className="mr-1 inline-block align-[-2px]" /> {e.error}</p>
           ))}
         </div>
       )}
@@ -136,7 +136,7 @@ export default function AnalyticsDashboard() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="flex items-center gap-2 text-sm font-bold">
-                    {index === 0 && <span title="Bài hiệu quả nhất">🏆</span>}
+                    {index === 0 && <span title="Bài hiệu quả nhất"><Trophy size={14} className="text-[#b8860b]" /></span>}
                     <span className="truncate">{s.snippet}</span>
                   </p>
                   <p className="mt-0.5 text-[11px] text-[var(--muted)]">
@@ -169,11 +169,11 @@ export default function AnalyticsDashboard() {
                 {p.picture ? (
                   <img src={p.picture} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
                 ) : (
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#eef1e8] text-lg">📝</div>
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#eef1e8]"><FileText size={20} className="text-[var(--muted)]" /></div>
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 truncate text-sm font-bold">
-                    {index === 0 && <span title="Bài hiệu quả nhất">🏆</span>}
+                    {index === 0 && <span title="Bài hiệu quả nhất"><Trophy size={14} className="text-[#b8860b]" /></span>}
                     <span className="truncate">{p.snippet}</span>
                   </p>
                   <p className="mt-0.5 text-[11px] text-[var(--muted)]">

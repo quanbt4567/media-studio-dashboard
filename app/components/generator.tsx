@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarClock, Clipboard, LoaderCircle, Plus, Rocket, Sparkles, Trash2, WandSparkles } from "lucide-react";
+import { BarChart3, CalendarCheck, CalendarClock, Clipboard, ClipboardList, Crown, Eye, FileText, Image as ImageIcon, Library, Lightbulb, LoaderCircle, Palette, Pin, Plus, Rocket, Sparkles, Trash2, Undo2, WandSparkles, Zap, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getAllowedTransitions, useSession } from "../../context/SessionContext";
 import type { Post } from "../lib/posts-store";
@@ -290,7 +290,7 @@ export default function Generator({
     setStatus("Waiting Media");
     const saved = await savePost({ content: postContent, status: "Waiting Media", visualSkipped: false });
     if (!saved) return;
-    if (note) await postHandoffComment(saved.id, `✉️ Nhắn designer: ${note}`);
+    if (note) await postHandoffComment(saved.id, `→ Nhắn designer: ${note}`);
     setHandoffNote("");
   }
 
@@ -301,7 +301,7 @@ export default function Generator({
     setStatus("Review Pending");
     const saved = await savePost({ content: postContent, status: "Review Pending", visualSkipped: true });
     if (!saved) return;
-    if (note) await postHandoffComment(saved.id, `✉️ Nhắn admin: ${note}`);
+    if (note) await postHandoffComment(saved.id, `→ Nhắn admin: ${note}`);
     setHandoffNote("");
   }
 
@@ -356,26 +356,26 @@ export default function Generator({
   }
 
   /** "Việc của tôi" — actionable items for the current role. */
-  type WorkItem = { key: PostStatus | "returned"; label: string; count: number };
+  type WorkItem = { key: PostStatus | "returned"; label: string; count: number; icon: LucideIcon };
   const myWork: WorkItem[] = ((): WorkItem[] => {
     const rejected = (p: Post) => p.review?.decision === "rejected";
     const items: WorkItem[] = [];
     if (role === "content") {
       const drafts = posts.filter((p) => p.status === "Draft");
       items.push(
-        { key: "Draft", label: "📝 Nháp của bạn", count: drafts.filter((p) => !rejected(p)).length },
-        { key: "returned", label: "↩ Bị trả về", count: drafts.filter(rejected).length },
+        { key: "Draft", label: "Nháp của bạn", icon: FileText, count: drafts.filter((p) => !rejected(p)).length },
+        { key: "returned", label: "Bị trả về", icon: Undo2, count: drafts.filter(rejected).length },
       );
     } else if (role === "media") {
       const waiting = posts.filter((p) => p.status === "Waiting Media");
       items.push(
-        { key: "Waiting Media", label: "🎨 Chờ bạn gắn ảnh", count: waiting.filter((p) => !rejected(p)).length },
-        { key: "returned", label: "↩ Bị trả về", count: waiting.filter(rejected).length },
+        { key: "Waiting Media", label: "Chờ bạn gắn ảnh", icon: ImageIcon, count: waiting.filter((p) => !rejected(p)).length },
+        { key: "returned", label: "Bị trả về", icon: Undo2, count: waiting.filter(rejected).length },
       );
     } else if (role === "admin") {
       items.push(
-        { key: "Review Pending", label: "👀 Chờ bạn duyệt", count: posts.filter((p) => p.status === "Review Pending").length },
-        { key: "Approved", label: "📅 Đã duyệt, chờ đăng", count: posts.filter((p) => p.status === "Approved" && !p.publishedAt).length },
+        { key: "Review Pending", label: "Chờ bạn duyệt", icon: Eye, count: posts.filter((p) => p.status === "Review Pending").length },
+        { key: "Approved", label: "Đã duyệt, chờ đăng", icon: CalendarCheck, count: posts.filter((p) => p.status === "Approved" && !p.publishedAt).length },
       );
     }
     return items.filter((w) => w.count > 0);
@@ -606,16 +606,16 @@ export default function Generator({
       {/* "Việc của tôi" — role work queue */}
       {myWork.length > 0 && (
         <div className="mb-3 rounded-2xl border border-[var(--ink)] bg-white p-3 shadow-[0_8px_24px_rgba(22,37,34,.08)]">
-          <p className="mb-2 text-xs font-extrabold">📌 Việc của bạn</p>
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Pin size={13} /> Việc của bạn</p>
           <div className="flex flex-wrap gap-1.5">
             {myWork.map((w) => (
               <button
                 key={w.key}
                 type="button"
                 onClick={() => setStatusFilter((f) => (f === w.key ? null : w.key))}
-                className={`rounded-full px-3 py-1.5 text-[11px] font-extrabold transition ${statusFilter === w.key ? "bg-[var(--ink)] text-white" : "bg-[#f2f4ec] text-[var(--ink)] hover:bg-[#e7ecdd]"}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-extrabold transition ${statusFilter === w.key ? "bg-[var(--ink)] text-white" : "bg-[#f2f4ec] text-[var(--ink)] hover:bg-[#e7ecdd]"}`}
               >
-                {w.label} · {w.count}
+                <w.icon size={12} /> {w.label} · {w.count}
               </button>
             ))}
             {statusFilter && (
@@ -632,7 +632,7 @@ export default function Generator({
         <input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="🔍 Tìm trong nội dung bài viết..."
+          placeholder="Tìm trong nội dung bài viết..."
           className="w-full rounded-xl border border-[var(--line)] bg-white px-3.5 py-2.5 text-xs outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)] sm:max-w-xs"
         />
       </div>
@@ -678,7 +678,7 @@ export default function Generator({
               >
                 <span className={`mb-1.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[#1877F2] text-white" : post.status === "Approved" ? "bg-[var(--lime)] text-[var(--ink)]" : post.status === "Draft" ? "bg-[#eef1e8] text-[var(--ink)]" : "bg-[#fff1d6] text-[#8b5d16]"}`}>{post.status}</span>
                 <span className="block line-clamp-2 text-xs font-bold leading-snug">{snippet(post.content)}</span>
-                <span className="mt-1 block truncate font-mono text-[9px] text-[var(--muted)]">{post.updatedBy} · {post.imageDataUrl ? "🖼️" : post.videoUrl ? "🎬" : "no image"}{post.scheduledAt ? ` · ◷ ${new Date(post.scheduledAt).toLocaleDateString()}` : ""}</span>
+                <span className="mt-1 block truncate font-mono text-[9px] text-[var(--muted)]">{post.updatedBy} · {post.imageDataUrl ? "ảnh" : post.videoUrl ? "video" : "no image"}{post.scheduledAt ? ` · ◷ ${new Date(post.scheduledAt).toLocaleDateString()}` : ""}</span>
                 {post.review?.decision === "rejected" && <span className="mb-1.5 ml-1 inline-block rounded-full bg-[#fff0ec] px-2 py-0.5 text-[9px] font-extrabold text-[#a74331]">↩ trả về</span>}
               </button>
               {role === "content" && (
@@ -706,8 +706,8 @@ export default function Generator({
               <span className={`inline-block h-1.5 w-1.5 rounded-full ${saving ? "animate-pulse bg-[var(--orange)]" : "bg-[var(--lime)]"}`} />
               <h3 className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">Composer</h3>
               <div className="ml-auto flex items-center gap-2">
-                {permissions.canUploadMedia && <button type="button" onClick={() => setShowLibraryPicker(true)} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]">📚 Thư viện ảnh</button>}
-                {role === "content" && <button type="button" onClick={() => { loadFormats(); setShowFormats(true); }} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]">📋 Mẫu bài viết</button>}
+                {permissions.canUploadMedia && <button type="button" onClick={() => setShowLibraryPicker(true)} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><Library size={13} /> Thư viện ảnh</button>}
+                {role === "content" && <button type="button" onClick={() => { loadFormats(); setShowFormats(true); }} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><ClipboardList size={13} /> Mẫu bài viết</button>}
                 {postContent && <button onClick={copyPost} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><Clipboard size={13} />{copied ? "Đã chép" : "Sao chép bài"}</button>}
                 {canDelete && <button type="button" onClick={deleteActivePost} className="flex items-center gap-1 rounded-full border border-[#f3c2b8] bg-[#fff0ec] px-2.5 py-1 text-[10px] font-extrabold text-[#a74331] hover:bg-[#ffe4dc]"><Trash2 size={11} /> Xóa</button>}
               </div>
@@ -718,7 +718,7 @@ export default function Generator({
       {permissions.canGenerateAI ? <>
         <label className="mb-2 block text-xs font-extrabold" htmlFor="topic">Viết về chủ đề gì?</label><textarea suppressHydrationWarning id="topic" value={topic} maxLength={240} onChange={(event) => setTopic(event.target.value)} placeholder="VD: workshop làm gốm cho người mới vào thứ 6..." className="min-h-28 w-full resize-none rounded-xl border border-[var(--line)] bg-[#fafbf7] p-3 text-sm outline-none transition placeholder:text-[#a8b0a7] focus:border-[var(--ink)] focus:ring-2 focus:ring-[var(--lime)]" />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="font-mono text-[10px] text-[var(--muted)]">{topic.length}/240 ký tự</p><button disabled={!topic.trim() || loading} onClick={generatePost} className="flex items-center gap-2 rounded-xl bg-[var(--ink)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[#263b35] disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle className="animate-spin" size={15} /> : <WandSparkles size={15} />} {loading ? "Đang viết..." : "Viết bằng AI"}</button></div>
-      </> : <p className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-3 text-xs leading-relaxed text-[var(--muted)]">{role === "admin" ? <><strong className="text-[var(--ink)]">👑 Admin mode</strong> — bạn chỉ duyệt và đăng bài. Viết bài là việc của writer, hình ảnh là việc của designer. Mở từng bài viết để xem preview, duyệt hoặc trả về.</> : <><strong className="text-[var(--ink)]">🎨 Media Creator mode</strong> — the writer&apos;s draft loads automatically below (read-only for you). Attach visuals, then mark the post ready for review.</>}</p>}
+      </> : <p className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-3 text-xs leading-relaxed text-[var(--muted)]">{role === "admin" ? <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Crown size={13} /> Admin mode</strong> — bạn chỉ duyệt và đăng bài. Viết bài là việc của writer, hình ảnh là việc của designer. Mở từng bài viết để xem preview, duyệt hoặc trả về.</> : <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Palette size={13} /> Media Creator mode</strong> — the writer&apos;s draft loads automatically below (read-only for you). Attach visuals, then mark the post ready for review.</>}</p>}
       {error && <p className="mt-4 rounded-lg bg-[#fff0ec] px-3 py-2 text-xs font-bold text-[#b8543c]">{error}</p>}
             <div className="mt-5">
               <FacebookPostBox value={postContent} onChange={setPostContent} image={mediaFile} onImageChange={handleImageSelect} onBrowseLibrary={permissions.canUploadMedia && !isPublished ? () => setShowLibraryPicker(true) : undefined} onVideoSelect={permissions.canUploadMedia && !isPublished ? handleVideoSelect : undefined} videoUploading={uploadingVideo} userName={process.env.NEXT_PUBLIC_CLUB_NAME || "BCN"} placeholder="Bài AI viết sẽ hiện ở đây. Chỉnh sử trước khi gửi..." textReadOnly={!permissions.canEditText || isPublished} hideImageControls={!permissions.canUploadMedia || isPublished} hideSubmit />
@@ -755,7 +755,7 @@ export default function Generator({
                       title="Bài chỉ có chữ, không cần ảnh — gửi thẳng cho admin duyệt"
                       className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--ink)] bg-white px-4 py-2.5 text-xs font-extrabold text-[var(--ink)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      ⚡ Gửi thẳng cho admin
+                      <Zap size={14} /> Gửi thẳng cho admin
                     </button>
                   </div>
                   <p className="mt-1.5 text-center text-[11px] text-[var(--muted)]">Bài cần ảnh minh họa → gửi designer. Bài chỉ có chữ → gửi thẳng admin cho nhanh.</p>
@@ -766,7 +766,7 @@ export default function Generator({
           {permissions.canEditText && !isPublished && (
             <section aria-label="AI score" className="rounded-2xl border border-[var(--line)] bg-white p-5">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">📊 AI score</h3>
+                <h3 className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]"><BarChart3 size={12} /> AI score</h3>
                 <button
                   type="button"
                   onClick={handleScore}
@@ -824,7 +824,7 @@ export default function Generator({
                 {scheduledInput
                   ? "Bài đã duyệt sẽ tự đăng đúng giờ này (hoặc bấm “Đăng ngay bài đến hạn” ở trên)."
                   : "Chọn ngày & giờ — bài sẽ tự đăng khi đã được duyệt."}
-                {bestHour !== null && <> 💡 Giờ vàng của Page là <strong className="text-[var(--ink)]">{bestHour}:00</strong> — đăng lúc này tương tác cao nhất.</>}
+                {bestHour !== null && <> <Lightbulb size={13} className="inline-block align-[-2px]" /> Giờ vàng của Page là <strong className="text-[var(--ink)]">{bestHour}:00</strong> — đăng lúc này tương tác cao nhất.</>}
               </p>
             </section>
           )}
@@ -857,7 +857,7 @@ export default function Generator({
             </button>
             {status !== "Approved" && !isPublished && <p className="text-center text-[11px] text-[var(--muted)]">Publishing unlocks once the post is approved.</p>}
             {publishError && <p role="alert" className="rounded-xl border border-[#f3c2b8] bg-[#fff0ec] px-4 py-3 text-xs font-bold leading-relaxed text-[#a74331]">{publishError}</p>}
-          </> : <p className="rounded-xl bg-[#eef1e8] px-4 py-3 text-center text-[11px] font-bold text-[var(--muted)]">👑 Publishing to Facebook is restricted to the Admin / Leader role.</p>}
+          </> : <p className="rounded-xl bg-[#eef1e8] px-4 py-3 text-center text-[11px] font-bold text-[var(--muted)]"><Crown size={12} className="mr-1 inline-block align-[-2px]" /> Publishing to Facebook is restricted to the Admin / Leader role.</p>}
             </div>
           </section>
         </div>
@@ -880,7 +880,7 @@ export default function Generator({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowLibraryPicker(false)}>
         <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-extrabold">📚 Thư viện ảnh dùng chung</h3>
+            <h3 className="flex items-center gap-2 text-lg font-extrabold"><Library size={18} /> Thư viện ảnh dùng chung</h3>
             <button type="button" onClick={() => setShowLibraryPicker(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
           </div>
           <MediaLibrary onPick={attachLibraryImage} />
@@ -891,7 +891,7 @@ export default function Generator({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowFormats(false)}>
         <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-lg font-extrabold">📋 Mẫu bài viết</h3>
+            <h3 className="flex items-center gap-2 text-lg font-extrabold"><ClipboardList size={18} /> Mẫu bài viết</h3>
             <button type="button" onClick={() => setShowFormats(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
           </div>
           <p className="mb-4 text-xs text-[var(--muted)]">Format được tự động lưu mỗi khi bạn gửi bài khỏi Draft. Bấm “Dùng” để tạo draft mới từ mẫu.</p>
@@ -920,7 +920,7 @@ export default function Generator({
                     title="Xóa mẫu này"
                     className="shrink-0 rounded-xl border border-[#f3c2b8] bg-white px-2.5 py-2 text-xs font-bold text-[#a74331] hover:bg-[#fff0ec]"
                   >
-                    🗑
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}

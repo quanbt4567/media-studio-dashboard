@@ -1,14 +1,14 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { Crown, LogOut, Palette, PenLine, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSession } from "../../context/SessionContext";
 
-const ROLE_LABEL: Record<string, string> = {
-  content: "✍️ Content Creator",
-  media: "🎨 Media Creator",
-  admin: "👑 Admin / Leader",
+const ROLE_META: Record<string, { label: string; icon: LucideIcon }> = {
+  content: { label: "Content Creator", icon: PenLine },
+  media: { label: "Media Creator", icon: Palette },
+  admin: { label: "Admin / Leader", icon: Crown },
 };
 
 /** Shows the logged-in user and their role, with a logout button. */
@@ -33,7 +33,11 @@ export default function UserBadge() {
         Logged in as
       </span>
       <span className="flex items-center gap-1.5 rounded-full border border-[var(--ink)] bg-[var(--ink)] px-3.5 py-2 text-xs font-extrabold text-white">
-        {ROLE_LABEL[user.role] ?? user.role}
+        {(() => {
+        const meta = ROLE_META[user.role];
+        const Icon = meta?.icon;
+        return (<><Icon size={13} /> {meta?.label ?? user.role}</>);
+      })()}
       </span>
       <span className="text-xs font-bold text-[var(--muted)]">{user.username}</span>
       <button

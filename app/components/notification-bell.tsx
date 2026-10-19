@@ -98,7 +98,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
             className="fixed z-[70] max-h-[70vh] w-80 overflow-y-auto rounded-2xl border border-[var(--line)] bg-white p-2 shadow-[0_24px_60px_rgba(22,37,34,.18)]"
             style={{ top: pos.top, right: pos.right }}
           >
-            <p className="px-2.5 py-2 text-xs font-extrabold">🔔 Thông báo</p>
+            <p className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-extrabold"><Bell size={13} /> Thông báo</p>
             {items.length === 0 ? (
               <p className="px-2.5 pb-3 pt-1 text-center text-xs text-[var(--muted)]">Chưa có thông báo nào.</p>
             ) : (
