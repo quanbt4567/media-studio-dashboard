@@ -3,15 +3,15 @@
 import { Crown, LogOut, Palette, PenLine, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSession } from "../../context/SessionContext";
+import { useSession, type Role } from "../../context/SessionContext";
 
-const ROLE_META: Record<string, { label: string; icon: LucideIcon }> = {
-  content: { label: "Content Creator", icon: PenLine },
-  media: { label: "Media Creator", icon: Palette },
-  admin: { label: "Admin / Leader", icon: Crown },
+const ROLE_META: Record<Role, { label: string; icon: LucideIcon }> = {
+  admin: { label: "Admin", icon: Crown },
+  media: { label: "Designer", icon: Palette },
+  content: { label: "Writer", icon: PenLine },
 };
 
-/** Shows the logged-in user and their role, with a logout button. */
+/** Compact user chip + logout for the top-right header. */
 export default function UserBadge() {
   const { user } = useSession();
   const router = useRouter();
@@ -27,27 +27,28 @@ export default function UserBadge() {
     }
   }
 
+  const meta = ROLE_META[user.role];
+  const Icon = meta?.icon;
+
   return (
-    <div className="flex flex-wrap items-center gap-2" aria-label="Logged-in user">
-      <span className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">
-        Logged in as
+    <div className="flex items-center gap-2" aria-label="Logged-in user">
+      <span
+        className="hidden items-center gap-1.5 rounded-full bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white sm:flex"
+        title={`Logged in as ${user.username}`}
+      >
+        {Icon && <Icon size={13} />}
+        {meta?.label ?? user.role}
+        <span className="font-medium text-white/60">· {user.username}</span>
       </span>
-      <span className="flex items-center gap-1.5 rounded-full border border-[var(--ink)] bg-[var(--ink)] px-3.5 py-2 text-xs font-extrabold text-white">
-        {(() => {
-        const meta = ROLE_META[user.role];
-        const Icon = meta?.icon;
-        return (<><Icon size={13} /> {meta?.label ?? user.role}</>);
-      })()}
-      </span>
-      <span className="text-xs font-bold text-[var(--muted)]">{user.username}</span>
       <button
         type="button"
         onClick={handleLogout}
         disabled={loggingOut}
-        className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-white/70 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] transition hover:border-[var(--ink)] hover:text-[var(--ink)] disabled:opacity-50"
+        title="Log out"
+        className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-white/80 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] shadow-sm backdrop-blur transition hover:border-[var(--ink)] hover:text-[var(--ink)] disabled:opacity-50"
       >
         <LogOut size={13} />
-        {loggingOut ? "Logging out..." : "Log out"}
+        <span className="hidden sm:inline">{loggingOut ? "..." : "Log out"}</span>
       </button>
     </div>
   );

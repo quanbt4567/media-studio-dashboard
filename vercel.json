@@ -1,1 +1,1 @@
-{"crons":[{"path":"/api/publish-due","schedule": "0 0 * * *"}]}
+{"crons":[{"path":"/api/publish-due","schedule":"0 0 * * *"}],"regions":["sin1"]}

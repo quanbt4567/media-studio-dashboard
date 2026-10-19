@@ -45,7 +45,8 @@ async function writeConversations(list: Conversation[]): Promise<void> {
   await writeStore("chat", list);
 }
 
-function ensureGroup(list: Conversation[], usernames: string[]): Conversation {
+function ensureGroup(list: Conversation[], usernames: string[]): boolean {
+  let changed = false;
   let group = list.find((c) => c.id === GROUP_ID);
   if (!group) {
     group = {
@@ -58,39 +59,46 @@ function ensureGroup(list: Conversation[], usernames: string[]): Conversation {
       updatedAt: new Date().toISOString(),
     };
     list.push(group);
+    changed = true;
   } else {
     // Keep membership in sync if the team roster changes.
     const missing = usernames.filter((u) => !group!.participants.includes(u));
-    if (missing.length > 0) group.participants.push(...missing);
+    if (missing.length > 0) {
+      group.participants.push(...missing);
+      changed = true;
+    }
   }
-  return group;
+  return changed;
 }
 
-function ensureDm(list: Conversation[], me: string, other: string): Conversation {
+function ensureDm(list: Conversation[], me: string, other: string): boolean {
   const id = dmId(me, other);
-  let dm = list.find((c) => c.id === id);
-  if (!dm) {
-    dm = {
-      id,
-      type: "dm",
-      participants: [me, other],
-      title: other,
-      messages: [],
-      lastReadAt: {},
-      updatedAt: new Date().toISOString(),
-    };
-    list.push(dm);
-  }
-  return dm;
+  if (list.some((c) => c.id === id)) return false;
+  list.push({
+    id,
+    type: "dm",
+    participants: [me, other],
+    title: other,
+    messages: [],
+    lastReadAt: {},
+    updatedAt: new Date().toISOString(),
+  });
+  return true;
 }
 
 /** All conversations visible to a user: the team group + a DM per teammate. */
 export async function listConversations(me: string, teammates: string[]): Promise<Conversation[]> {
   const list = await readConversations();
   const others = teammates.filter((u) => u.toLowerCase() !== me.toLowerCase());
-  ensureGroup(list, [me, ...others]);
-  others.forEach((other) => ensureDm(list, me, other));
-  await writeConversations(list);
+  let changed = ensureGroup(list, [me, ...others]);
+  others.forEach((other) => {
+    if (ensureDm(list, me, other)) changed = true;
+  });
+  // Don't write on every read — only when a conversation was actually created
+  // or the group roster changed. Keeps the 8s chat poll cheap.
+  if (changed) {
+    await writeConversations(list);
+  }
   return list
     .filter((c) => c.participants.some((p) => p.toLowerCase() === me.toLowerCase()))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));

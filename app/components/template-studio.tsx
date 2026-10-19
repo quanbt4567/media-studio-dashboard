@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Camera, Download, ImagePlus, Images, LayoutTemplate, LoaderCircle, Megaphone, Palette, Plus, Quote, Redo2, RefreshCw, Save, Sparkles, Trash2, Type, Undo2, Users, type LucideIcon } from "lucide-react";
+import { CalendarDays, Camera, Crop, Download, ImagePlus, Images, LayoutTemplate, LoaderCircle, Megaphone, Palette, Plus, Quote, Redo2, RefreshCw, Save, Sparkles, Trash2, Type, Undo2, Users, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type CanvasElement,
@@ -8,6 +8,7 @@ import {
   type DesignTemplate,
 } from "../lib/design-template-store";
 import MediaLibrary from "./media-library";
+import ImageCropper from "./image-cropper";
 
 const SIZE = 1080;
 
@@ -346,12 +347,13 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/** Draw an image covering the rect (center crop), like CSS object-fit: cover. */
-function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+/** Draw an image covering the rect (cover crop), like CSS object-fit: cover.
+ *  fx/fy (0..1) pick which part of the image shows — 0.5/0.5 is centered. */
+function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number, fx = 0.5, fy = 0.5) {
   const scale = Math.max(w / img.width, h / img.height);
   const dw = img.width * scale;
   const dh = img.height * scale;
-  ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.drawImage(img, x + (w - dw) * fx, y + (h - dh) * fy, dw, dh);
 }
 
 function fontOf(el: CanvasElement): string {
@@ -411,6 +413,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   const [savedFlash, setSavedFlash] = useState(false);
   const [showBgLibrary, setShowBgLibrary] = useState(false);
   const [showElLibrary, setShowElLibrary] = useState(false);
+  /** Image crop modal: element id being cropped, or null. */
+  const [cropElId, setCropElId] = useState<string | null>(null);
   /** Element library mode: "add" inserts a new image, "replace" swaps the selected one. */
   const [elLibraryMode, setElLibraryMode] = useState<"add" | "replace">("add");
   /** Saved design templates (mẫu thiết kế dùng lại). */
@@ -652,10 +656,10 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             ctx.beginPath();
             ctx.roundRect(el.x, el.y, el.w, el.h, Math.min(el.radius, el.w / 2, el.h / 2));
             ctx.clip();
-            drawCover(ctx, img, el.x, el.y, el.w, el.h);
+            drawCover(ctx, img, el.x, el.y, el.w, el.h, el.focalX ?? 0.5, el.focalY ?? 0.5);
             ctx.restore();
           } else {
-            drawCover(ctx, img, el.x, el.y, el.w, el.h);
+            drawCover(ctx, img, el.x, el.y, el.w, el.h, el.focalX ?? 0.5, el.focalY ?? 0.5);
           }
         } catch { /* skip broken */ }
       } else if (el.type === "text" && el.text?.trim()) {
@@ -940,7 +944,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       replaceImgRef.current = null;
       pushHistory();
       if (targetId) {
-        updateEl(targetId, { src: dataUrl });
+        updateEl(targetId, { src: dataUrl, focalX: 0.5, focalY: 0.5 });
       } else {
         addImageElement(dataUrl);
       }
@@ -1111,7 +1115,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     )
                   ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={el.src} alt="" draggable={false} className="block w-full" style={{ height: el.h, objectFit: "cover", userSelect: "none", borderRadius: el.radius ?? 0 }} />
+                    <img src={el.src} alt="" draggable={false} className="block w-full" style={{ height: el.h, objectFit: "cover", objectPosition: `${(el.focalX ?? 0.5) * 100}% ${(el.focalY ?? 0.5) * 100}%`, userSelect: "none", borderRadius: el.radius ?? 0 }} />
                   )}
                   {isSel && !isEditing && (
                     <div
@@ -1163,6 +1167,17 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                       className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
                     >
                       <Images size={12} /> Thư viện
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        pushHistory();
+                        setCropElId(selected.id);
+                      }}
+                      title="Kéo để chọn vùng ảnh hiển thị trong khung"
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                    >
+                      <Crop size={12} /> Căn ảnh
                     </button>
                   </>
                 )}
@@ -1359,7 +1374,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               setShowElLibrary(false);
               if (targetId) {
                 pushHistory();
-                updateEl(targetId, { src: item.dataUrl });
+                updateEl(targetId, { src: item.dataUrl, focalX: 0.5, focalY: 0.5 });
               } else {
                 addImageElement(item.dataUrl);
               }
@@ -1367,6 +1382,21 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </div>
         </div>
       )}
+      {(() => {
+        const cropEl = cropElId ? elements.find((el) => el.id === cropElId) : null;
+        if (!cropEl || cropEl.type !== "image" || !cropEl.src) return null;
+        return (
+          <ImageCropper
+            src={cropEl.src}
+            frameW={cropEl.w}
+            frameH={cropEl.h}
+            focalX={cropEl.focalX ?? 0.5}
+            focalY={cropEl.focalY ?? 0.5}
+            onChange={(fx, fy) => updateEl(cropEl.id, { focalX: fx, focalY: fy })}
+            onClose={() => setCropElId(null)}
+          />
+        );
+      })()}
       {showTplPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowTplPicker(false)}>
           <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>

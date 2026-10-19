@@ -20,6 +20,7 @@ import Generator from "./generator";
 import IdeaGenerator from "./idea-generator";
 import MediaLibrary from "./media-library";
 import NotificationBell from "./notification-bell";
+import UserBadge from "./user-badge";
 import ChatWidget from "./chat-widget";
 import ActivityFeed from "./activity-feed";
 import SettingsPanel from "./settings-panel";
@@ -207,6 +208,7 @@ export default function StudioWorkspace() {
                   View live site <ArrowUpRight size={14} />
                 </span>
               )}
+              <UserBadge />
             </div>
           </header>
 

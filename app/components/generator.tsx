@@ -10,7 +10,6 @@ import MediaLibrary from "./media-library";
 import PostStatusSwitcher, { PostStatus } from "./post-status-switcher";
 import ReviewPanel from "./review-panel";
 import TemplateStudio from "./template-studio";
-import UserBadge from "./user-badge";
 
 const blockedTerms = [
   "ignore previous",
@@ -643,8 +642,6 @@ export default function Generator({
 
   return <div className="rounded-[28px] border border-white/75 bg-white/70 p-4 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl sm:p-7 entrance" style={{ animationDelay: "180ms" }}>
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3"><div><div className="mb-2 flex items-center gap-2"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--lime)]"><Sparkles size={14} /></span><span className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Studio assistant</span></div><h2 className="text-2xl font-black tracking-[-.05em]">Make something people feel.</h2><p className="mt-1 max-w-md text-xs leading-relaxed text-[var(--muted)]">Turn a rough idea into a Facebook-ready post in seconds.</p></div><span className="rounded-full bg-[#eef1e8] px-3 py-1 font-mono text-[9px] uppercase tracking-wider text-[var(--muted)]">AI powered</span></div>
-    <div className="mb-6"><UserBadge /></div>
-
     {/* Due posts banner */}
     {role === "admin" && duePosts.length > 0 && (
       <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[#f3c2b8] bg-[#fff0ec] px-4 py-3">

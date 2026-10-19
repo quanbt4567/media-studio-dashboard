@@ -36,6 +36,12 @@ export interface CanvasElement {
    * never break the template header again.
    */
   locked?: boolean;
+  /**
+   * Focal point for cover-crop (0..1, default 0.5 = center). Which part of the
+   * image shows inside the frame; adjustable via the "Căn ảnh" crop tool.
+   */
+  focalX?: number;
+  focalY?: number;
 }
 
 export type DesignBg = { kind: "gradient"; from: string; to: string } | { kind: "image"; src: string };
