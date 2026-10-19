@@ -2,7 +2,7 @@
 
 import { Check, CircleDot } from "lucide-react";
 
-export const postStatuses = ["Draft", "Waiting Media", "Review Pending", "Approved"] as const;
+export const postStatuses = ["Draft", "Waiting Media", "Review Pending", "Approved", "Published"] as const;
 export type PostStatus = (typeof postStatuses)[number];
 
 const statusStyles: Record<PostStatus, string> = {
@@ -10,6 +10,7 @@ const statusStyles: Record<PostStatus, string> = {
   "Waiting Media": "bg-[#fff1d6] text-[#8b5d16]",
   "Review Pending": "bg-[#dceceb] text-[#28645e]",
   Approved: "bg-[var(--lime)] text-[var(--ink)]",
+  Published: "bg-[#1877F2] text-white",
 };
 
 export default function PostStatusSwitcher({ status, onChange, isStatusAllowed }: { status: PostStatus; onChange: (status: PostStatus) => void; isStatusAllowed?: (status: PostStatus) => boolean }) {

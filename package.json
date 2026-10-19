@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@google/genai": "latest",
+    "@vercel/kv": "^3.0.0",
+    "@vercel/blob": "^1.1.1",
     "bcryptjs": "^2.4.3",
     "jose": "^5.9.6",
     "lucide-react": "^0.468.0",
@@ -19,11 +21,11 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "latest",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@tailwindcss/postcss": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "tailwindcss": "latest",

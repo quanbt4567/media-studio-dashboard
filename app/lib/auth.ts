@@ -56,10 +56,7 @@ export function findUser(username: string): AppUser | undefined {
   return getUsers().find((user) => user.username.toLowerCase() === normalized);
 }
 
-export async function verifyPassword(
-  password: string,
-  passwordHash: string,
-): Promise<boolean> {
+export async function verifyPassword(password: string, passwordHash: string): Promise<boolean> {
   try {
     return await bcrypt.compare(password, passwordHash);
   } catch {
@@ -76,19 +73,13 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 /** Checks a login password against either a bcrypt hash or a plain-text password. */
-export async function checkPassword(
-  user: AppUser,
-  password: string,
-): Promise<boolean> {
+export async function checkPassword(user: AppUser, password: string): Promise<boolean> {
   if (user.passwordHash) return verifyPassword(password, user.passwordHash);
-  if (typeof user.password === "string")
-    return safeEqual(password, user.password);
+  if (typeof user.password === "string") return safeEqual(password, user.password);
   return false;
 }
 
-export async function createSessionToken(
-  payload: SessionPayload,
-): Promise<string> {
+export async function createSessionToken(payload: SessionPayload): Promise<string> {
   return await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -96,15 +87,10 @@ export async function createSessionToken(
     .sign(getSecret());
 }
 
-export async function verifySessionToken(
-  token: string,
-): Promise<SessionPayload | null> {
+export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (
-      typeof payload.username !== "string" ||
-      !["content", "media", "admin"].includes(payload.role as Role)
-    ) {
+    if (typeof payload.username !== "string" || !["content", "media", "admin"].includes(payload.role as Role)) {
       return null;
     }
     return { username: payload.username, role: payload.role as Role };

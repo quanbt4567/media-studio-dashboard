@@ -1,36 +1,15 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { PostStatus } from "../app/components/post-status-switcher";
-import type { Role, SessionPayload } from "../app/lib/auth";
+import { ROLE_PERMISSIONS, getAllowedTransitions, type Role, type RolePermissions } from "../app/lib/roles";
+import type { SessionPayload } from "../app/lib/auth";
 
 /**
  * Session-based auth context. The role comes from the logged-in user's
  * server-verified session — it can no longer be freely toggled in the UI.
  */
-export type { Role };
-
-export interface RolePermissions {
-  canGenerateAI: boolean;
-  canEditText: boolean;
-  canUploadMedia: boolean;
-  canPublish: boolean;
-}
-
-export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
-  content: { canGenerateAI: true, canEditText: true, canUploadMedia: false, canPublish: false },
-  media: { canGenerateAI: false, canEditText: false, canUploadMedia: true, canPublish: false },
-  admin: { canGenerateAI: true, canEditText: true, canUploadMedia: true, canPublish: true },
-};
-
-const ALL_STATUSES: PostStatus[] = ["Draft", "Waiting Media", "Review Pending", "Approved"];
-
-/** Statuses the given role is allowed to move TO from the current status. */
-export function getAllowedTransitions(role: Role, current: PostStatus): PostStatus[] {
-  if (role === "admin") return ALL_STATUSES.filter((status) => status !== current);
-  if (role === "content") return current === "Draft" ? ["Waiting Media"] : [];
-  return current === "Waiting Media" ? ["Review Pending"] : [];
-}
+export type { Role, RolePermissions };
+export { ROLE_PERMISSIONS, getAllowedTransitions };
 
 interface SessionContextValue {
   user: SessionPayload;

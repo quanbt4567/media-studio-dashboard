@@ -14,10 +14,7 @@ export async function POST(request: Request) {
     const cleanPassword = typeof password === "string" ? password : "";
 
     if (!cleanUsername || !cleanPassword) {
-      return NextResponse.json(
-        { error: "Username and password are required." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Username and password are required." }, { status: 400 });
     }
 
     const user = findUser(cleanUsername);
@@ -25,27 +22,15 @@ export async function POST(request: Request) {
 
     if (!user || !valid) {
       // Same response whether the user exists or not — don't leak usernames.
-      return NextResponse.json(
-        { error: "Invalid username or password." },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid username or password." }, { status: 401 });
     }
 
-    const token = await createSessionToken({
-      username: user.username,
-      role: user.role,
-    });
-    const response = NextResponse.json({
-      username: user.username,
-      role: user.role,
-    });
+    const token = await createSessionToken({ username: user.username, role: user.role });
+    const response = NextResponse.json({ username: user.username, role: user.role });
     response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
     return response;
   } catch (error) {
     console.error("Login failed", error);
-    return NextResponse.json(
-      { error: "Login is not available right now." },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Login is not available right now." }, { status: 500 });
   }
 }

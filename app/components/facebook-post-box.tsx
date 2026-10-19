@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   FormEvent,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -28,6 +29,16 @@ export interface CreatePostBoxProps {
   textReadOnly?: boolean;
   /** When true, image upload controls are hidden (e.g. Content Creator role). */
   hideImageControls?: boolean;
+  /** When true, the submit button is hidden (the role hands off elsewhere). */
+  hideSubmit?: boolean;
+  /** Custom label for the submit button. */
+  submitLabel?: string;
+  /** When provided, shows a "from library" button in the media asset row. */
+  onBrowseLibrary?: () => void;
+  /** When provided, shows a video-upload button in the media asset row. */
+  onVideoSelect?: (file: File) => void;
+  /** True while a video is uploading (disables the button). */
+  videoUploading?: boolean;
 }
 
 const emojis = ['😀', '😂', '😍', '🎉', '👍', '❤️'];
@@ -35,7 +46,7 @@ const emojis = ['😀', '😂', '😍', '🎉', '👍', '❤️'];
 const CreatePostBox: React.FC<CreatePostBoxProps> = ({
   value,
   defaultValue = '',
-  placeholder = "What's on your mind?",
+  placeholder = "Bạn đang nghĩ gì?",
   avatarUrl,
   userName = 'You',
   image,
@@ -45,10 +56,14 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
   className = '',
   textReadOnly = false,
   hideImageControls = false,
+  hideSubmit = false,
+  submitLabel = "Post",
+  onBrowseLibrary,
+  onVideoSelect,
+  videoUploading = false,
 }) => {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [internalImage, setInternalImage] = useState<File>();
-  const [imagePreview, setImagePreview] = useState<string>();
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const contentInputRef = useRef<HTMLTextAreaElement>(null);
@@ -56,16 +71,18 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
   const selectedImage = onImageChange ? image : internalImage;
   const initials = userName.trim().charAt(0).toUpperCase() || 'Y';
 
-  useEffect(() => {
-    if (!selectedImage) {
-      setImagePreview(undefined);
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(selectedImage);
-    setImagePreview(previewUrl);
-    return () => URL.revokeObjectURL(previewUrl);
+  // Compute the object URL during render instead of setState-in-effect.
+  const imagePreview = useMemo(() => {
+    if (!selectedImage) return undefined;
+    return URL.createObjectURL(selectedImage);
   }, [selectedImage]);
+
+  // Only cleanup here — no setState, so no render cascade.
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   useEffect(() => {
     const contentInput = contentInputRef.current;
@@ -207,18 +224,51 @@ const CreatePostBox: React.FC<CreatePostBoxProps> = ({
             </div>
           )}
         </div>
-        <button
-          type="submit"
-          disabled={!content.trim() && !selectedImage}
-          className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Post
-        </button>
+        {!hideSubmit && (
+          <button
+            type="submit"
+            disabled={!content.trim() && !selectedImage}
+            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitLabel}
+          </button>
+        )}
       </div>
       {!hideImageControls && (
-        <label onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} className="mt-3 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-500 transition hover:border-primary hover:bg-slate-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
-          <span aria-hidden="true">🖼️</span><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-        </label>
+        <div className="mt-3 flex gap-2">
+          <label onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} className="flex flex-1 cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-500 transition hover:border-primary hover:bg-slate-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
+            <span aria-hidden="true">🖼️</span><span><strong className="text-slate-700 dark:text-white">Media asset</strong> · drop an image here or click to browse</span><input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+          </label>
+          {onBrowseLibrary && (
+            <button
+              type="button"
+              onClick={onBrowseLibrary}
+              title="Lấy ảnh từ thư viện dùng chung"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:border-primary hover:text-primary dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
+            >
+              📚 Thư viện
+            </button>
+          )}
+          {onVideoSelect && (
+            <label
+              title="Upload video (lưu trên Vercel Blob)"
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:border-primary hover:text-primary dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 ${videoUploading ? "pointer-events-none opacity-50" : ""}`}
+            >
+              🎬 {videoUploading ? "Đang tải…" : "Video"}
+              <input
+                type="file"
+                accept="video/mp4,video/quicktime,video/webm,video/x-m4v"
+                className="hidden"
+                disabled={videoUploading}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (file) onVideoSelect(file);
+                }}
+              />
+            </label>
+          )}
+        </div>
       )}
     </form>
   );

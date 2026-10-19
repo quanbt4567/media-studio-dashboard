@@ -2,6 +2,7 @@
  * Shared helper: fetch the most recent posts from the connected Facebook Page.
  * Used by /api/fetch-page-posts and by /api/generate (tone-of-voice few-shot).
  */
+import { resolveApiKey } from "./settings-store";
 
 export interface PagePost {
   id: string;
@@ -13,8 +14,8 @@ const GRAPH_VERSION = "v25.0";
 
 /** Returns up to `limit` recent post messages (newest first). Throws on misconfiguration or API errors. */
 export async function getRecentPagePosts(limit = 5): Promise<string[]> {
-  const pageId = process.env.FB_PAGE_ID;
-  const pageAccessToken = process.env.FB_PAGE_ACCESS_TOKEN;
+  const pageId = await resolveApiKey("fbPageId");
+  const pageAccessToken = await resolveApiKey("fbPageAccessToken");
 
   if (!pageId || !pageAccessToken) {
     throw new Error("Facebook page credentials are not configured.");
