@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/app/lib/session";
-import { geminiErrorMessage, withGeminiKeys } from "@/app/lib/gemini-errors";
+import { geminiErrorMessage } from "@/app/lib/gemini-errors";
+import { aiText } from "@/app/lib/text-ai";
 
 /**
  * AI visual brief for the designer ("gợi ý visual"): given the writer's post
@@ -71,11 +71,7 @@ export async function POST(request: Request) {
   const catalog = TEMPLATES.map((t) => `- ${t.id}: ${t.name} — ${t.desc}`).join("\n");
 
   try {
-    const result = await withGeminiKeys(async (apiKey) => {
-      const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
-        contents: `Bạn là art director cho Ban Công Nghệ (câu lạc bộ công nghệ sinh viên). Dựa vào bài post Facebook dưới đây, hãy gợi ý cho designer:
+    const result = await aiText(`Bạn là art director cho Ban Công Nghệ (câu lạc bộ công nghệ sinh viên). Dựa vào bài post Facebook dưới đây, hãy gợi ý cho designer:
 
 1. "imageBrief": mô tả cụ thể ảnh nên thêm/chụp cho bài này — gồm chủ thể chính, bố cục, cảm xúc/tone, và gợi ý màu sắc theo brand (xanh navy + vàng gold). 2-3 câu, tiếng Việt, thực tế (designer sinh viên tự chụp/làm được).
 2. "templateId": chọn 1 mẫu phù hợp nhất trong danh sách (chỉ dùng đúng id).
@@ -88,10 +84,7 @@ Bài post:
 """${content}"""
 
 Chỉ trả về JSON thuần (không markdown, không giải thích):
-{"imageBrief": "...", "templateId": "...", "templateReason": "..."}`,
-      });
-      return response.text ?? "";
-    });
+{"imageBrief": "...", "templateId": "...", "templateReason": "..."}`);
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }

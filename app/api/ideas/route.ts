@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/app/lib/session";
-import { geminiErrorMessage, withGeminiKeys } from "@/app/lib/gemini-errors";
+import { geminiErrorMessage } from "@/app/lib/gemini-errors";
+import { aiText } from "@/app/lib/text-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -70,22 +70,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Custom topic is too long (max 200 characters)." }, { status: 400 });
   }
 
-  const result = await withGeminiKeys(async (apiKey) => {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: `You are a social media strategist for a Vietnamese university student club. Suggest 5 Facebook post ideas for: "${topic}".`,
-      config: {
-        systemInstruction: `Return ONLY a valid JSON array (no markdown fences, no commentary) of exactly 5 objects with these fields:
+  const result = await aiText(
+      `You are a social media strategist for a Vietnamese university student club. Suggest 5 Facebook post ideas for: "${topic}".`,
+      {
+        system: `Return ONLY a valid JSON array (no markdown fences, no commentary) of exactly 5 objects with these fields:
 - "title": short catchy post title in Vietnamese (max 60 chars)
 - "angle": one-sentence creative angle in Vietnamese (max 140 chars)
 - "hashtags": array of 3 relevant hashtags (with # prefix)
 - "bestTime": suggested posting slot, e.g. "19:00–21:00" or "Sáng 8:00"
 Make ideas varied: announcement, behind-the-scenes, interactive (poll/question), member spotlight, countdown/reminder. Keep the tone youthful and warm. Never use ** markdown in any field.`,
       },
-    });
-    return (response.text || "").trim();
-  });
+    );
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 500 });

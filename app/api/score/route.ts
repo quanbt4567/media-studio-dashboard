@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
 import { getSessionUser } from "@/app/lib/session";
-import { withGeminiKeys } from "@/app/lib/gemini-errors";
+import { aiText } from "@/app/lib/text-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +38,8 @@ export async function POST(request: Request) {
   if (!content) return NextResponse.json({ error: "Content is required." }, { status: 400 });
   if (content.length > 5000) return NextResponse.json({ error: "Content too long." }, { status: 400 });
 
-  const result = await withGeminiKeys(async (apiKey) => {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: `Bạn là giám khảo khó tính chuyên chấm bài đăng Facebook cho câu lạc bộ sinh viên Việt Nam.
+  const result = await aiText(
+      `Bạn là giám khảo khó tính chuyên chấm bài đăng Facebook cho câu lạc bộ sinh viên Việt Nam.
 Chấm bài viết sau trên thang 100 điểm theo các tiêu chí:
 - hook (câu mở đầu có níu người đọc không): tối đa 30
 - cta (kêu gọi hành động rõ ràng không): tối đa 25
@@ -56,10 +52,10 @@ Bài viết cần chấm:
 """
 ${content}
 """`,
-      config: { responseMimeType: "application/json" },
-    });
-    return (response.text || "").trim();
-  });
+      {
+        json: true,
+      },
+    );
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 500 });

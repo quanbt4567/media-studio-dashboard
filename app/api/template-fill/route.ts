@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/app/lib/session";
-import { geminiErrorMessage, withGeminiKeys } from "@/app/lib/gemini-errors";
+import { geminiErrorMessage } from "@/app/lib/gemini-errors";
+import { aiText } from "@/app/lib/text-ai";
 
 /**
  * AI auto-fill for design templates ("AI điền nội dung"): extracts a short
@@ -66,11 +66,7 @@ export async function POST(request: Request) {
   const kindHint = KIND_HINTS[kind] ?? "Đây là mẫu bài đăng chung.";
 
   try {
-    const result = await withGeminiKeys(async (apiKey) => {
-      const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
-        contents: `Trích xuất nội dung cho mẫu thiết kế từ bài post Facebook sau.
+    const result = await aiText(`Trích xuất nội dung cho mẫu thiết kế từ bài post Facebook sau.
 
 ${kindHint}
 
@@ -83,10 +79,7 @@ Bài post:
 """${content}"""
 
 Chỉ trả về JSON thuần (không markdown, không giải thích):
-{"headline": "...", "body": "..."}`,
-      });
-      return response.text ?? "";
-    });
+{"headline": "...", "body": "..."}`);
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
