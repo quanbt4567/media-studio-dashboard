@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 const SESSION_COOKIE = "msd_session";
 // Routes anyone can reach without logging in.
-const PUBLIC_PATHS = ["/login", "/api/auth/login"];
+const PUBLIC_PATHS = ["/login", "/api/auth/login", "/privacy"];
 
 function loginUrl(request: NextRequest) {
   const url = request.nextUrl.clone();
