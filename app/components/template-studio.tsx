@@ -682,16 +682,21 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       if (el.type === "image" && el.src) {
         try {
           const img = await loadImage(el.src);
+          // ALWAYS clip to the element's rect: drawCover overshoots the rect
+          // whenever the image's aspect differs from the slot's (cover math),
+          // and without a clip the overflow paints over neighbouring
+          // elements — the editor never shows this because CSS object-fit
+          // clips to the box, so exports silently diverged from the editor.
+          ctx.save();
+          ctx.beginPath();
           if (el.radius && el.radius > 0) {
-            ctx.save();
-            ctx.beginPath();
             ctx.roundRect(el.x, el.y, el.w, el.h, Math.min(el.radius, el.w / 2, el.h / 2));
-            ctx.clip();
-            drawCover(ctx, img, el.x, el.y, el.w, el.h, el.focalX ?? 0.5, el.focalY ?? 0.5);
-            ctx.restore();
           } else {
-            drawCover(ctx, img, el.x, el.y, el.w, el.h, el.focalX ?? 0.5, el.focalY ?? 0.5);
+            ctx.rect(el.x, el.y, el.w, el.h);
           }
+          ctx.clip();
+          drawCover(ctx, img, el.x, el.y, el.w, el.h, el.focalX ?? 0.5, el.focalY ?? 0.5);
+          ctx.restore();
         } catch { /* skip broken */ }
       } else if (el.type === "text" && el.text?.trim()) {
         ctx.save();
