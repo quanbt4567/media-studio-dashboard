@@ -219,10 +219,10 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_MEGAPHONE },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "THÔNG BÁO", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên thông báo]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Nội dung chi tiết]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
-      { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
+      { type: "text", x: 64, y: 916, w: 540, h: 90, text: "[Nội dung chi tiết]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 610, y: 954, w: 400, h: 28, text: "MEDIA - Ban Công Nghệ", fontSize: 18, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 984, w: 400, h: 24, text: "mediabancongnghe@gmail.com", fontSize: 15, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
+      { type: "text", x: 410, y: 1010, w: 600, h: 22, text: "facebook.com/messages/t/61572321333029", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
     ],
   },
   {
@@ -239,10 +239,10 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_CALENDAR },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "SỰ KIỆN SẮP TỚI", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên sự kiện]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Thời gian] · [Địa điểm]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
-      { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
+      { type: "text", x: 64, y: 916, w: 540, h: 90, text: "[Thời gian] · [Địa điểm]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 610, y: 954, w: 400, h: 28, text: "MEDIA - Ban Công Nghệ", fontSize: 18, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 984, w: 400, h: 24, text: "mediabancongnghe@gmail.com", fontSize: 15, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
+      { type: "text", x: 410, y: 1010, w: 600, h: 22, text: "facebook.com/messages/t/61572321333029", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
     ],
   },
   {
@@ -259,10 +259,10 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_CAMERA },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "RECAP", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Tên hoạt động]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Điểm nổi bật]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
-      { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
+      { type: "text", x: 64, y: 916, w: 540, h: 90, text: "[Điểm nổi bật]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 610, y: 954, w: 400, h: 28, text: "MEDIA - Ban Công Nghệ", fontSize: 18, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 984, w: 400, h: 24, text: "mediabancongnghe@gmail.com", fontSize: 15, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
+      { type: "text", x: 410, y: 1010, w: 600, h: 22, text: "facebook.com/messages/t/61572321333029", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
     ],
   },
   {
@@ -279,10 +279,10 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "image", x: 64, y: 686, w: 40, h: 40, src: ICON_USERS },
       { type: "text", x: 118, y: 684, w: 898, h: 48, text: "TUYỂN CỘNG TÁC VIÊN", fontSize: 32, color: "#ffb300", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 64, y: 748, w: 952, h: 150, text: "[Vị trí cần tuyển]", role: "headline", fontSize: 66, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 64, y: 916, w: 640, h: 90, text: "[Mô tả & quyền lợi] · [Link đăng ký]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
-      { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
+      { type: "text", x: 64, y: 916, w: 540, h: 90, text: "[Mô tả & quyền lợi] · [Link đăng ký]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 610, y: 954, w: 400, h: 28, text: "MEDIA - Ban Công Nghệ", fontSize: 18, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 984, w: 400, h: 24, text: "mediabancongnghe@gmail.com", fontSize: 15, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
+      { type: "text", x: 410, y: 1010, w: 600, h: 22, text: "facebook.com/messages/t/61572321333029", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
     ],
   },
   {
@@ -298,9 +298,9 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "text", x: 110, y: 330, w: 860, h: 360, text: "\u201c[C\u00e2u n\u00f3i hay]\u201d", role: "headline", fontSize: 56, color: "#ffffff", bold: true, italic: true, align: "center", fontFamily: "playfair" },
       { type: "text", x: 110, y: 706, w: 860, h: 60, text: "\u2014 [T\u00ean ng\u01b0\u1eddi n\u00f3i]", role: "body", fontSize: 32, color: "#ffb300", bold: true, align: "center", fontFamily: "system" },
       { type: "image", x: 504, y: 792, w: 72, h: 10, src: "__gold-bar__", radius: 5 },
-      { type: "text", x: 610, y: 948, w: 400, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 22, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "text", x: 610, y: 982, w: 400, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
-      { type: "text", x: 410, y: 1012, w: 600, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 954, w: 400, h: 28, text: "MEDIA - Ban Công Nghệ", fontSize: 18, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 610, y: 984, w: 400, h: 24, text: "mediabancongnghe@gmail.com", fontSize: 15, color: "rgba(255,255,255,0.8)", align: "right", fontFamily: "system" },
+      { type: "text", x: 410, y: 1010, w: 600, h: 22, text: "facebook.com/messages/t/61572321333029", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "right", fontFamily: "system" },
     ],
   },
   {
@@ -318,9 +318,9 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
         { type: "text", x: 90, y: 500, w: 900, h: 190, text: "[Tiêu đề chính]", role: "headline", fontSize: 72, color: "#ffffff", bold: true, align: "center", fontFamily: "display" },
         { type: "text", x: 140, y: 710, w: 800, h: 130, text: "[Nội dung chi tiết — ngắn gọn, súc tích]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.72)", align: "center", fontFamily: "system" },
         { type: "image", x: 140, y: 872, w: 800, h: 148, src: MODERN_GLASS_CARD, radius: 24 },
-        { type: "text", x: 170, y: 898, w: 740, h: 36, text: "MEDIA - Ban Công Nghệ", fontSize: 24, color: "#ffffff", bold: true, align: "center", fontFamily: "system" },
-        { type: "text", x: 170, y: 936, w: 740, h: 32, text: "mediabancongnghe@gmail.com", fontSize: 20, color: "rgba(255,255,255,0.8)", align: "center", fontFamily: "system" },
-        { type: "text", x: 170, y: 968, w: 740, h: 30, text: "facebook.com/messages/t/61572321333029", fontSize: 18, color: "rgba(255,255,255,0.65)", align: "center", fontFamily: "system" },
+        { type: "text", x: 170, y: 902, w: 740, h: 30, text: "MEDIA - Ban Công Nghệ", fontSize: 20, color: "#ffffff", bold: true, align: "center", fontFamily: "system" },
+        { type: "text", x: 170, y: 938, w: 740, h: 26, text: "mediabancongnghe@gmail.com", fontSize: 16, color: "rgba(255,255,255,0.8)", align: "center", fontFamily: "system" },
+        { type: "text", x: 170, y: 968, w: 740, h: 24, text: "facebook.com/messages/t/61572321333029", fontSize: 14, color: "rgba(255,255,255,0.65)", align: "center", fontFamily: "system" },
       ],
   },
 ]
@@ -702,13 +702,19 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         ctx.save();
         ctx.font = fontOf(el);
         ctx.fillStyle = el.color ?? "#ffffff";
-        ctx.textBaseline = "top";
+        // Match the editor's line box (lineHeight 1.25, glyphs centered in
+        // each line): draw each line's em-box center at the line center.
+        // textBaseline "top" used to render text ~0.35em higher than the
+        // editor — visible as icon/label misalignment in exports.
+        ctx.textBaseline = "middle";
         const lines = wrapLines(ctx, el.text, el.w);
         const lineH = (el.fontSize ?? 48) * 1.25;
         lines.forEach((line, i) => {
           const lw = ctx.measureText(line).width;
           const lx = el.align === "center" ? el.x + (el.w - lw) / 2 : el.align === "right" ? el.x + el.w - lw : el.x;
-          ctx.fillText(line, lx, el.y + i * lineH);
+          // +0.15em: DOM line-box centering sits glyphs slightly lower than
+          // the canvas em-box center — measured ~6px at 32px font.
+          ctx.fillText(line, lx, el.y + lineH * (i + 0.5) + (el.fontSize ?? 48) * 0.15);
         });
         ctx.restore();
       }
