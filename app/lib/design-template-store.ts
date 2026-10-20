@@ -37,6 +37,19 @@ export interface CanvasElement {
    */
   locked?: boolean;
   /**
+   * Geometry lock for built-in template slots (photo, text, decorations).
+   * The element stays selectable so its CONTENT remains editable (text, image
+   * src, crop) but it can't be moved, resized, duplicated or deleted —
+   * the template layout can't be broken by accident.
+   */
+  geometryLocked?: boolean;
+  /**
+   * Named slot for template placeholders (e.g. "photo"). Lets "+ Ảnh" fill
+   * the template's photo slot instead of dropping a floating square that
+   * breaks the layout.
+   */
+  slot?: string;
+  /**
    * Focal point for cover-crop (0..1, default 0.5 = center). Which part of the
    * image shows inside the frame; adjustable via the "Căn ảnh" crop tool.
    */

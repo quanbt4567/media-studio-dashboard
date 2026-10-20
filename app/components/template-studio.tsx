@@ -197,8 +197,15 @@ function getPhotoPlaceholder(w = 1080, h = 470): string {
   return url;
 }
 
-const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
-  {
+/** True when the src is one of this session's generated photo placeholders. */
+function isPlaceholderSrc(src: string): boolean {
+  for (const url of photoPlaceholderCache.values()) {
+    if (url === src) return true;
+  }
+  return false;
+}
+
+const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     id: "bcn-announce",
     name: "Thông báo",
     desc: "Mọi loại thông báo",
@@ -411,6 +418,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   const [aiResult, setAiResult] = useState<string | null>(null);
   const [libraryNote, setLibraryNote] = useState("");
   const [savedFlash, setSavedFlash] = useState(false);
+  /** True when the canvas has edits not yet saved to the post (preview shows the old save). */
+  const [dirty, setDirty] = useState(false);
   const [showBgLibrary, setShowBgLibrary] = useState(false);
   const [showElLibrary, setShowElLibrary] = useState(false);
   /** Image crop modal: element id being cropped, or null. */
@@ -482,7 +491,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   function deleteSelected() {
     if (!selectedId) return;
-    if (selected?.locked) return;
+    if (selected?.locked || selected?.geometryLocked) return;
     pushHistory();
     setElements((prev) => prev.filter((el) => el.id !== selectedId));
     setSelectedId(null);
@@ -490,7 +499,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function duplicateSelected() {
-    if (!selected || selected.locked) return;
+    if (!selected || selected.locked || selected.geometryLocked) return;
     pushHistory();
     const copy: CanvasElement = { ...selected, id: uid("el"), x: selected.x + 40, y: selected.y + 40 };
     setElements((prev) => [...prev, copy]);
@@ -498,7 +507,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function moveLayer(dir: 1 | -1) {
-    if (!selectedId || selected?.locked) return;
+    if (!selectedId || selected?.locked || selected?.geometryLocked) return;
     pushHistory();
     setElements((prev) => {
       const i = prev.findIndex((el) => el.id === selectedId);
@@ -525,6 +534,24 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const el: CanvasElement = { id: uid("el"), type: "image", x: 240, y: 300, w: 600, h: 600, src };
     setElements((prev) => [...prev, el]);
     setSelectedId(el.id);
+  }
+
+  /**
+   * Add an image to the canvas: fills the template's photo slot when it's
+   * still empty (placeholder) instead of dropping a floating square that
+   * breaks the template layout.
+   */
+  function addOrFillPhotoSlot(src: string) {
+    const emptySlot = elements.find(
+      (el) => el.type === "image" && el.slot === "photo" && isPlaceholderSrc(el.src || ""),
+    );
+    if (emptySlot) {
+      pushHistory();
+      updateEl(emptySlot.id, { src, focalX: 0.5, focalY: 0.5 });
+      setSelectedId(emptySlot.id);
+    } else {
+      addImageElement(src);
+    }
   }
 
   function applyPreset(kind: "title" | "announce" | "quote") {
@@ -555,9 +582,12 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
   // --- drag & resize -------------------------------------------------------
   function onElPointerDown(e: React.PointerEvent, el: CanvasElement) {
-    if (!canDesign || editingId === el.id) return;
+    if (!canDesign || editingId === el.id || el.locked) return;
     e.stopPropagation();
     setSelectedId(el.id);
+    // Geometry-locked template parts: selectable (content stays editable)
+    // but never draggable — the layout can't be broken by accident.
+    if (el.geometryLocked) return;
     const startX = e.clientX;
     const startY = e.clientY;
     const ox = el.x;
@@ -577,6 +607,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   function onResizePointerDown(e: React.PointerEvent, el: CanvasElement) {
+    if (el.geometryLocked) return;
     e.stopPropagation();
     const startX = e.clientX;
     const startW = el.w;
@@ -695,6 +726,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     try {
       const dataUrl = await canvasToDataUrl(await renderCanvas(), "image/jpeg", 0.92);
       onSave(dataUrl);
+      setDirty(false);
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 2500);
     } catch (err) {
@@ -787,6 +819,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     pastRef.current = [...pastRef.current.slice(-29), snapshot()];
     futureRef.current = [];
     setHistVer((v) => v + 1);
+    setDirty(true);
   }
   function undo() {
     const prev = pastRef.current[pastRef.current.length - 1];
@@ -880,7 +913,18 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       // or deleted by accident.
       const locked =
         marker === "__ribbon__" || marker === "__bcn-logo__" || marker === "__khoa-cntt-logo__";
-      return { ...el, id: uid("el"), src, ...(locked ? { locked: true } : {}) };
+      const isPhotoSlot = marker === "__photo-slot__";
+      return {
+        ...el,
+        id: uid("el"),
+        src,
+        ...(locked ? { locked: true } : {}),
+        // Photo slot + all other built-in parts keep their template geometry:
+        // selectable so content stays editable (text, image, crop) but can't
+        // be moved, resized or deleted — the layout can't break by accident.
+        ...(!locked ? { geometryLocked: true } : {}),
+        ...(isPhotoSlot ? { slot: "photo" } : {}),
+      };
     });
     // Header always stays on top: replacing or resizing the photo can never
     // cover or break the template header again.
@@ -942,11 +986,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       const dataUrl = reader.result as string;
       const targetId = replaceImgRef.current;
       replaceImgRef.current = null;
-      pushHistory();
       if (targetId) {
+        pushHistory();
         updateEl(targetId, { src: dataUrl, focalX: 0.5, focalY: 0.5 });
       } else {
-        addImageElement(dataUrl);
+        addOrFillPhotoSlot(dataUrl);
       }
       fetch("/api/media", {
         method: "POST",
@@ -1117,7 +1161,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={el.src} alt="" draggable={false} className="block w-full" style={{ height: el.h, objectFit: "cover", objectPosition: `${(el.focalX ?? 0.5) * 100}% ${(el.focalY ?? 0.5) * 100}%`, userSelect: "none", borderRadius: el.radius ?? 0 }} />
                   )}
-                  {isSel && !isEditing && (
+                  {isSel && !isEditing && !el.geometryLocked && (
                     <div
                       onPointerDown={(e) => onResizePointerDown(e, el)}
                       className="absolute -bottom-2 -right-2 h-5 w-5 cursor-nwse-resize rounded-full border-2 border-white bg-[#1877F2] shadow"
@@ -1140,10 +1184,19 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             <p className="text-[11px] text-[var(--muted)]">Chưa chọn lớp nào. Nhấn vào chữ/ảnh trên canvas.</p>
           ) : (
             <div className="space-y-2.5">
+              {selected.geometryLocked && (
+                <p className="rounded-lg bg-[#eef4ff] px-2.5 py-1.5 text-[10px] font-bold text-[#2451a8]">
+                  🔒 Phần của mẫu — chỉ sửa nội dung, không dời/kéo/xóa được.
+                </p>
+              )}
               <div className="flex flex-wrap gap-1.5">
-                <button type="button" onClick={duplicateSelected} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">⧉ Nhân bản</button>
-                <button type="button" onClick={() => moveLayer(1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↑ Lớp trên</button>
-                <button type="button" onClick={() => moveLayer(-1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↓ Lớp dưới</button>
+                {!selected.geometryLocked && (
+                  <>
+                    <button type="button" onClick={duplicateSelected} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">⧉ Nhân bản</button>
+                    <button type="button" onClick={() => moveLayer(1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↑ Lớp trên</button>
+                    <button type="button" onClick={() => moveLayer(-1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↓ Lớp dưới</button>
+                  </>
+                )}
                 {selected.type === "image" && (
                   <>
                     <button
@@ -1181,7 +1234,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     </button>
                   </>
                 )}
-                <button type="button" onClick={deleteSelected} className="flex items-center gap-1 rounded-lg border border-[#f3c2b8] px-2.5 py-1.5 text-[11px] font-bold text-[#a74331] hover:bg-[#fff0ec]">
+                <button type="button" onClick={deleteSelected} className={`flex items-center gap-1 rounded-lg border border-[#f3c2b8] px-2.5 py-1.5 text-[11px] font-bold text-[#a74331] hover:bg-[#fff0ec] ${selected.geometryLocked ? "hidden" : ""}`}>
                   <Trash2 size={12} /> Xóa
                 </button>
               </div>
@@ -1333,9 +1386,9 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           <button
             type="button"
             onClick={handleSave}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--ink)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
+            className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 ${dirty ? "bg-[#b3541e]" : "bg-[var(--ink)]"}`}
           >
-            <Save size={14} /> {savedFlash ? "Đã lưu ✓" : "Lưu vào bài viết"}
+            <Save size={14} /> {savedFlash ? "Đã lưu ✓" : dirty ? "Lưu vào bài viết •" : "Lưu vào bài viết"}
           </button>
           <button
             type="button"
@@ -1346,6 +1399,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             <Download size={15} />
           </button>
         </div>
+        {dirty && (
+          <p className="mt-1.5 rounded-lg bg-[#fff4e8] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
+            Có thay đổi chưa lưu — bấm “Lưu vào bài viết” để preview và bài đăng cập nhật.
+          </p>
+        )}
         <p className="flex items-center gap-1 text-[10px] text-[var(--muted)]"><Plus size={11} /> Thiết kế 1080×1080, lưu dưới dạng JPEG chất lượng cao.</p>
       </div>
 
@@ -1376,7 +1434,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 pushHistory();
                 updateEl(targetId, { src: item.dataUrl, focalX: 0.5, focalY: 0.5 });
               } else {
-                addImageElement(item.dataUrl);
+                addOrFillPhotoSlot(item.dataUrl);
               }
             }} />
           </div>
