@@ -133,6 +133,30 @@ function getSolid(w: number, h: number, color: string): string {
   return url;
 }
 
+let headerGradCache: string | null = null;
+/**
+ * Header band as a horizontal black→white gradient: solid black under the
+ * white BCN logo on the left, fading to solid white under the full-color
+ * Khoa logo on the right, so both logos render at their best contrast.
+ */
+function getHeaderGradient(w = 1080, h = 104): string {
+  if (headerGradCache) return headerGradCache;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  const g = ctx.createLinearGradient(0, 0, w, 0);
+  g.addColorStop(0, "#0d0d0d");
+  g.addColorStop(0.42, "#0d0d0d");
+  g.addColorStop(0.68, "#7a7a7a");
+  g.addColorStop(0.85, "#e6e6e6");
+  g.addColorStop(1, "#ffffff");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  headerGradCache = canvas.toDataURL("image/png");
+  return headerGradCache;
+}
+
 /** Light photo-slot placeholder, generated at the slot's aspect ratio. */
 function makePhotoPlaceholder(W = 1080, H = 470): string {
   const canvas = document.createElement("canvas");
@@ -212,7 +236,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     desc: "Mọi loại thông báo",
     bg: { kind: "gradient", from: "#ffffff", to: "#e9e9e9" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon-grad__" },
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 0, y: 104, w: 1080, h: 500, src: "__photo-slot__" },
@@ -232,7 +256,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     desc: "Workshop, họp mặt, ngoại khóa",
     bg: { kind: "gradient", from: "#ffffff", to: "#e9e9e9" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon-grad__" },
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 0, y: 104, w: 1080, h: 500, src: "__photo-slot__" },
@@ -252,7 +276,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     desc: "Tổng kết sau sự kiện",
     bg: { kind: "gradient", from: "#ffffff", to: "#e9e9e9" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon-grad__" },
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 0, y: 104, w: 1080, h: 500, src: "__photo-slot__" },
@@ -272,7 +296,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     desc: "Tuyển quân, casting",
     bg: { kind: "gradient", from: "#ffffff", to: "#e9e9e9" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon-grad__" },
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 0, y: 104, w: 1080, h: 500, src: "__photo-slot__" },
@@ -292,7 +316,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     desc: "Câu nói hay, cảm nghĩ",
     bg: { kind: "gradient", from: "#ffffff", to: "#e9e9e9" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 104, src: "__ribbon-grad__" },
       { type: "image", x: 40, y: 22, w: 214, h: 60, src: "__bcn-logo__" },
       { type: "image", x: 842, y: 29, w: 198, h: 46, src: "__khoa-cntt-logo__", radius: 10 },
       { type: "image", x: 500, y: 210, w: 80, h: 80, src: ICON_QUOTE },
@@ -998,12 +1022,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       // keeps the boxed original because it sits on a white card.
       if (src === "__khoa-cntt-logo__") src = tpl.id === "bcn-modern" ? KHOA_CNTT_LOGO : KHOA_CNTT_LOGO_COLOR;
       if (src === "__ribbon__") src = getSolid(1080, 104, "#0d0d0d");
+      if (src === "__ribbon-grad__") src = getHeaderGradient(1080, 104);
       if (src === "__gold-bar__") src = getSolid(72, 10, "#111111");
       if (src === "__vbar__") src = getSolid(8, 330, "#ffffff");
       // Brand header (ribbon + logos): locked so it can't be selected, moved
       // or deleted by accident.
       const locked =
-        marker === "__ribbon__" || marker === "__bcn-logo__" || marker === "__khoa-cntt-logo__";
+        marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__khoa-cntt-logo__";
       const isPhotoSlot = marker === "__photo-slot__";
       return {
         ...el,
