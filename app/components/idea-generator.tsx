@@ -29,7 +29,10 @@ export default function IdeaGenerator({
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [topicUsed, setTopicUsed] = useState("");
   const [loading, setLoading] = useState(false);
-  const [creatingId, setCreatingId] = useState<number | null>(null);
+  /** Idea card whose "what do you want to write" composer is open. */
+  const [draftFor, setDraftFor] = useState<number | null>(null);
+  const [brief, setBrief] = useState("");
+  const [writing, setWriting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -65,24 +68,48 @@ export default function IdeaGenerator({
     }
   }
 
-  async function handleUseAsDraft(idea: Idea, index: number) {
-    if (!canCreate || creatingId !== null) return;
-    setCreatingId(index);
+  /** Open the "what do you want to write" composer for an idea (prefilled with the idea itself). */
+  function openDraftComposer(idea: Idea, index: number) {
+    setDraftFor(index);
+    setBrief(`${idea.title}\n${idea.angle}`);
+    setError("");
+  }
+
+  /** AI writes the full post from the idea + the writer's brief, then saves it as a draft. */
+  async function handleGenerateDraft(idea: Idea, index: number) {
+    if (!canCreate || writing) return;
+    const topic = brief.replace(/\s+/g, " ").trim().slice(0, 240);
+    if (topic.length < 10) {
+      setError("Mô tả thêm vài ý bạn muốn viết (ít nhất 10 ký tự) để AI viết đúng ý.");
+      return;
+    }
+    setWriting(true);
     setError("");
     try {
-      const starter = `${idea.title}\n\n${idea.angle}\n\n${idea.hashtags.join(" ")}`;
+      const genRes = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic }),
+      });
+      const genData = await genRes.json();
+      if (!genRes.ok) throw new Error(genData.error || "AI viết bài thất bại.");
+      let content = typeof genData.content === "string" ? genData.content.trim() : "";
+      if (!content) throw new Error("AI không trả về nội dung.");
+      const tags = idea.hashtags.join(" ");
+      if (tags && !content.includes("#")) content = `${content}\n\n${tags}`;
       const response = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: starter }),
+        body: JSON.stringify({ content }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not create the draft.");
+      setDraftFor(null);
       onDraftCreated(data.post);
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Could not create the draft.");
     } finally {
-      setCreatingId(null);
+      setWriting(false);
     }
   }
 
@@ -147,14 +174,50 @@ export default function IdeaGenerator({
             <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-[#1877F2]"><Hash size={11} />{idea.hashtags.join(" ")}</p>
             <p className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-[var(--muted)]"><Clock size={11} />Giờ đăng gợi ý: {idea.bestTime || "—"}</p>
             {canCreate ? (
-              <button
-                type="button"
-                onClick={() => handleUseAsDraft(idea, index)}
-                disabled={creatingId !== null}
-                className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
-              >
-                <Plus size={13} /> {creatingId === index ? "Đang tạo…" : "Dùng làm bản nháp"}
-              </button>
+              draftFor === index ? (
+                <div className="mt-3 rounded-xl border border-[var(--ink)] bg-[#fafbf7] p-3">
+                  <label htmlFor={`brief-${index}`} className="mb-1.5 block text-[11px] font-extrabold">
+                    Bạn muốn viết gì?
+                  </label>
+                  <textarea
+                    id={`brief-${index}`}
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value)}
+                    rows={4}
+                    autoFocus
+                    placeholder="Thêm chi tiết: thời gian, địa điểm, đối tượng, giọng văn, ý bắt buộc có…"
+                    className="w-full rounded-lg border border-[var(--line)] bg-white px-2.5 py-2 text-xs leading-relaxed outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+                  />
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateDraft(idea, index)}
+                      disabled={writing}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                    >
+                      {writing ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                      {writing ? "AI đang viết…" : "AI viết bài & tạo nháp"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDraftFor(null)}
+                      disabled={writing}
+                      className="rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-[11px] font-bold text-[var(--muted)] transition hover:text-[var(--ink)] disabled:opacity-40"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openDraftComposer(idea, index)}
+                  disabled={writing}
+                  className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                >
+                  <Plus size={13} /> Dùng làm bản nháp
+                </button>
+              )
             ) : (
               <p className="mt-3 text-[10px] text-[var(--muted)]">Đăng nhập vai trò writer để tạo bản nháp từ ý tưởng này.</p>
             )}

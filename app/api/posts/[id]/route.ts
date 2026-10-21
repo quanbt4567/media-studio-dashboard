@@ -188,6 +188,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           : `👀 Bài “${snippet}” chờ bạn duyệt`,
         post.id,
       );
+    } else if (patch.status === "Draft" && user.role === "media") {
+      notify(["content"], `↩ ${user.username} trả bài “${snippet}” về cho writer sửa nội dung`, post.id);
     }
   }
 

@@ -28,5 +28,6 @@ export function getAllowedTransitions(role: Role, current: PostStatus): PostStat
   if (current === "Published") return [];
   if (role === "admin") return ALL_STATUSES.filter((status) => status !== current);
   if (role === "content") return current === "Draft" ? ["Waiting Media", "Review Pending"] : [];
-  return current === "Waiting Media" ? ["Review Pending"] : [];
+  // Designer: send to review, or hand the post back to the writer for fixes.
+  return current === "Waiting Media" ? ["Review Pending", "Draft"] : [];
 }

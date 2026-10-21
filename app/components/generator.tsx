@@ -100,6 +100,9 @@ export default function Generator({
   const [ticketMeta, setTicketMeta] = useState("");
   const [scheduledInput, setScheduledInput] = useState("");
   const [saving, setSaving] = useState(false);
+  /** Designer → writer hand-back: note form visibility + text. */
+  const [showReturn, setShowReturn] = useState(false);
+  const [returnNote, setReturnNote] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -458,6 +461,19 @@ export default function Generator({
     if (saved) setStatus("Review Pending");
   }
 
+  /** Designer hands the post back to the writer (status → Draft) with an optional fix-it note as a comment. */
+  async function handleReturnToWriter() {
+    if (!activeId) return;
+    const note = returnNote.trim();
+    if (note) await postHandoffComment(activeId, `↩ Designer trả bài — cần sửa: ${note}`);
+    const saved = await savePost({ status: "Draft" });
+    if (saved) {
+      setStatus("Draft");
+      setShowReturn(false);
+      setReturnNote("");
+    }
+  }
+
   const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
 
   /** Designer uploads a video straight to Vercel Blob (bypasses the 4.5 MB API body limit). */
@@ -781,6 +797,15 @@ export default function Generator({
                   <p className="mt-1 text-[11px] text-[var(--muted)]">Đang tải video lên… {videoProgress ?? 0}%</p>
                 </div>
               )}
+              {showLibraryPicker && (
+                <div className="mt-4 rounded-2xl border border-[var(--ink)] bg-[#fafbf7] p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="flex items-center gap-2 text-sm font-extrabold"><Library size={16} /> Thư viện ảnh dùng chung — chọn ảnh để gắn vào bài</h4>
+                    <button type="button" onClick={() => setShowLibraryPicker(false)} className="rounded-full border border-[var(--line)] bg-white px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
+                  </div>
+                  <MediaLibrary onPick={attachLibraryImage} />
+                </div>
+              )}
               {/* Writer handoff: choose the designer lane or the text-only fast lane. */}
               {role === "content" && status === "Draft" && (
                 <div className="mt-4 rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] p-3">
@@ -928,6 +953,49 @@ export default function Generator({
                   {!hasVisual && (
                     <p className="mt-1.5 text-center text-[11px] text-[var(--muted)]">Gắn hình ảnh hoặc video trước khi gửi duyệt.</p>
                   )}
+                  {!showReturn ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowReturn(true)}
+                      disabled={saving}
+                      className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-white px-5 py-2.5 text-xs font-extrabold text-[var(--muted)] transition hover:border-[var(--ink)] hover:text-[var(--ink)] disabled:opacity-50"
+                    >
+                      ↩ Trả lại writer sửa nội dung
+                    </button>
+                  ) : (
+                    <div className="mt-2 rounded-xl border border-[var(--ink)] bg-[#fafbf7] p-3">
+                      <label htmlFor="return-note" className="mb-1.5 block text-[11px] font-extrabold">
+                        Cần writer sửa gì?
+                      </label>
+                      <textarea
+                        id="return-note"
+                        value={returnNote}
+                        onChange={(e) => setReturnNote(e.target.value)}
+                        rows={3}
+                        autoFocus
+                        placeholder="Vd: sai thời gian sự kiện, thiếu địa điểm, kiểm tra lại tên nhà tài trợ…"
+                        className="w-full rounded-lg border border-[var(--line)] bg-white px-2.5 py-2 text-xs leading-relaxed outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+                      />
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleReturnToWriter}
+                          disabled={saving}
+                          className="flex-1 rounded-lg bg-[#b8543c] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                        >
+                          {saving ? "Đang trả…" : "↩ Trả bài cho writer"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowReturn(false)}
+                          disabled={saving}
+                          className="rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-[11px] font-bold text-[var(--muted)] transition hover:text-[var(--ink)] disabled:opacity-40"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               <FacebookPreview generatedText={postContent} image={previewImage} video={ticketVideo} onRemoveImage={previewImage && permissions.canUploadMedia ? handleRemoveImage : undefined} onRemoveVideo={ticketVideo && permissions.canUploadMedia ? handleRemoveVideo : undefined} />
@@ -959,17 +1027,6 @@ export default function Generator({
         </div>
       )}
     </>}
-    {showLibraryPicker && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowLibraryPicker(false)}>
-        <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-lg font-extrabold"><Library size={18} /> Thư viện ảnh dùng chung</h3>
-            <button type="button" onClick={() => setShowLibraryPicker(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
-          </div>
-          <MediaLibrary onPick={attachLibraryImage} />
-        </div>
-      </div>
-    )}
     {showFormats && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowFormats(false)}>
         <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
