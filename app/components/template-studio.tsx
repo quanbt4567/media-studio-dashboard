@@ -347,20 +347,20 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
       { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-      { type: "image", x: 48, y: 300, w: 6, h: 56, src: "__violet__" },
-      { type: "text", x: 70, y: 308, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 376, w: 984, h: 250, text: "[Tên thông báo]", role: "headline", fontSize: 92, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 650, w: 880, h: 130, text: "[Nội dung chi tiết]", role: "body", fontSize: 30, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 806, w: 984, h: 2, src: "__hairline__" },
-      { type: "image", x: 48, y: 846, w: 28, h: 28, src: ICON_CALENDAR_VIOLET },
-      { type: "text", x: 90, y: 846, w: 560, h: 32, text: "[Ngày diễn ra]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 898, w: 28, h: 28, src: ICON_CLOCK_VIOLET },
-      { type: "text", x: 90, y: 898, w: 560, h: 32, text: "[Giờ diễn ra]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 950, w: 28, h: 28, src: ICON_PIN_VIOLET },
-      { type: "text", x: 90, y: 950, w: 560, h: 32, text: "[Địa điểm]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-      { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
+      { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 270, w: 984, h: 220, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 518, w: 900, h: 118, text: "[Nội dung chi tiết]", role: "body", fontSize: 28, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 674, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 48, y: 706, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 88, y: 706, w: 560, h: 30, text: "[Ngày diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 768, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 88, y: 768, w: 560, h: 30, text: "[Giờ diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 830, w: 26, h: 26, src: ICON_PIN_VIOLET },
+      { type: "text", x: 88, y: 830, w: 560, h: 30, text: "[Địa điểm]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 930, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1018, y: 922, w: 10, h: 18, src: "__violet__" },
+      { type: "text", x: 48, y: 944, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
       ] },
     ],
   },
@@ -560,18 +560,21 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: numb
 }
 
 let measureCtx: CanvasRenderingContext2D | null = null;
-/** Wrapped height (px, canvas units) of a text element at its current size. */
+/** Wrapped height (px, canvas units) after fitting text to its own box. */
 function textHeightOf(el: CanvasElement): number {
   if (el.type !== "text" || !el.text?.trim()) return 0;
   if (typeof document === "undefined") return 0;
   if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
   if (!measureCtx) return 0;
-  measureCtx.font = fontOf(el);
-  return wrapLines(measureCtx, el.text, el.w).length * (el.fontSize ?? 48) * 1.25;
+  const fitted = fitFontSize(el);
+  measureCtx.font = fontOf({ ...el, fontSize: fitted });
+  return wrapLines(measureCtx, el.text, Math.max(1, el.w)).length * fitted * 1.25;
 }
-/** Text spilling past the canvas bottom is lost in the exported image. */
+/** Flag text that cannot fit its box or reaches beyond canvas bounds. */
 function textOverflowsCanvas(el: CanvasElement, h: number = SIZE): boolean {
-  return el.type === "text" && el.y + textHeightOf(el) > h + 1;
+  if (el.type !== "text" || !el.text?.trim()) return false;
+  const contentHeight = textHeightOf(el);
+  return contentHeight > el.h + 1 || el.y + contentHeight > h + 1;
 }
 
 function fontOf(el: CanvasElement): string {
@@ -600,6 +603,27 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
     lines.push(line);
   }
   return lines;
+}
+
+/**
+ * Shrink long copy to fit its fixed template slot. Font metrics match canvas
+ * export; DOM applies the measured result after hydration to avoid SSR mismatch.
+ */
+function fitFontSize(el: CanvasElement): number {
+  const base = el.fontSize ?? 48;
+  if (el.type !== "text" || !el.text?.trim() || typeof document === "undefined") return base;
+  if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
+  if (!measureCtx) return base;
+  const minSize = el.role === "headline" ? 18 : 12;
+  const maxWidth = Math.max(1, el.w);
+  const maxHeight = Math.max(1, el.h);
+  for (let size = base; size >= minSize; size -= 1) {
+    measureCtx.font = fontOf({ ...el, fontSize: size });
+    const lines = wrapLines(measureCtx, el.text, maxWidth);
+    const widthFits = lines.every((line) => measureCtx!.measureText(line).width <= maxWidth + 0.5);
+    if (widthFits && lines.length * size * 1.25 <= maxHeight + 0.5) return size;
+  }
+  return minSize;
 }
 
 async function compressForLibrary(dataUrl: string): Promise<string> {
@@ -691,8 +715,29 @@ function BuiltInThumb({ tpl, renderThumb }: { tpl: BuiltInTemplate; renderThumb:
 
 export default function TemplateStudio({ postContent, postImage, canDesign, onSave, suggestedTemplateId, visualBrief }: EditorProps) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
+  const [autoFontSizes, setAutoFontSizes] = useState<Record<string, number>>({});
   const elementsRef = useRef<CanvasElement[]>([]);
   elementsRef.current = elements;
+
+  // Re-measure after hydration and whenever text changes. Initial server/client
+  // markup remains identical; the canvas exporter uses the same fit algorithm.
+  useEffect(() => {
+    let active = true;
+    const measure = async () => {
+      if (typeof document === "undefined") return;
+      try { await document.fonts.ready; } catch { /* fallback font is acceptable */ }
+      const next: Record<string, number> = {};
+      for (const el of elements) {
+        if (el.type !== "text" || !el.text?.trim()) continue;
+        const size = fitFontSize(el);
+        if (size < (el.fontSize ?? 48)) next[el.id] = size;
+      }
+      if (active) setAutoFontSizes(next);
+    };
+    void measure();
+    return () => { active = false; };
+  }, [elements]);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [bg, setBg] = useState<Bg>(() =>
@@ -1090,21 +1135,20 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         } catch { /* skip broken */ }
       } else if (el.type === "text" && el.text?.trim()) {
         ctx.save();
-        ctx.font = fontOf(el);
+        const fittedSize = fitFontSize(el);
+        ctx.font = fontOf({ ...el, fontSize: fittedSize });
         ctx.fillStyle = el.color ?? "#ffffff";
-        // Match the editor's line box (lineHeight 1.25, glyphs centered in
-        // each line): draw each line's em-box center at the line center.
-        // textBaseline "top" used to render text ~0.35em higher than the
-        // editor — visible as icon/label misalignment in exports.
         ctx.textBaseline = "middle";
-        const lines = wrapLines(ctx, el.text, el.w);
-        const lineH = (el.fontSize ?? 48) * 1.25;
+        // The preview and export both fit copy to a fixed slot and clip locally.
+        ctx.beginPath();
+        ctx.rect(el.x, el.y, Math.max(1, el.w), Math.max(1, el.h));
+        ctx.clip();
+        const lines = wrapLines(ctx, el.text, Math.max(1, el.w));
+        const lineH = fittedSize * 1.25;
         lines.forEach((line, i) => {
           const lw = ctx.measureText(line).width;
           const lx = el.align === "center" ? el.x + (el.w - lw) / 2 : el.align === "right" ? el.x + el.w - lw : el.x;
-          // +0.15em: DOM line-box centering sits glyphs slightly lower than
-          // the canvas em-box center — measured ~6px at 32px font.
-          ctx.fillText(line, lx, el.y + lineH * (i + 0.5) + (el.fontSize ?? 48) * 0.15);
+          ctx.fillText(line, lx, el.y + lineH * (i + 0.5) + fittedSize * 0.15);
         });
         ctx.restore();
       }
@@ -1589,7 +1633,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   const textStyleOf = (el: CanvasElement): React.CSSProperties => ({
-    fontSize: el.fontSize,
+    fontSize: autoFontSizes[el.id] ?? el.fontSize,
     color: el.color,
     fontWeight: el.bold ? 800 : 400,
     fontStyle: el.italic ? "italic" : "normal",
@@ -1597,7 +1641,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     fontFamily: FONTS.find((f) => f.id === el.fontFamily)?.css,
     lineHeight: 1.25,
     whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
     wordBreak: "break-word",
+    height: el.h,
+    maxHeight: el.h,
+    overflow: "hidden",
+    boxSizing: "border-box",
+    display: "block",
   });
 
   if (!canDesign) {
@@ -1745,7 +1795,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         onBlur={() => setEditingId(null)}
                         onPointerDown={(e) => e.stopPropagation()}
                         className="w-full resize-none rounded bg-[var(--surface)]/90 p-1 outline-none"
-                        style={{ ...textStyleOf(el), userSelect: "text" }}
+                        style={{ ...textStyleOf(el), userSelect: "text", overflow: "auto" }}
                         rows={3}
                       />
                     ) : (
