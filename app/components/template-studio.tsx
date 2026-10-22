@@ -1028,12 +1028,24 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const photos = elements.filter((el) => el.slot === "photo");
     if (!photos.length || photos.length === n) return;
     pushHistory();
-    const frame = {
+    let frame = {
       x: Math.min(...photos.map((e) => e.x)),
       y: Math.min(...photos.map((e) => e.y)),
       w: Math.max(...photos.map((e) => e.x + e.w)) - Math.min(...photos.map((e) => e.x)),
       h: Math.max(...photos.map((e) => e.y + e.h)) - Math.min(...photos.map((e) => e.y)),
     };
+    // Multi-photo grids start BELOW the black header band so the first row
+    // is never eaten by it (the single photo keeps the full-bleed frame,
+    // and switching back to 1 photo restores that frame).
+    const band = elements.find(
+      (el) => el.type === "image" && el.slot !== "photo" && el.x === 0 && el.y === 0 && el.w >= 1000 && el.h > 0 && el.h <= 200,
+    );
+    const bandBottom = band ? band.h : 0;
+    if (bandBottom && n > 1 && frame.y < bandBottom) {
+      frame = { ...frame, y: bandBottom, h: frame.h - (bandBottom - frame.y) };
+    } else if (bandBottom && n === 1 && frame.y === bandBottom) {
+      frame = { ...frame, y: 0, h: frame.h + bandBottom };
+    }
     const cells = photoGridCells(frame, n);
     const newPhotos: CanvasElement[] = cells.map((c, i) => {
       const prev = photos[i];
@@ -1579,13 +1591,44 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     pushHistory();
     const tpl = BUILT_IN_TEMPLATES.find((t) => t.id === appliedBuiltInId);
     const shaped = adaptElementsToHeight(elements, h - canvasH, tpl?.shiftFromY ?? 700);
-    setElements(
-      shaped.map((el) =>
-        el.slot === "photo" && el.src && isPlaceholderSrc(el.src)
-          ? { ...el, src: getPhotoPlaceholder(el.w, el.h) }
-          : el,
-      ),
-    );
+    const gridPhotos = shaped.filter((el) => el.slot === "photo");
+    if (gridPhotos.length > 1) {
+      // A multi-photo grid cannot be adapted cell-by-cell (every cell growing
+      // by the same delta overlaps rows or leaves holes). Rebuild the grid
+      // from its adapted union frame instead, keeping real photos in order.
+      const frame = {
+        x: Math.min(...gridPhotos.map((e) => e.x)),
+        y: Math.min(...gridPhotos.map((e) => e.y)),
+        w: Math.max(...gridPhotos.map((e) => e.x + e.w)) - Math.min(...gridPhotos.map((e) => e.x)),
+        h: Math.max(...gridPhotos.map((e) => e.y + e.h)) - Math.min(...gridPhotos.map((e) => e.y)),
+      };
+      const cells = photoGridCells(frame, gridPhotos.length);
+      const rebuilt = cells.map((c, i) => {
+        const prev = gridPhotos[i];
+        const hasReal = prev && prev.src && !isPlaceholderSrc(prev.src);
+        return {
+          ...prev,
+          x: c.x, y: c.y, w: c.w, h: c.h,
+          src: hasReal ? prev.src : getPhotoPlaceholder(c.w, c.h),
+          focalX: hasReal ? prev.focalX ?? 0.5 : 0.5,
+          focalY: hasReal ? prev.focalY ?? 0.5 : 0.5,
+        };
+      });
+      const firstIdx = shaped.findIndex((el) => el.slot === "photo");
+      setElements([
+        ...shaped.slice(0, firstIdx),
+        ...rebuilt,
+        ...shaped.slice(firstIdx).filter((el) => el.slot !== "photo"),
+      ]);
+    } else {
+      setElements(
+        shaped.map((el) =>
+          el.slot === "photo" && el.src && isPlaceholderSrc(el.src)
+            ? { ...el, src: getPhotoPlaceholder(el.w, el.h) }
+            : el,
+        ),
+      );
+    }
     setCanvasH(h);
   }
 
