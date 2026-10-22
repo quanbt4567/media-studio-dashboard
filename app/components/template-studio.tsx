@@ -2076,10 +2076,10 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             </div>
             <p className="mb-4 text-xs text-[var(--muted)]">Chọn một mẫu có sẵn — bố cục được nạp lên canvas, bạn chỉ cần đổi chữ & thay ảnh.</p>
             <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Sparkles size={13} /> Mẫu có sẵn — dùng cho mọi hoạt động</p>
-            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BUILT_IN_TEMPLATES.map((tpl) => (
-                <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-2)]">
-                  <div className="relative aspect-square w-full overflow-hidden">
+            <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {BUILT_IN_TEMPLATES.filter((tpl) => tpl.id !== "bcn-modern" && tpl.name.trim().toLowerCase() !== "hiện đại").map((tpl) => (
+                <div key={tpl.id} className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
+                  <div className="relative aspect-square w-full overflow-hidden bg-[#08090D]">
                     {tpl.id === suggestedTemplateId && (
                       <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[11px] font-extrabold text-[#3a2c00]">
                         <Sparkles size={11} /> AI gợi ý
@@ -2087,13 +2087,16 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     )}
                     <BuiltInThumb tpl={tpl} renderThumb={renderThumbFor} />
                   </div>
-                  <div className="p-2.5">
-                    <p className="truncate text-xs font-extrabold">{tpl.name}</p>
-                    <p className="truncate text-[11px] text-[var(--muted)]">{tpl.desc}</p>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-sm font-extrabold">{tpl.name}</p>
+                      <span className="shrink-0 rounded-full border border-[var(--line)] px-2 py-0.5 text-[9px] font-bold text-[var(--muted)]">1080 × 1080</span>
+                    </div>
+                    <p className="mt-1 min-h-8 text-xs leading-relaxed text-[var(--muted)]">{tpl.desc}</p>
                     <button
                       type="button"
                       onClick={() => applyBuiltIn(tpl)}
-                      className="mt-2 w-full rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[11px] font-extrabold text-white"
+                      className="mt-3 w-full rounded-xl bg-[var(--accent)] px-3 py-2 text-xs font-extrabold text-white transition hover:brightness-110 active:scale-[.99]"
                     >
                       Dùng mẫu
                     </button>
