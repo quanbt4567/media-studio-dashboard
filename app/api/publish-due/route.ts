@@ -3,6 +3,7 @@ import { publishPostToFacebook } from "@/app/lib/facebook-publish";
 import { readPosts, updatePost } from "@/app/lib/posts-store";
 import { notify } from "@/app/lib/notifications";
 import { getSessionUser } from "@/app/lib/session";
+import { safeEqualStr } from "@/app/lib/safe-equal";
 
 export const dynamic = "force-dynamic";
 // Publishing several posts can take a while; allow headroom on Vercel.
@@ -27,7 +28,7 @@ function cronBearerOk(request: Request): boolean {
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get("authorization") || "";
   const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  return Boolean(cronSecret && bearer && bearer === cronSecret);
+  return Boolean(cronSecret && bearer && safeEqualStr(bearer, cronSecret));
 }
 
 async function adminSessionOk(): Promise<boolean> {

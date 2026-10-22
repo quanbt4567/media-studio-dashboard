@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { safeEqualStr } from "@/app/lib/safe-equal";
 
 const SESSION_COOKIE = "msd_session";
 // Routes anyone can reach without logging in.
@@ -24,7 +25,7 @@ export default async function proxy(request: NextRequest) {
   if (pathname.startsWith("/api/publish-due")) {
     const cronSecret = process.env.CRON_SECRET;
     const authHeader = request.headers.get("authorization") || "";
-    if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    if (cronSecret && safeEqualStr(authHeader, `Bearer ${cronSecret}`)) {
       return NextResponse.next();
     }
     // Without a valid bearer token, fall through to the session check below

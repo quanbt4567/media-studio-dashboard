@@ -33,6 +33,10 @@ export async function POST(request: Request) {
   if (!dataUrl.startsWith("data:image/")) {
     return NextResponse.json({ error: "dataUrl must be a data:image/* URL." }, { status: 400 });
   }
+  // SVG can carry scripts — the library only needs raster images.
+  if (/^data:image\/svg\+xml/i.test(dataUrl)) {
+    return NextResponse.json({ error: "SVG không được hỗ trợ — hãy dùng PNG/JPG/WebP." }, { status: 400 });
+  }
   if (dataUrl.length > 8_000_000) {
     return NextResponse.json({ error: "Image too large (max ~6MB)." }, { status: 400 });
   }
