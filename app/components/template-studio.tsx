@@ -317,29 +317,29 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     id: "bcn-announce",
     name: "Thông báo",
     desc: "Mọi loại thông báo",
-    shiftFromY: 690,
+    shiftFromY: 470,
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
-      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-      { type: "image", x: 48, y: 238, w: 6, h: 56, src: "__violet__" },
-      { type: "text", x: 70, y: 246, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 306, w: 720, h: 210, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 540, w: 600, h: 110, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 700, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
-      { type: "text", x: 94, y: 700, w: 560, h: 34, text: "[Ngày diễn ra]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 764, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
-      { type: "text", x: 94, y: 764, w: 560, h: 34, text: "[Giờ diễn ra]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 828, w: 30, h: 30, src: ICON_PIN_VIOLET },
-      { type: "text", x: 94, y: 828, w: 560, h: 34, text: "[Địa điểm]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-      { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 430, src: "__photo-slot__", overlay: "__shade-top__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "text", x: 48, y: 454, w: 500, h: 32, text: "THÔNG BÁO", fontSize: 24, color: "#A69AFB", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 510, w: 984, h: 170, text: "[Tên thông báo]", role: "headline", fontSize: 76, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 690, w: 920, h: 92, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.86)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 804, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 88, y: 804, w: 580, h: 30, text: "[Ngày diễn ra]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 858, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 88, y: 858, w: 580, h: 30, text: "[Giờ diễn ra]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 912, w: 26, h: 26, src: ICON_PIN_VIOLET },
+      { type: "text", x: 88, y: 912, w: 580, h: 30, text: "[Địa điểm]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 1000, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1018, y: 992, w: 10, h: 18, src: "__violet__" },
+      { type: "text", x: 48, y: 1012, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
       { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
@@ -366,7 +366,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 600, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 652, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -388,7 +389,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     variants: [
       { id: "portrait", label: "Ảnh dọc", elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 740, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 772, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 762, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -415,7 +417,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -437,7 +440,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TUYỂN THÀNH VIÊN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 262, w: 6, h: 52, src: "__violet__" },
       { type: "text", x: 70, y: 270, w: 460, h: 36, text: "TUYỂN THÀNH VIÊN", fontSize: 24, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
@@ -467,7 +471,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-quote__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 186, w: 140, h: 110, text: "“", fontSize: 130, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 330, w: 780, h: 320, text: "[Câu nói hay]", role: "headline", fontSize: 54, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -484,7 +489,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 20, y: 16, w: 340, h: 100, src: "__logo-backdrop__", radius: 12 },
+      { type: "image", x: 30, y: 22, w: 320, h: 90, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 220, w: 140, h: 110, text: "“", fontSize: 140, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 370, w: 984, h: 330, text: "[Câu nói hay]", role: "headline", fontSize: 60, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -1354,6 +1360,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       // Use the existing original horizontal BCN lockup. Its underline/flag is
       // part of the image asset, never recreated from arbitrary rectangles.
       if (src === "__bcn-wordmark__") src = BCN_LOGO;
+      if (src === "__logo-backdrop__") src = getSolid(el.w, el.h, "#050505");
       // Khoa logo: white monochrome (background removed) so it reads on
       // the graphite header next to the BCN logo; the modern template
       // keeps the boxed original because it sits on a white card.
@@ -1372,7 +1379,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       // Brand header (ribbon + logos): locked so it can't be selected, moved
       // or deleted by accident.
       const locked =
-        marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__bcn-wordmark__" || marker === "__khoa-cntt-logo__" || marker === "__fade-bottom__";
+        marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__bcn-wordmark__" || marker === "__logo-backdrop__" || marker === "__khoa-cntt-logo__" || marker === "__fade-bottom__";
       const isPhotoSlot = marker === "__photo-slot__";
       return {
         ...el,
