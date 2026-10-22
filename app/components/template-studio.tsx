@@ -622,28 +622,69 @@ function BuiltInThumb({ tpl, renderThumb }: { tpl: BuiltInTemplate; renderThumb:
   useEffect(() => {
     let alive = true;
     renderThumb(tpl)
-      .then((u) => {
-        if (alive) setUrl(u);
-      })
+      .then((u) => { if (alive) setUrl(u); })
       .catch(() => {});
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [tpl, renderThumb]);
+
   if (url) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={url} alt={tpl.name} className="h-full w-full object-cover" draggable={false} />;
   }
-  const Icon = BUILT_IN_ICONS[tpl.id] ?? LayoutTemplate;
+
+  const label = tpl.id === "bcn-announce" ? "THÔNG BÁO"
+    : tpl.id === "bcn-event" ? "SỰ KIỆN"
+    : tpl.id === "bcn-recap" ? "RECAP"
+    : tpl.id === "bcn-recruit" ? "TUYỂN THÀNH VIÊN" : "TRÍCH DẪN";
+
   return (
-    <div
-      className="flex h-full w-full items-center justify-center p-3 text-center"
-      style={{
-        background:
-          tpl.bg.kind === "gradient" ? `linear-gradient(135deg, ${tpl.bg.from}, ${tpl.bg.to})` : undefined,
-      }}
-    >
-      <Icon size={42} className="text-white/90" />
+    <div className="relative h-full w-full overflow-hidden bg-[#08090D] text-white">
+      <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 82% 18%,rgba(166,154,251,.18),transparent 35%),linear-gradient(145deg,#262730,#08090D 72%)" }} />
+      {tpl.id === "bcn-announce" && <>
+        <div className="absolute inset-x-0 top-0 h-[57%] bg-gradient-to-br from-[#393B47] via-[#242630] to-[#101116]">
+          <div className="absolute inset-0 opacity-60" style={{ background: "repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 1px,transparent 1px 18px)" }} />
+          <div className="absolute bottom-2 left-3 right-3 h-10 border border-white/10 bg-gradient-to-br from-[#454753] to-[#111217]" />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-[49%] bg-gradient-to-b from-[#191A20] to-[#08090D] p-3">
+          <div className="mb-2 flex items-center gap-1.5"><span className="h-1 w-5 rounded-full bg-[#A69AFB]" /><span className="text-[8px] font-bold tracking-[.2em] text-[#D3CBFF]">THÔNG BÁO</span></div>
+          <div className="text-[clamp(13px,1.5vw,20px)] font-black leading-[1.08]">THAY ĐỔI<br />LỊCH SINH HOẠT</div>
+          <div className="mt-2 h-1 w-3/4 rounded-full bg-white/20" /><div className="mt-1.5 h-1 w-1/2 rounded-full bg-white/10" />
+        </div>
+      </>}
+      {tpl.id === "bcn-event" && <>
+        <div className="absolute inset-x-0 top-0 h-[68%] bg-gradient-to-br from-[#37394D] via-[#1A1B28] to-[#08090D]">
+          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 65% 30%,rgba(166,154,251,.45),transparent 25%),linear-gradient(120deg,transparent,rgba(255,255,255,.07),transparent)" }} />
+          <div className="absolute bottom-0 left-[12%] right-[12%] h-[30%] rounded-t-full bg-[#101116]" />
+        </div>
+        <div className="absolute bottom-0 inset-x-0 p-3"><div className="mb-1 text-[8px] font-bold tracking-[.2em] text-[#CFC6FF]">WORKSHOP / EVENT</div><div className="text-[clamp(14px,1.7vw,22px)] font-black leading-none">TECH SHARING DAY</div><div className="mt-2 h-1 w-2/3 rounded-full bg-white/20" /></div>
+      </>}
+      {tpl.id === "bcn-recap" && <>
+        <div className="absolute inset-0 grid grid-rows-[1.1fr_.75fr] gap-1.5 p-2.5">
+          <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-[#484A57] to-[#15161C]"><div className="absolute inset-0" style={{ background: "linear-gradient(120deg,transparent,rgba(166,154,251,.22),transparent)" }} /><div className="absolute bottom-2 left-2 text-[9px] font-black">SCHOOL LIFE STORIES</div></div>
+          <div className="grid grid-cols-3 gap-1.5"><div className="bg-[#373946]" /><div className="bg-[#292B36]" /><div className="bg-[#454754]" /></div>
+        </div>
+        <div className="absolute bottom-[16%] left-4 right-4 text-[clamp(13px,1.7vw,21px)] font-black leading-none">KHOẢNH KHẮC<br />ĐÁNG NHỚ</div>
+      </>}
+      {tpl.id === "bcn-recruit" && <>
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.12)),radial-gradient(ellipse at 72% 30%,rgba(166,154,251,.25),transparent 38%)" }} />
+        <div className="absolute right-[8%] top-[18%] h-[48%] w-[42%] rounded-t-[48%] border border-white/10 bg-gradient-to-b from-[#4A4C58] to-[#16171D]" />
+        <div className="absolute bottom-[12%] left-3 right-3"><div className="mb-1 text-[8px] font-bold tracking-[.2em] text-[#CFC6FF]">JOIN OUR TEAM</div><div className="text-[clamp(14px,1.8vw,23px)] font-black leading-[1.02]">CÙNG TẠO<br />NHỮNG CÂU CHUYỆN</div><div className="mt-2 inline-flex rounded-full bg-[#A69AFB] px-2 py-1 text-[8px] font-extrabold text-[#15151B]">ĐIỀN ĐƠN NGAY →</div></div>
+      </>}
+      {tpl.id === "bcn-quote" && <>
+        <div className="absolute inset-0" style={{ background: "linear-gradient(90deg,rgba(0,0,0,.92),rgba(0,0,0,.1)),radial-gradient(circle at 75% 45%,rgba(166,154,251,.18),transparent 35%)" }} />
+        <div className="absolute right-[12%] top-[18%] h-[65%] w-px bg-white/25" />
+        <div className="absolute left-3 top-[23%] text-5xl font-black text-[#A69AFB]">“</div>
+        <div className="absolute left-3 right-4 top-[39%] font-serif text-[clamp(16px,2vw,25px)] leading-[1.08]">Công nghệ<br />chỉ thật sự ý nghĩa<br />khi nó <span className="text-[#A69AFB]">kết nối</span></div>
+      </>}
+      <div className="absolute left-3 right-3 top-3 z-10 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="text-[clamp(8px,.9vw,11px)] font-black tracking-tight">BAN CÔNG NGHỆ</div>
+          <div className="text-[clamp(6px,.65vw,8px)] text-white/70">School Life Stories</div>
+          <div className="mt-1 flex items-center"><span className="h-px w-8 bg-white/80" /><span className="h-1.5 w-2 bg-white" /></div>
+        </div>
+        <span className="shrink-0 text-[8px] font-bold tracking-[.15em] text-[#D3CBFF]">/ {label}</span>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-white/50" /><div className="absolute bottom-0 right-[7%] h-2 w-1.5 bg-white" />
     </div>
   );
 }
@@ -2035,10 +2076,10 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             </div>
             <p className="mb-4 text-xs text-[var(--muted)]">Chọn một mẫu có sẵn — bố cục được nạp lên canvas, bạn chỉ cần đổi chữ & thay ảnh.</p>
             <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Sparkles size={13} /> Mẫu có sẵn — dùng cho mọi hoạt động</p>
-            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BUILT_IN_TEMPLATES.map((tpl) => (
-                <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-2)]">
-                  <div className="relative aspect-square w-full overflow-hidden">
+            <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {BUILT_IN_TEMPLATES.filter((tpl) => tpl.id !== "bcn-modern" && tpl.name.trim().toLowerCase() !== "hiện đại").map((tpl) => (
+                <div key={tpl.id} className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
+                  <div className="relative aspect-square w-full overflow-hidden bg-[#08090D]">
                     {tpl.id === suggestedTemplateId && (
                       <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[11px] font-extrabold text-[#3a2c00]">
                         <Sparkles size={11} /> AI gợi ý
@@ -2046,13 +2087,16 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     )}
                     <BuiltInThumb tpl={tpl} renderThumb={renderThumbFor} />
                   </div>
-                  <div className="p-2.5">
-                    <p className="truncate text-xs font-extrabold">{tpl.name}</p>
-                    <p className="truncate text-[11px] text-[var(--muted)]">{tpl.desc}</p>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-sm font-extrabold">{tpl.name}</p>
+                      <span className="shrink-0 rounded-full border border-[var(--line)] px-2 py-0.5 text-[9px] font-bold text-[var(--muted)]">1080 × 1080</span>
+                    </div>
+                    <p className="mt-1 min-h-8 text-xs leading-relaxed text-[var(--muted)]">{tpl.desc}</p>
                     <button
                       type="button"
                       onClick={() => applyBuiltIn(tpl)}
-                      className="mt-2 w-full rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[11px] font-extrabold text-white"
+                      className="mt-3 w-full rounded-xl bg-[var(--accent)] px-3 py-2 text-xs font-extrabold text-white transition hover:brightness-110 active:scale-[.99]"
                     >
                       Dùng mẫu
                     </button>
