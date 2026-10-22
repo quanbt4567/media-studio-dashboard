@@ -321,10 +321,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 238, w: 6, h: 56, src: "__violet__" },
       { type: "text", x: 70, y: 246, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
@@ -342,10 +340,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
       { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
@@ -372,10 +368,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 600, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 652, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -397,10 +391,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     variants: [
       { id: "portrait", label: "Ảnh dọc", elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 740, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 772, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 762, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -427,10 +419,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -452,10 +442,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TUYỂN THÀNH VIÊN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 262, w: 6, h: 52, src: "__violet__" },
       { type: "text", x: 70, y: 270, w: 460, h: 36, text: "TUYỂN THÀNH VIÊN", fontSize: 24, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
@@ -485,10 +473,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-quote__" },
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 186, w: 140, h: 110, text: "“", fontSize: 130, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 330, w: 780, h: 320, text: "[Câu nói hay]", role: "headline", fontSize: 54, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -505,10 +491,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "text", x: 48, y: 38, w: 460, h: 36, text: "BAN CÔNG NGHỆ", fontSize: 29, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 76, w: 460, h: 22, text: "School Life Stories", fontSize: 16, color: "rgba(255,255,255,0.72)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 107, w: 132, h: 3, src: "__gold-bar__" },
-      { type: "image", x: 172, y: 100, w: 8, h: 10, src: "__violet__" },
+      { type: "image", x: 24, y: 20, w: 310, h: 90, src: "__logo-backdrop__", radius: 14 },
+      { type: "image", x: 38, y: 26, w: 282, h: 79, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 220, w: 140, h: 110, text: "“", fontSize: 140, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 370, w: 984, h: 330, text: "[Câu nói hay]", role: "headline", fontSize: 60, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -701,10 +685,10 @@ function BuiltInThumb({ tpl, renderThumb }: { tpl: BuiltInTemplate; renderThumb:
         <div className="absolute left-3 right-4 top-[39%] font-serif text-[clamp(16px,2vw,25px)] leading-[1.08]">Công nghệ<br />chỉ thật sự ý nghĩa<br />khi nó <span className="text-[#A69AFB]">kết nối</span></div>
       </>}
       <div className="absolute left-3 right-3 top-3 z-10 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="text-[clamp(8px,.9vw,11px)] font-black tracking-tight">BAN CÔNG NGHỆ</div>
-          <div className="text-[clamp(6px,.65vw,8px)] text-white/70">School Life Stories</div>
-          <div className="mt-1 flex items-center"><span className="h-px w-8 bg-white/80" /><span className="h-1.5 w-2 bg-white" /></div>
+        <div className="min-w-0 rounded-lg border border-white/10 bg-black/80 px-2 py-1.5 shadow-lg">
+          {/* The original horizontal lockup includes the distinctive flag-line motif. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BCN_LOGO} alt="BAN CÔNG NGHỆ — School Life Stories" className="block h-auto w-[116px] max-w-full object-contain" draggable={false} />
         </div>
         <span className="shrink-0 text-[8px] font-bold tracking-[.15em] text-[#D3CBFF]">/ {label}</span>
       </div>
@@ -1375,6 +1359,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       if (src === "__diamond-bottom__") src = strips.bottom;
       if (src === "__photo-slot__") src = getPhotoPlaceholder(el.w, el.h);
       if (src === "__bcn-logo__") src = BCN_LOGO_ROUND;
+      // Use the existing original horizontal BCN lockup. Its underline/flag is
+      // part of the image asset, never recreated from arbitrary rectangles.
+      if (src === "__bcn-wordmark__") src = BCN_LOGO;
+      // Translucent backing keeps the white wordmark readable over bright photos.
+      if (src === "__logo-backdrop__") src = getSolid(el.w, el.h, "rgba(4,5,10,0.82)");
       // Khoa logo: white monochrome (background removed) so it reads on
       // the graphite header next to the BCN logo; the modern template
       // keeps the boxed original because it sits on a white card.
@@ -1393,7 +1382,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       // Brand header (ribbon + logos): locked so it can't be selected, moved
       // or deleted by accident.
       const locked =
-        marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__khoa-cntt-logo__" || marker === "__fade-bottom__";
+        marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__bcn-wordmark__" || marker === "__logo-backdrop__" || marker === "__khoa-cntt-logo__" || marker === "__fade-bottom__";
       const isPhotoSlot = marker === "__photo-slot__";
       return {
         ...el,
