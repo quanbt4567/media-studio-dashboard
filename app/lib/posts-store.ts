@@ -238,6 +238,9 @@ export async function updatePost(
       if (patch.videoName !== undefined) next.videoName = patch.videoName;
     }
     if (patch.visualSkipped !== undefined) next.visualSkipped = patch.visualSkipped;
+    if (patch.visualBrief !== undefined) next.visualBrief = patch.visualBrief;
+    if (patch.suggestedTemplateId !== undefined) next.suggestedTemplateId = patch.suggestedTemplateId;
+    if (patch.suggestedTemplateReason !== undefined) next.suggestedTemplateReason = patch.suggestedTemplateReason;
     if (patch.clearScheduledAt) {
       delete next.scheduledAt;
     } else if (patch.scheduledAt !== undefined) {

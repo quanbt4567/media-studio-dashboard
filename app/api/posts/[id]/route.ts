@@ -20,6 +20,11 @@ interface PostPatch {
   videoName?: string;
   clearVideo?: boolean;
   visualSkipped?: boolean;
+  visualBrief?: string;
+  suggestedTemplateId?: string;
+  suggestedTemplateReason?: string;
+  /** One-off handoff note: folded into the notification text, not stored on the post. */
+  handoffNote?: string;
   scheduledAt?: string;
   clearScheduledAt?: boolean;
 }
@@ -137,6 +142,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     update.visualSkipped = patch.visualSkipped;
   }
 
+  if (patch.visualBrief !== undefined || patch.suggestedTemplateId !== undefined || patch.suggestedTemplateReason !== undefined) {
+    // The AI visual brief is part of the writer's handoff to the designer.
+    if (!permissions.canEditText) {
+      return NextResponse.json({ error: "Only writers can attach a visual brief." }, { status: 403 });
+    }
+    if (typeof patch.visualBrief === "string") update.visualBrief = patch.visualBrief.slice(0, 2000);
+    if (typeof patch.suggestedTemplateId === "string") update.suggestedTemplateId = patch.suggestedTemplateId;
+    if (typeof patch.suggestedTemplateReason === "string") update.suggestedTemplateReason = patch.suggestedTemplateReason.slice(0, 500);
+  }
+
   if (patch.status !== undefined && patch.status !== current.status) {
     if (!getAllowedTransitions(user.role, current.status).includes(patch.status)) {
       return NextResponse.json(
@@ -178,18 +193,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   // admin decisions and publishes notify from their own routes).
   if (post && patch.status && patch.status !== current.status && user.role !== "admin") {
     const snippet = post.content.split("\n")[0]?.trim().slice(0, 50) || "bài viết";
+    const note = typeof patch.handoffNote === "string" ? patch.handoffNote.trim().slice(0, 300) : "";
+    const noteSuffix = note ? ` 💬 ${user.username} nhắn: “${note}”` : "";
+    // Awaited on purpose: on serverless the response returning can freeze the
+    // function before a fire-and-forget write lands, losing the notification.
     if (patch.status === "Waiting Media") {
-      notify(["media"], `✉️ ${user.username} gửi bài “${snippet}” — cần gắn ảnh`, post.id);
+      await notify(["media"], `✉️ ${user.username} gửi bài “${snippet}” — cần gắn ảnh${patch.visualBrief ? " (có gợi ý visual AI trong bài)" : ""}${noteSuffix}`, post.id);
     } else if (patch.status === "Review Pending") {
-      notify(
+      await notify(
         ["admin"],
         post.visualSkipped
-          ? `⚡ ${user.username} gửi thẳng bài text-only “${snippet}” chờ duyệt`
-          : `👀 Bài “${snippet}” chờ bạn duyệt`,
+          ? `⚡ ${user.username} gửi thẳng bài text-only “${snippet}” chờ duyệt${noteSuffix}`
+          : `👀 Bài “${snippet}” chờ bạn duyệt${noteSuffix}`,
         post.id,
       );
     } else if (patch.status === "Draft" && user.role === "media") {
-      notify(["content"], `↩ ${user.username} trả bài “${snippet}” về cho writer sửa nội dung`, post.id);
+      await notify(["content"], `↩ ${user.username} trả bài “${snippet}” về cho writer sửa nội dung${noteSuffix}`, post.id);
     }
   }
 

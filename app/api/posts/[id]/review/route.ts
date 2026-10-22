@@ -80,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       },
       user.username,
     );
-    notify(
+    await notify(
       [sendBackTo === "designer" ? "media" : "content"],
       `↩ Admin trả bài về cho bạn: ${note.slice(0, 80)}`,
       id,
@@ -98,6 +98,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     user.username,
   );
 
-  notify(["content", "media"], "✅ Bài của bạn đã được admin duyệt", id);
+  await notify(["content", "media"], "✅ Bài của bạn đã được admin duyệt", id);
   return NextResponse.json({ post: updated });
 }

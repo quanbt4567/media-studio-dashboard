@@ -75,7 +75,7 @@ async function runPublishDue() {
         "scheduler",
       );
       published.push({ id: post.id, facebookPostId: result.facebookPostId });
-      notify(["content", "media"], "🚀 Bài đã tự đăng theo lịch lên Facebook", post.id);
+      await notify(["content", "media"], "🚀 Bài đã tự đăng theo lịch lên Facebook", post.id);
     } else {
       failed.push({ id: post.id, error: result.error || "Unknown error" });
     }

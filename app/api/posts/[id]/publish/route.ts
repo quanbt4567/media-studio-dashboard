@@ -65,6 +65,6 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     user.username,
   );
 
-  notify(["content", "media"], "🚀 Bài đã được đăng lên Facebook", id);
+  await notify(["content", "media"], "🚀 Bài đã được đăng lên Facebook", id);
   return NextResponse.json({ post: updated, facebookPostId: result.facebookPostId });
 }

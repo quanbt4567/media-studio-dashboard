@@ -44,6 +44,10 @@ interface PostPatch {
   videoName?: string;
   clearVideo?: boolean;
   visualSkipped?: boolean;
+  visualBrief?: string;
+  suggestedTemplateId?: string;
+  suggestedTemplateReason?: string;
+  handoffNote?: string;
   scheduledAt?: string;
   clearScheduledAt?: boolean;
 }
@@ -333,6 +337,7 @@ export default function Generator({
       content: postContent,
       status: "Waiting Media",
       visualSkipped: false,
+      ...(note ? { handoffNote: note } : {}),
       ...(visualBrief
         ? {
             visualBrief: visualBrief.imageBrief,
@@ -358,7 +363,7 @@ export default function Generator({
     const note = handoffNote.trim();
     setPostContent(postContent);
     setStatus("Review Pending");
-    const saved = await savePost({ content: postContent, status: "Review Pending", visualSkipped: true });
+    const saved = await savePost({ content: postContent, status: "Review Pending", visualSkipped: true, ...(note ? { handoffNote: note } : {}) });
     if (!saved) return;
     if (note) await postHandoffComment(saved.id, `→ Nhắn admin: ${note}`);
     setHandoffNote("");
@@ -469,7 +474,7 @@ export default function Generator({
     if (!activeId) return;
     const note = returnNote.trim();
     if (note) await postHandoffComment(activeId, `↩ Designer trả bài — cần sửa: ${note}`);
-    const saved = await savePost({ status: "Draft" });
+    const saved = await savePost({ status: "Draft", ...(note ? { handoffNote: note } : {}) });
     if (saved) {
       setStatus("Draft");
       setShowReturn(false);
