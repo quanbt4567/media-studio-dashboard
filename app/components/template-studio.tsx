@@ -247,6 +247,50 @@ function getShade(kind: "left" | "fade" | "quote" | "top", w: number, h: number)
   return url;
 }
 
+/** QR slot placeholder: a white rounded box with QR finder squares and a
+ *  label. The designer replaces it with the real QR image (Thay ảnh); while
+ *  unfilled it is treated like the photo placeholder and never exported. */
+const qrPlaceholderCache = new Map<string, string>();
+function getQrPlaceholder(w: number, h: number): string {
+  const key = `${w}x${h}`;
+  let url = qrPlaceholderCache.get(key);
+  if (url) return url;
+  const S = 2; // render at 2x for a crisp editor/export graphic
+  const canvas = document.createElement("canvas");
+  canvas.width = w * S;
+  canvas.height = h * S;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.roundRect(0, 0, W, H, 18 * S);
+  ctx.fill();
+  const pad = W * 0.13, fs = W * 0.24;
+  const finder = (x: number, y: number) => {
+    ctx.fillStyle = "#111318";
+    ctx.beginPath(); ctx.roundRect(x, y, fs, fs, 6 * S); ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.roundRect(x + fs * 0.22, y + fs * 0.22, fs * 0.56, fs * 0.56, 4 * S); ctx.fill();
+    ctx.fillStyle = "#111318";
+    ctx.beginPath(); ctx.roundRect(x + fs * 0.38, y + fs * 0.38, fs * 0.24, fs * 0.24, 2 * S); ctx.fill();
+  };
+  finder(pad, pad);
+  finder(W - pad - fs, pad);
+  finder(pad, H - pad - fs);
+  ctx.fillStyle = "#111318";
+  ctx.font = `800 ${Math.round(W * 0.13)}px 'Be Vietnam Pro', sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("MÃ QR", W * 0.63, H * 0.68);
+  ctx.fillStyle = "rgba(17,19,24,0.55)";
+  ctx.font = `600 ${Math.round(W * 0.075)}px 'Be Vietnam Pro', sans-serif`;
+  ctx.fillText("nhấn để thay", W * 0.63, H * 0.82);
+  url = canvas.toDataURL("image/png");
+  qrPlaceholderCache.set(key, url);
+  return url;
+}
+
 /** Translucent dark panel placed behind text blocks that sit on a photo
  *  (info rows, role lists) — guarantees a calm, readable zone over even
  *  the brightest pavement/sky areas. The element's radius rounds it. */
@@ -337,6 +381,9 @@ function isPlaceholderSrc(src: string): boolean {
   for (const url of photoPlaceholderCache.values()) {
     if (url === src) return true;
   }
+  for (const url of qrPlaceholderCache.values()) {
+    if (url === src) return true;
+  }
   return false;
 }
 
@@ -419,16 +466,18 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 48, y: 690, w: 984, h: 100, text: "[Tên sự kiện]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
       { type: "text", x: 48, y: 800, w: 984, h: 40, text: "[Mô tả ngắn]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 884, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
-      { type: "text", x: 88, y: 886, w: 220, h: 32, text: "[Ngày]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 330, y: 884, w: 2, h: 32, src: "__hairline__" },
-      { type: "image", x: 352, y: 884, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
-      { type: "text", x: 392, y: 886, w: 200, h: 32, text: "[Giờ]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 614, y: 884, w: 2, h: 32, src: "__hairline__" },
-      { type: "image", x: 636, y: 884, w: 30, h: 30, src: ICON_PIN_VIOLET },
-      { type: "text", x: 676, y: 886, w: 356, h: 32, text: "[Địa điểm]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-      { type: "image", x: 48, y: 948, w: 308, h: 56, src: "__violet__", radius: 28 },
-      { type: "text", x: 48, y: 961, w: 308, h: 30, text: "ĐĂNG KÝ NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
+      { type: "image", x: 48, y: 856, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 84, y: 858, w: 240, h: 30, text: "[Ngày]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 336, y: 856, w: 2, h: 28, src: "__hairline__" },
+      { type: "image", x: 352, y: 856, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 388, y: 858, w: 170, h: 30, text: "[Giờ]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 570, y: 856, w: 2, h: 28, src: "__hairline__" },
+      { type: "image", x: 586, y: 856, w: 26, h: 26, src: ICON_PIN_VIOLET },
+      { type: "text", x: 622, y: 858, w: 240, h: 30, text: "[Địa điểm]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 922, w: 308, h: 56, src: "__violet__", radius: 28 },
+      { type: "text", x: 48, y: 935, w: 308, h: 30, text: "ĐĂNG KÝ NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
+      { type: "image", x: 892, y: 856, w: 132, h: 132, src: "__qr-slot__", radius: 16 },
+      { type: "text", x: 880, y: 994, w: 156, h: 18, text: "Quét để đăng ký", fontSize: 13, color: "rgba(255,255,255,0.65)", align: "center", fontFamily: "system" },
       { type: "image", x: 48, y: 1028, w: 984, h: 2, src: "__hairline__" },
       { type: "image", x: 1024, y: 1002, w: 32, h: 32, src: FLAG_VIOLET },
     ],
@@ -459,20 +508,20 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     id: "bcn-recap",
     name: "Recap",
     desc: "Tổng kết sau sự kiện",
-    shiftFromY: 580,
+    shiftFromY: 790,
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
-      { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 780, src: "__photo-slot__", overlay: "__shade-top__" },
       { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
       { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-      { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
-      { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
-      { type: "text", x: 48, y: 652, w: 700, h: 90, text: "[Tên hoạt động]", role: "headline", fontSize: 56, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 756, w: 700, h: 40, text: "[Điểm nổi bật]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-      { type: "text", x: 800, y: 652, w: 232, h: 22, text: "KIẾN THỨC", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-      { type: "text", x: 800, y: 684, w: 232, h: 22, text: "KẾT NỐI", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-      { type: "text", x: 800, y: 716, w: 232, h: 22, text: "TRẢI NGHIỆM", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 806, w: 54, h: 8, src: "__violet__" },
+      { type: "text", x: 114, y: 796, w: 300, h: 28, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 838, w: 700, h: 70, text: "[Tên hoạt động]", role: "headline", fontSize: 48, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 920, w: 700, h: 36, text: "[Điểm nổi bật]", role: "body", fontSize: 24, color: "rgba(255,255,255,0.92)", align: "left", fontFamily: "system" },
+      { type: "text", x: 800, y: 838, w: 232, h: 24, text: "KIẾN THỨC", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "text", x: 800, y: 870, w: 232, h: 24, text: "KẾT NỐI", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "text", x: 800, y: 902, w: 232, h: 24, text: "TRẢI NGHIỆM", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
       { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
       { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
@@ -496,6 +545,8 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
       { type: "text", x: 48, y: 512, w: 540, h: 120, text: "[Mô tả & quyền lợi]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
       { type: "image", x: 48, y: 664, w: 330, h: 58, src: "__violet__", radius: 29 },
       { type: "text", x: 48, y: 678, w: 330, h: 30, text: "ĐIỀN ĐƠN NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
+      { type: "image", x: 48, y: 756, w: 150, h: 150, src: "__qr-slot__", radius: 16 },
+      { type: "text", x: 40, y: 914, w: 166, h: 20, text: "Quét để điền đơn", fontSize: 14, color: "rgba(255,255,255,0.75)", align: "center", fontFamily: "system" },
       { type: "image", x: 716, y: 540, w: 26, h: 26, src: ICON_CAMERA_VIOLET },
       { type: "text", x: 756, y: 540, w: 276, h: 30, text: "Sản xuất nội dung", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
       { type: "image", x: 716, y: 602, w: 26, h: 26, src: ICON_MEGAPHONE_VIOLET },
@@ -1421,6 +1472,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       if (src === "__hairline__") src = getSolid(16, 2, "rgba(255,255,255,0.35)");
       if (src === "__panel__") src = getPanel(el.w, el.h);
       if (src === "__header-band__") src = getSolid(el.w, el.h, "#0A0A0D");
+      if (src === "__qr-slot__") src = getQrPlaceholder(el.w, el.h);
       let overlay = el.overlay;
       if (overlay === "__shade-left__") overlay = getShade("left", el.w, el.h);
       if (overlay === "__shade-quote__") overlay = getShade("quote", el.w, el.h);
@@ -1431,6 +1483,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       const locked =
         marker === "__ribbon__" || marker === "__ribbon-grad__" || marker === "__bcn-logo__" || marker === "__bcn-wordmark__" || marker === "__khoa-cntt-logo__" || marker === "__fade-bottom__";
       const isPhotoSlot = marker === "__photo-slot__";
+      const isQrSlot = marker === "__qr-slot__";
       return {
         ...el,
         id: uid("el"),
@@ -1443,6 +1496,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         // be moved, resized or deleted — the layout can't break by accident.
         ...(!locked ? { geometryLocked: true } : {}),
         ...(isPhotoSlot ? { slot: "photo" } : {}),
+        ...(isQrSlot ? { slot: "qr" } : {}),
       };
     });
     // Header always stays on top: replacing or resizing the photo can never
