@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   BarChart3,
   CalendarDays,
-  FolderOpen,
   Images,
   LayoutGrid,
   Lightbulb,
@@ -139,8 +138,7 @@ export default function StudioWorkspace() {
         </nav>
         <div className="mt-auto hidden border-t border-[var(--line)] pt-5 lg:block">
           <p className="mt-8 flex items-center gap-2 px-3 font-mono text-[10px] uppercase tracking-[.15em] text-[#a4afa5]">
-            <FolderOpen size={12} />
-            Spring / 2026
+            © {new Date().getFullYear()} · Media — Ban Công Nghệ
           </p>
         </div>
       </aside>

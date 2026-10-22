@@ -78,7 +78,7 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
-        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[.15em] text-[#a4afa5]">Spring / 2026</p>
+        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[.15em] text-[#a4afa5]">© {new Date().getFullYear()} · Media — Ban Công Nghệ</p>
       </div>
     </main>
   );
