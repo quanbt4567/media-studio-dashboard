@@ -8,6 +8,7 @@ import {
   type DesignTemplate,
 } from "../lib/design-template-store";
 import MediaLibrary from "./media-library";
+import { popInRef } from "./fx/motion";
 import ImageCropper from "./image-cropper";
 
 const SIZE = 1080;
@@ -1517,7 +1518,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       </div>
 
       {showBgLibrary && (
-        <div className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-extrabold">Chọn nền từ thư viện</h3>
             <button type="button" onClick={() => setShowBgLibrary(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
@@ -1528,7 +1529,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         </div>
       )}
       {showElLibrary && (
-        <div className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-extrabold">{elLibraryMode === "replace" ? "Thay ảnh từ thư viện" : "Chèn ảnh từ thư viện"}</h3>
             <button type="button" onClick={() => { setShowElLibrary(false); setElLibraryMode("add"); replaceImgRef.current = null; }} className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
@@ -1565,7 +1566,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         );
       })()}
       {showTplPicker && (
-        <div className="absolute right-0 top-0 z-40 w-[min(680px,95vw)] rounded-2xl border border-[var(--line)] bg-white p-5 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(680px,95vw)] rounded-2xl border border-[var(--line)] bg-white p-5 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="max-h-[75vh] overflow-y-auto pr-1">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-extrabold"><LayoutTemplate size={18} /> Mẫu thiết kế</h3>

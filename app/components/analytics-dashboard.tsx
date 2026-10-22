@@ -2,6 +2,7 @@
 
 import { BarChart3, FileText, Heart, MessageCircle, RefreshCw, Share2, TriangleAlert, Trophy } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { CountUp } from "./fx/motion";
 
 interface PostStats {
   id: string;
@@ -106,11 +107,11 @@ export default function AnalyticsDashboard() {
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
           <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">Đã đăng (qua app)</p>
-          <p className="text-2xl font-black">{totalPublished}</p>
+          <p className="text-2xl font-black"><CountUp value={totalPublished} /></p>
         </div>
         <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
           <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">Tổng tương tác</p>
-          <p className="text-2xl font-black">{stats.reduce((sum, s) => sum + s.engagement, 0)}</p>
+          <p className="text-2xl font-black"><CountUp value={stats.reduce((sum, s) => sum + s.engagement, 0)} /></p>
         </div>
         <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
           <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">Giờ vàng đăng bài</p>
@@ -118,7 +119,7 @@ export default function AnalyticsDashboard() {
         </div>
         <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
           <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)]">Người theo dõi Page</p>
-          <p className="text-2xl font-black">{page ? page.followers.toLocaleString("vi-VN") : "—"}</p>
+          <p className="text-2xl font-black">{page ? <CountUp value={page.followers} /> : "—"}</p>
           {page && <p className="mt-0.5 truncate text-[11px] text-[var(--muted)]">{page.name} · {page.fanCount.toLocaleString("vi-VN")} lượt thích</p>}
         </div>
       </div>

@@ -1,8 +1,10 @@
 "use client";
 
+import gsap from "gsap";
 import { Clock, Hash, Lightbulb, LoaderCircle, Plus, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Post } from "../lib/posts-store";
+import { prefersReducedMotion } from "./fx/motion";
 
 interface Idea {
   title: string;
@@ -34,6 +36,20 @@ export default function IdeaGenerator({
   const [brief, setBrief] = useState("");
   const [writing, setWriting] = useState(false);
   const [error, setError] = useState("");
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Idea cards stagger in when a fresh batch arrives.
+  useEffect(() => {
+    if (!gridRef.current || ideas.length === 0 || prefersReducedMotion()) return;
+    const tween = gsap.fromTo(
+      gridRef.current.children,
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.07 },
+    );
+    return () => {
+      tween.kill();
+    };
+  }, [ideas]);
 
   useEffect(() => {
     fetch("/api/ideas")
@@ -166,7 +182,7 @@ export default function IdeaGenerator({
           5 ideas for “{topicUsed}”
         </p>
       )}
-      <div className="grid gap-3 md:grid-cols-2">
+      <div ref={gridRef} className="grid gap-3 md:grid-cols-2">
         {ideas.map((idea, index) => (
           <div key={index} className="flex flex-col rounded-2xl border border-[var(--line)] bg-white/70 p-4">
             <p className="text-sm font-extrabold leading-snug">{idea.title}</p>

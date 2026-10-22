@@ -22,6 +22,7 @@ import NotificationBell from "./notification-bell";
 import UserBadge from "./user-badge";
 import ChatWidget from "./chat-widget";
 import ActivityFeed from "./activity-feed";
+import { FadeSlide } from "./fx/motion";
 import SettingsPanel from "./settings-panel";
 
 type Tab = "studio" | "ideas" | "calendar" | "media" | "analytics" | "settings";
@@ -218,6 +219,7 @@ export default function StudioWorkspace() {
 
           <ActivityFeed posts={posts} onSelectPost={handleSelectPost} />
 
+          <FadeSlide key={tab} k={tab}>
           {tab === "studio" && (
             <Generator
               posts={posts}
@@ -247,6 +249,7 @@ export default function StudioWorkspace() {
           {tab === "media" && <MediaLibrary />}
           {tab === "analytics" && <AnalyticsDashboard />}
           {tab === "settings" && role === "admin" && <SettingsPanel />}
+          </FadeSlide>
         </div>
       </section>
       <ChatWidget />

@@ -7,6 +7,7 @@ import type { Post } from "../lib/posts-store";
 import FacebookPostBox from "./facebook-post-box";
 import FacebookPreview from "./facebook-preview";
 import MediaLibrary from "./media-library";
+import { fadeSlideRef } from "./fx/motion";
 import PostStatusSwitcher, { PostStatus } from "./post-status-switcher";
 import ReviewPanel from "./review-panel";
 import TemplateStudio from "./template-studio";
@@ -798,7 +799,7 @@ export default function Generator({
                 </div>
               )}
               {showLibraryPicker && (
-                <div className="mt-4 rounded-2xl border border-[var(--ink)] bg-[#fafbf7] p-4">
+                <div ref={fadeSlideRef} className="mt-4 rounded-2xl border border-[var(--ink)] bg-[#fafbf7] p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h4 className="flex items-center gap-2 text-sm font-extrabold"><Library size={16} /> Thư viện ảnh dùng chung — chọn ảnh để gắn vào bài</h4>
                     <button type="button" onClick={() => setShowLibraryPicker(false)} className="rounded-full border border-[var(--line)] bg-white px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>

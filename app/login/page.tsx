@@ -4,6 +4,7 @@ import { LoaderCircle, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ClubLogo from "../components/club-logo";
+import ParticleField from "../components/fx/particle-field";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,8 +35,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="studio-canvas flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm rounded-[28px] border border-white/75 bg-white/70 p-8 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl entrance">
+    <main className="studio-canvas relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
+      <ParticleField />
+      <div className="relative z-10 w-full max-w-sm rounded-[28px] border border-white/75 bg-white/70 p-8 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl entrance">
         <div className="mb-8">
           <ClubLogo size="lg" />
         </div>
