@@ -198,18 +198,19 @@ function getShade(kind: "left" | "fade" | "quote" | "top", w: number, h: number)
   let g: CanvasGradient;
   if (kind === "left") {
     g = ctx.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, "rgba(7,7,11,0.94)");
-    g.addColorStop(0.5, "rgba(7,7,11,0.66)");
-    g.addColorStop(0.8, "rgba(7,7,11,0.32)");
-    g.addColorStop(1, "rgba(7,7,11,0.12)");
+    g.addColorStop(0, "rgba(7,7,11,0.96)");
+    g.addColorStop(0.45, "rgba(7,7,11,0.84)");
+    g.addColorStop(0.75, "rgba(7,7,11,0.58)");
+    g.addColorStop(1, "rgba(7,7,11,0.34)");
   } else if (kind === "quote") {
     g = ctx.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, "rgba(7,7,11,0.92)");
-    g.addColorStop(0.55, "rgba(7,7,11,0.55)");
-    g.addColorStop(1, "rgba(7,7,11,0.28)");
+    g.addColorStop(0, "rgba(7,7,11,0.95)");
+    g.addColorStop(0.5, "rgba(7,7,11,0.78)");
+    g.addColorStop(1, "rgba(7,7,11,0.52)");
   } else if (kind === "top") {
     g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, "rgba(7,7,11,0.55)");
+    g.addColorStop(0, "rgba(7,7,11,0.72)");
+    g.addColorStop(0.5, "rgba(7,7,11,0.3)");
     g.addColorStop(1, "rgba(7,7,11,0)");
   } else {
     g = ctx.createLinearGradient(0, 0, 0, h);
@@ -219,6 +220,23 @@ function getShade(kind: "left" | "fade" | "quote" | "top", w: number, h: number)
   }
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
+  // Legibility bands baked into the same shade: a top band keeps the logo
+  // lockup and the top-right category label readable on bright photos, and
+  // a bottom band does the same for the info rows on full-bleed layouts.
+  if (kind === "left" || kind === "quote" || kind === "fade") {
+    const top = ctx.createLinearGradient(0, 0, 0, h * 0.34);
+    top.addColorStop(0, "rgba(7,7,11,0.66)");
+    top.addColorStop(1, "rgba(7,7,11,0)");
+    ctx.fillStyle = top;
+    ctx.fillRect(0, 0, w, h * 0.34);
+  }
+  if (kind === "left") {
+    const bottom = ctx.createLinearGradient(0, h * 0.6, 0, h);
+    bottom.addColorStop(0, "rgba(7,7,11,0)");
+    bottom.addColorStop(1, "rgba(7,7,11,0.62)");
+    ctx.fillStyle = bottom;
+    ctx.fillRect(0, h * 0.6, w, h * 0.4);
+  }
   url = canvas.toDataURL("image/png");
   shadeCache.set(key, url);
   return url;
@@ -321,12 +339,12 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 238, w: 6, h: 56, src: "__violet__" },
       { type: "text", x: 70, y: 246, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 48, y: 306, w: 720, h: 210, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 540, w: 600, h: 110, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 540, w: 600, h: 110, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
       { type: "image", x: 48, y: 700, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
       { type: "text", x: 94, y: 700, w: 560, h: 34, text: "[Ngày diễn ra]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
       { type: "image", x: 48, y: 764, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
@@ -339,12 +357,12 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
       { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 48, y: 270, w: 984, h: 220, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 518, w: 900, h: 118, text: "[Nội dung chi tiết]", role: "body", fontSize: 28, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 518, w: 900, h: 118, text: "[Nội dung chi tiết]", role: "body", fontSize: 28, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
       { type: "image", x: 48, y: 674, w: 984, h: 2, src: "__hairline__" },
       { type: "image", x: 48, y: 706, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
       { type: "text", x: 88, y: 706, w: 560, h: 30, text: "[Ngày diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
@@ -366,7 +384,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 600, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 652, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -388,7 +406,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     variants: [
       { id: "portrait", label: "Ảnh dọc", elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 740, src: "__photo-slot__", overlay: "__photo-fade__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 772, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 762, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -415,7 +433,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
       { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
@@ -437,12 +455,12 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TUYỂN THÀNH VIÊN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "image", x: 48, y: 262, w: 6, h: 52, src: "__violet__" },
       { type: "text", x: 70, y: 270, w: 460, h: 36, text: "TUYỂN THÀNH VIÊN", fontSize: 24, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
       { type: "text", x: 48, y: 326, w: 620, h: 170, text: "[Vị trí cần tuyển]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-      { type: "text", x: 48, y: 512, w: 540, h: 120, text: "[Mô tả & quyền lợi]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.88)", align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 512, w: 540, h: 120, text: "[Mô tả & quyền lợi]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
       { type: "image", x: 48, y: 664, w: 330, h: 58, src: "__violet__", radius: 29 },
       { type: "text", x: 48, y: 678, w: 330, h: 30, text: "ĐIỀN ĐƠN NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
       { type: "image", x: 716, y: 540, w: 26, h: 26, src: ICON_CAMERA_VIOLET },
@@ -467,7 +485,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
     elements: [
       { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-quote__" },
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 186, w: 140, h: 110, text: "“", fontSize: 130, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 330, w: 780, h: 320, text: "[Câu nói hay]", role: "headline", fontSize: 54, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -484,7 +502,7 @@ const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
     ],
     variants: [
       { id: "nophoto", label: "Không ảnh", elements: [
-      { type: "image", x: 24, y: 20, w: 320, h: 90, src: "__bcn-wordmark__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
       { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
       { type: "text", x: 48, y: 220, w: 140, h: 110, text: "“", fontSize: 140, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
       { type: "text", x: 48, y: 370, w: 984, h: 330, text: "[Câu nói hay]", role: "headline", fontSize: 60, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
@@ -1114,6 +1132,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         const fittedSize = fitFontSize(el);
         ctx.font = fontOf({ ...el, fontSize: fittedSize });
         ctx.fillStyle = el.color ?? "#ffffff";
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 10;
         ctx.textBaseline = "middle";
         // The preview and export both fit copy to a fixed slot and clip locally.
         ctx.beginPath();
@@ -1619,6 +1639,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     textAlign: el.align,
     fontFamily: FONTS.find((f) => f.id === el.fontFamily)?.css,
     lineHeight: 1.25,
+    textShadow: "0 2px 14px rgba(0,0,0,0.55), 0 0 3px rgba(0,0,0,0.35)",
     whiteSpace: "pre-wrap",
     overflowWrap: "anywhere",
     wordBreak: "break-word",
