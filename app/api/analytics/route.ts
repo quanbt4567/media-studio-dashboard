@@ -10,36 +10,67 @@ interface PostStats {
   snippet: string;
   publishedAt?: string;
   facebookPostId?: string;
+  /** Total reactions of every type (matches the counter shown on Facebook). */
   likes: number;
+  reactions?: Record<string, number>;
   comments: number;
   shares: number;
   engagement: number;
   metricsUpdatedAt?: string;
 }
 
-async function fetchPostStats(fbPostId: string, token: string): Promise<{ stats: { likes: number; comments: number; shares: number } | null; error?: string }> {
+const REACTION_TYPES = ["LIKE", "LOVE", "WOW", "HAHA", "SAD", "ANGRY"] as const;
+
+/**
+ * Reaction totals for one post. Facebook's UI counter aggregates ALL
+ * reaction types, while the classic `likes.summary` only counts the Like
+ * type — reading `reactions.summary(true)` (plus per-type aliases in the
+ * same call) is what makes the numbers match the Page. Falls back to the
+ * legacy likes query if the reactions fields are rejected.
+ */
+async function fetchPostStats(fbPostId: string, token: string): Promise<{ stats: { likes: number; comments: number; shares: number; reactions?: Record<string, number> } | null; error?: string }> {
+  const byTypeFields = REACTION_TYPES.map(
+    (t) => `reactions.type(${t}).summary(true).as(reactions_${t.toLowerCase()})`,
+  ).join(",");
   try {
-    // Note: the `shares` field no longer exists on PagePost in recent Graph API
-    // versions (removed) — requesting it fails the whole call with (#100).
-    // Shares default to 0; likes + comments remain accurate.
-    const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?fields=likes.summary(true),comments.summary(true)&access_token=${encodeURIComponent(token)}`;
+    const fields = `reactions.summary(true),${byTypeFields},comments.summary(true)`;
+    const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?fields=${encodeURIComponent(fields)}&access_token=${encodeURIComponent(token)}`;
     const res = await fetch(url);
-    if (!res.ok) {
-      let detail = `HTTP ${res.status}`;
+    if (res.ok) {
+      const data = (await res.json()) as Record<string, { summary?: { total_count?: number } } | undefined>;
+      const reactions: Record<string, number> = {};
+      for (const t of REACTION_TYPES) {
+        const count = data[`reactions_${t.toLowerCase()}`]?.summary?.total_count ?? 0;
+        if (count > 0) reactions[t] = count;
+      }
+      return {
+        stats: {
+          likes: data.reactions?.summary?.total_count ?? 0,
+          comments: data.comments?.summary?.total_count ?? 0,
+          shares: 0,
+          reactions,
+        },
+      };
+    }
+    // Reactions fields rejected (older token/permissions) — legacy fallback.
+    const legacyParams = new URLSearchParams({ fields: "likes.summary(true),comments.summary(true)", access_token: token });
+    const legacyRes = await fetch(`https://graph.facebook.com/v21.0/${encodeURIComponent(fbPostId)}?${legacyParams.toString()}`);
+    if (!legacyRes.ok) {
+      let detail = `HTTP ${legacyRes.status}`;
       try {
-        const errBody = (await res.json()) as { error?: { message?: string; code?: number } };
+        const errBody = (await legacyRes.json()) as { error?: { message?: string } };
         if (errBody?.error?.message) detail += ` — ${errBody.error.message}`;
       } catch { /* ignore parse errors */ }
       return { stats: null, error: detail };
     }
-    const data = (await res.json()) as {
+    const legacy = (await legacyRes.json()) as {
       likes?: { summary?: { total_count?: number } };
       comments?: { summary?: { total_count?: number } };
     };
     return {
       stats: {
-        likes: data.likes?.summary?.total_count ?? 0,
-        comments: data.comments?.summary?.total_count ?? 0,
+        likes: legacy.likes?.summary?.total_count ?? 0,
+        comments: legacy.comments?.summary?.total_count ?? 0,
         shares: 0,
       },
     };
@@ -52,7 +83,9 @@ interface PagePostStats {
   id: string;
   snippet: string;
   createdAt?: string;
+  /** Total reactions of every type. */
   likes: number;
+  reactions?: Record<string, number>;
   comments: number;
   shares: number;
   engagement: number;
@@ -77,38 +110,53 @@ async function fetchPageInfo(pageId: string, token: string): Promise<{ name: str
 }
 
 async function fetchPagePosts(pageId: string, token: string): Promise<PagePostStats[]> {
-  try {
-    const fields = "id,message,created_time,likes.summary(true),comments.summary(true),shares,full_picture";
-    const params = new URLSearchParams({ fields, limit: "20", access_token: token });
-    const url = `https://graph.facebook.com/v21.0/${encodeURIComponent(pageId)}/posts?${params.toString()}`;
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = (await res.json()) as {
-      data?: {
-        id?: string;
-        message?: string;
-        created_time?: string;
-        likes?: { summary?: { total_count?: number } };
-        comments?: { summary?: { total_count?: number } };
-        shares?: { count?: number };
-        full_picture?: string;
-      }[];
-    };
-    return (data.data ?? []).map((p) => {
-      const likes = p.likes?.summary?.total_count ?? 0;
+  const byTypeFields = REACTION_TYPES.map(
+    (t) => `reactions.type(${t}).summary(true).as(reactions_${t.toLowerCase()})`,
+  ).join(",");
+  const parse = (data: {
+    data?: (Record<string, { summary?: { total_count?: number } } | undefined> & {
+      id?: string;
+      message?: string;
+      created_time?: string;
+      comments?: { summary?: { total_count?: number } };
+      shares?: { count?: number };
+      full_picture?: string;
+    })[];
+  }): PagePostStats[] =>
+    (data.data ?? []).map((p) => {
+      const reactions: Record<string, number> = {};
+      for (const t of REACTION_TYPES) {
+        const count = p[`reactions_${t.toLowerCase()}`]?.summary?.total_count ?? 0;
+        if (count > 0) reactions[t] = count;
+      }
+      const likes = p.reactions?.summary?.total_count ?? 0;
       const comments = p.comments?.summary?.total_count ?? 0;
       const shares = p.shares?.count ?? 0;
       return {
         id: p.id ?? "",
-        snippet: (p.message ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || "Untitled",
+        snippet: ((p.message ?? "").split(/\n/)[0] ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || "Untitled",
         createdAt: p.created_time,
         likes,
+        reactions,
         comments,
         shares,
         engagement: likes + comments * 2 + shares * 3,
         picture: p.full_picture,
       };
     });
+  try {
+    const base = `reactions.summary(true),${byTypeFields},comments.summary(true),full_picture`;
+    const attempts = [
+      `id,message,created_time,${base},shares`,
+      `id,message,created_time,${base}`,
+      "id,message,created_time,likes.summary(true),comments.summary(true),shares,full_picture",
+    ];
+    for (const fields of attempts) {
+      const params = new URLSearchParams({ fields, limit: "20", access_token: token });
+      const res = await fetch(`https://graph.facebook.com/v21.0/${encodeURIComponent(pageId)}/posts?${params.toString()}`);
+      if (res.ok) return parse((await res.json()) as Parameters<typeof parse>[0]);
+    }
+    return [];
   } catch {
     return [];
   }
@@ -134,39 +182,75 @@ export async function GET() {
   const statsErrors: { postId: string; error: string }[] = [];
   const facebookConfigured = Boolean(token);
 
-  // Page-level numbers (followers + recent Page posts, whatever published them).
-  const page = token && pageId ? await fetchPageInfo(pageId, token) : null;
-  const pagePosts = token && pageId ? await fetchPagePosts(pageId, token) : [];
+  // Page-level numbers (followers + recent Page posts) — fetched in parallel.
+  const [page, pagePosts] = token && pageId
+    ? await Promise.all([fetchPageInfo(pageId, token), fetchPagePosts(pageId, token)])
+    : [null, [] as PagePostStats[]];
   pagePosts.sort((a, b) => b.engagement - a.engagement);
 
-  for (const post of published) {
-    let likes = post.metrics?.likes ?? 0;
-    let comments = post.metrics?.comments ?? 0;
-    let shares = post.metrics?.shares ?? 0;
-    let metricsUpdatedAt = post.metrics?.updatedAt;
-
-    if (token && post.facebookPostId) {
-      const { stats: fresh, error: statsError } = await fetchPostStats(post.facebookPostId, token);
-      if (statsError) {
-        statsErrors.push({ postId: post.id, error: `Không lấy được số liệu Facebook (${statsError}). Kiểm tra token/quyền của Page.` });
-      } else if (fresh) {
-        ({ likes, comments, shares } = fresh);
-        metricsUpdatedAt = new Date().toISOString();
-        await updatePost(
-          post.id,
-          { metrics: { likes, comments, shares, updatedAt: metricsUpdatedAt }, activityAction: "refreshed Facebook stats" },
-          "analytics",
-        );
+  // Per-post metrics. Posts refreshed within the freshness window reuse
+  // their cached numbers (no Facebook call, no store write); the rest are
+  // fetched with bounded concurrency instead of one-by-one.
+  const FRESH_MS = 10 * 60 * 1000;
+  const CONCURRENCY = 6;
+  const now = Date.now();
+  const isFresh = (post: (typeof published)[number]) =>
+    Boolean(post.metrics?.updatedAt) && now - new Date(post.metrics!.updatedAt).getTime() < FRESH_MS;
+  const stale = published.filter((post) => token && post.facebookPostId && !isFresh(post));
+  const freshById = new Map<string, { likes: number; comments: number; shares: number; reactions?: Record<string, number> }>();
+  for (let i = 0; i < stale.length; i += CONCURRENCY) {
+    const batch = stale.slice(i, i + CONCURRENCY);
+    const results = await Promise.all(
+      batch.map(async (post) => ({ post, result: await fetchPostStats(post.facebookPostId!, token!) })),
+    );
+    for (const { post, result } of results) {
+      if (result.error) {
+        statsErrors.push({ postId: post.id, error: `Không lấy được số liệu Facebook (${result.error}). Kiểm tra token/quyền của Page.` });
+      } else if (result.stats) {
+        freshById.set(post.id, result.stats);
       }
     }
+  }
 
-    const snippet = post.content.replace(/\s+/g, " ").trim().slice(0, 80) || "Untitled";
+  // Write back only posts whose numbers actually changed — silently (no
+  // activity-timeline spam, no updatedBy/updatedAt churn).
+  const writes: Promise<unknown>[] = [];
+  for (const post of published) {
+    const fresh = freshById.get(post.id);
+    if (!fresh) continue;
+    const changed =
+      fresh.likes !== (post.metrics?.likes ?? 0) ||
+      fresh.comments !== (post.metrics?.comments ?? 0) ||
+      fresh.shares !== (post.metrics?.shares ?? 0) ||
+      JSON.stringify(fresh.reactions ?? {}) !== JSON.stringify(post.metrics?.reactions ?? {});
+    if (changed || !post.metrics) {
+      writes.push(
+        updatePost(
+          post.id,
+          { metrics: { ...fresh, updatedAt: new Date().toISOString() }, silent: true },
+          "analytics",
+        ),
+      );
+    }
+  }
+  await Promise.all(writes);
+
+  for (const post of published) {
+    const fresh = freshById.get(post.id);
+    const likes = fresh?.likes ?? post.metrics?.likes ?? 0;
+    const comments = fresh?.comments ?? post.metrics?.comments ?? 0;
+    const shares = fresh?.shares ?? post.metrics?.shares ?? 0;
+    const reactions = fresh?.reactions ?? post.metrics?.reactions;
+    const metricsUpdatedAt = fresh ? new Date().toISOString() : post.metrics?.updatedAt;
+
+    const snippet = (post.content.split(/\n/)[0] ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || "Untitled";
     stats.push({
       id: post.id,
       snippet,
       publishedAt: post.publishedAt,
       facebookPostId: post.facebookPostId,
       likes,
+      reactions,
       comments,
       shares,
       engagement: likes + comments * 2 + shares * 3,
