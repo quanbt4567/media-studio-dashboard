@@ -17,7 +17,7 @@ function parseDay(iso: string): string {
   return Number.isNaN(d.getTime()) ? "" : dayKey(d);
 }
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
 export default function ContentCalendar({
   posts,
@@ -36,6 +36,7 @@ export default function ContentCalendar({
 }) {
   const [cursor, setCursor] = useState(() => startOfMonth(new Date()));
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | "Published" | "scheduled" | "Review Pending">("all");
 
   const cells = useMemo(() => {
     const first = startOfMonth(cursor);
@@ -51,6 +52,9 @@ export default function ContentCalendar({
   const byDay = useMemo(() => {
     const map = new Map<string, Post[]>();
     for (const post of posts) {
+      if (statusFilter === "Published" && post.status !== "Published") continue;
+      if (statusFilter === "scheduled" && (post.status === "Published" || !post.scheduledAt)) continue;
+      if (statusFilter === "Review Pending" && post.status !== "Review Pending") continue;
       const stamp = post.publishedAt || post.scheduledAt;
       if (!stamp) continue;
       const key = parseDay(stamp);
@@ -60,10 +64,10 @@ export default function ContentCalendar({
       map.set(key, list);
     }
     return map;
-  }, [posts]);
+  }, [posts, statusFilter]);
 
   const selectedPosts = selectedDay ? (byDay.get(selectedDay) ?? []) : [];
-  const monthLabel = cursor.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = cursor.toLocaleDateString("vi-VN", { month: "long", year: "numeric" });
   const todayKey = dayKey(new Date());
 
   function moveMonth(delta: number) {
@@ -77,21 +81,41 @@ export default function ContentCalendar({
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><CalendarDays size={14} /></span>
           <div>
-            <p className="font-mono text-[11px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Content calendar</p>
-            <h2 className="text-xl font-black tracking-[-.04em]">Plan the month.</h2>
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Lịch nội dung</p>
+            <h2 className="text-xl font-black tracking-[-.04em]">Kế hoạch tháng.</h2>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">←</button>
+          <button type="button" onClick={() => moveMonth(-1)} aria-label="Tháng trước" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">←</button>
           <span className="min-w-[140px] text-center text-sm font-extrabold">{monthLabel}</span>
-          <button type="button" onClick={() => moveMonth(1)} aria-label="Next month" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">→</button>
+          <button type="button" onClick={() => moveMonth(1)} aria-label="Tháng sau" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">→</button>
         </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Lọc theo trạng thái">
+        {(
+          [
+            ["all", "Tất cả"],
+            ["Published", "Đã đăng"],
+            ["scheduled", "Đã lên lịch"],
+            ["Review Pending", "Chờ duyệt"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setStatusFilter(key)}
+            className={`rounded-full px-3 py-1.5 text-[11px] font-extrabold transition ${statusFilter === key ? "bg-[var(--accent)] text-white" : "border border-[var(--line)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]"}`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {role === "admin" && dueCount > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3">
           <p className="flex items-center gap-2 text-xs font-extrabold text-[var(--danger-text)]">
-            <Clock size={14} /> {dueCount} post{dueCount === 1 ? "" : "s"} past {dueCount === 1 ? "its" : "their"} scheduled time
+            <Clock size={14} /> {dueCount} bài đã quá giờ hẹn đăng
           </p>
           <button
             type="button"
@@ -99,7 +123,7 @@ export default function ContentCalendar({
             disabled={publishingDue}
             className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
           >
-            <Rocket size={13} /> {publishingDue ? "Publishing…" : "Publish due now"}
+            <Rocket size={13} /> {publishingDue ? "Đang đăng…" : "Đăng ngay"}
           </button>
         </div>
       )}
@@ -131,7 +155,7 @@ export default function ContentCalendar({
                     {post.status === "Published" ? "✓ " : "◷ "}{(post.content.split("\n")[0] || "Untitled").slice(0, 42)}
                   </span>
                 ))}
-                {list.length > 2 && <span className="block px-1.5 text-[11px] font-bold text-[var(--muted)]">+{list.length - 2} more</span>}
+                {list.length > 2 && <span className="block px-1.5 text-[11px] font-bold text-[var(--muted)]">+{list.length - 2} bài nữa</span>}
               </div>
             </button>
           );
@@ -141,12 +165,18 @@ export default function ContentCalendar({
       {selectedDay && (
         <div className="mt-4 rounded-2xl border border-[var(--line)] bg-white/[0.04] p-4">
           <p className="mb-2 text-xs font-extrabold">
-            {new Date(`${selectedDay}T12:00:00`).toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })}
-            <span className="ml-2 font-medium text-[var(--muted)]">{selectedPosts.length} post{selectedPosts.length === 1 ? "" : "s"}</span>
+            {new Date(`${selectedDay}T12:00:00`).toLocaleDateString("vi-VN", { weekday: "long", day: "numeric", month: "long" })}
+            <span className="ml-2 font-medium text-[var(--muted)]">{selectedPosts.length} bài</span>
           </p>
           {selectedPosts.length === 0 ? (
-            <p className="text-[11px] text-[var(--muted)]">Nothing scheduled this day. Set a date on a post in the Studio tab to plan it here.</p>
+            <p className="text-[11px] text-[var(--muted)]">Chưa có bài nào hôm nay. Đặt lịch cho bài ở tab Studio để lên kế hoạch tại đây.</p>
           ) : (
+            <>
+            {selectedPosts.filter((pp) => pp.status !== "Published").length >= 2 && (
+              <p className="mb-2 rounded-lg bg-[var(--amber-tint)] px-3 py-2 text-[11px] font-bold text-[var(--amber-text)]">
+                ⚠ Có {selectedPosts.filter((pp) => pp.status !== "Published").length} bài dự kiến đăng cùng ngày — cân nhắc giãn cách để mỗi bài đều có đất diễn.
+              </p>
+            )}
             <div className="space-y-2">
               {selectedPosts.map((post) => (
                 <button
@@ -158,18 +188,18 @@ export default function ContentCalendar({
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}>{post.status}</span>
                   <span className="min-w-0 flex-1 truncate text-xs font-bold">{(post.content.split("\n")[0] || "Untitled draft").slice(0, 60)}</span>
                   <span className="shrink-0 font-mono text-[11px] text-[var(--muted)]">
-                    {new Date(post.publishedAt || post.scheduledAt || "").toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(post.publishedAt || post.scheduledAt || "").toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </button>
               ))}
             </div>
+            </>
           )}
         </div>
       )}
 
       <p className="mt-4 text-[11px] leading-relaxed text-[var(--muted)]">
-        Schedule a post from the Studio tab — approved posts go out automatically via the <span className="font-mono">/api/publish-due</span> endpoint.
-        Vercel Cron hits it every 5 minutes (see <span className="font-mono">vercel.json</span>; authentication is automatic).
+        Lên lịch từ tab Studio — bài đã duyệt sẽ tự đăng đúng giờ qua endpoint <span className="font-mono">/api/publish-due</span> (được gọi mỗi 5 phút; có thêm một lượt dự phòng hằng ngày).
       </p>
     </div>
   );

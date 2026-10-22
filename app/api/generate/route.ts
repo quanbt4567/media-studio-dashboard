@@ -3,6 +3,7 @@ import { getRecentPagePosts } from "@/app/lib/page-posts";
 import { getSessionUser } from "@/app/lib/session";
 import { geminiErrorMessage } from "@/app/lib/gemini-errors";
 import { aiText } from "@/app/lib/text-ai";
+import { getBrandVoice } from "@/app/lib/prefs-store";
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -13,7 +14,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Chỉ writer được dùng AI viết bài." }, { status: 403 });
   }
   try {
-    const { topic } = await request.json();
+    const { topic, tone } = await request.json();
+    const TONES: Record<string, string> = {
+      friendly: "Write in a friendly, approachable tone with light warmth.",
+      formal: "Write in a polished, formal tone suitable for official announcements.",
+      playful: "Write in a playful, humorous Gen-Z friendly tone (still respectful and clear).",
+      inspiring: "Write in an inspiring, uplifting tone that motivates students to join.",
+    };
+    const toneInstruction = typeof tone === "string" && TONES[tone] ? `\n\nTONE REQUEST: ${TONES[tone]}` : "";
     const cleanTopic = typeof topic === "string" ? topic.trim() : "";
 
     if (cleanTopic.length < 5) {
@@ -39,6 +47,10 @@ export async function POST(request: Request) {
       console.warn("Tone-of-voice fetch failed, generating without examples.", toneError);
     }
 
+    const brandVoice = await getBrandVoice();
+    const brandVoiceBlock = brandVoice
+      ? `\n\nBRAND VOICE — the club's approved writing guidelines. Follow them unless they conflict with the safety rules above:\n${brandVoice}`
+      : "";
     const result = await aiText(
       `Write one polished Facebook post for a university club about: ${cleanTopic}. Keep it warm, concise, and specific. Include 2-4 fitting emojis, a clear call to action, and 3-5 relevant hashtags. Return only the post copy, with natural paragraph breaks.`,
       {
@@ -68,7 +80,7 @@ export async function POST(request: Request) {
 OUTPUT FORMAT CONSTRAINTS:
 - Keep the generated post concise, under 300 words.
 - Do not include any malicious links, spam, or controversial political/religious statements.
-- Always output clean Markdown format without raw HTML tags.${toneExamples}`,
+- Always output clean Markdown format without raw HTML tags.${toneExamples}${toneInstruction}${brandVoiceBlock}`,
       },
     );
 

@@ -131,7 +131,7 @@ export default function StudioWorkspace() {
                 {id === "analytics" && (
                   <div className="hidden lg:block" aria-hidden="true">
                     <div className="mx-3 mb-2 mt-4 border-t border-[var(--line)]" />
-                    <p className="px-3 pb-1 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--faint)]">Hệ thống</p>
+                    <p className="px-3 pb-1 font-mono text-[11px] uppercase tracking-[.18em] text-[var(--faint)]">Hệ thống</p>
                   </div>
                 )}
                 <button

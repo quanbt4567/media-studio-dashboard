@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/app/lib/session";
 import { geminiErrorMessage } from "@/app/lib/gemini-errors";
 import { aiText } from "@/app/lib/text-ai";
+import { getBrandVoice } from "@/app/lib/prefs-store";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Custom topic is too long (max 200 characters)." }, { status: 400 });
   }
 
+  const brandVoice = await getBrandVoice();
+  const brandVoiceBlock = brandVoice
+    ? `\nBRAND VOICE — the club's approved writing guidelines; shape the ideas to fit them:\n${brandVoice}`
+    : "";
   const result = await aiText(
       `You are a social media strategist for a Vietnamese university student club. Suggest 5 Facebook post ideas for: "${topic}".`,
       {
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
 - "angle": one-sentence creative angle in Vietnamese (max 140 chars)
 - "hashtags": array of 3 relevant hashtags (with # prefix)
 - "bestTime": suggested posting slot, e.g. "19:00–21:00" or "Sáng 8:00"
-Make ideas varied: announcement, behind-the-scenes, interactive (poll/question), member spotlight, countdown/reminder. Keep the tone youthful and warm. Never use ** markdown in any field.`,
+Make ideas varied: announcement, behind-the-scenes, interactive (poll/question), member spotlight, countdown/reminder. Keep the tone youthful and warm. Never use ** markdown in any field.${brandVoiceBlock}`,
       },
     );
 

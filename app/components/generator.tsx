@@ -79,6 +79,7 @@ export default function Generator({
 }) {
   const { role, permissions, user } = useSession();
   const [topic, setTopic] = useState("");
+  const [tone, setTone] = useState("default");
   const [postContent, setPostContent] = useState("");
   const [mediaFile, setMediaFile] = useState<File>();
   const [ticketImage, setTicketImage] = useState<string>();
@@ -258,7 +259,7 @@ export default function Generator({
 
     setLoading(true); setError(""); setCopied(false);
     try {
-      const response = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic: cleanTopic }) });
+      const response = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topic: cleanTopic, ...(tone !== "default" ? { tone } : {}) }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
       setPostContent(data.content);
@@ -375,7 +376,7 @@ export default function Generator({
   }
 
   /** Start a new draft from a saved format. */
-  async function useFormat(id: string) {
+  async function applyFormat(id: string) {
     try {
       const response = await fetch(`/api/formats/${id}`, { method: "POST" });
       const data = await response.json();
@@ -654,8 +655,12 @@ export default function Generator({
   const canDelete = activePost && activePost.status !== "Published" && (role === "admin" || (activePost.createdBy === user.username && activePost.status === "Draft"));
   const canSchedule = role === "admin" && status !== "Published";
   const nowIso = new Date().toISOString();
+  const in24hIso = new Date(Date.parse(nowIso) + 24 * 60 * 60 * 1000).toISOString();
   const duePosts = posts.filter(
     (post) => post.status === "Approved" && !post.publishedAt && post.scheduledAt && post.scheduledAt <= nowIso,
+  );
+  const upcomingDue = posts.filter(
+    (post) => post.status === "Approved" && !post.publishedAt && post.scheduledAt && post.scheduledAt > nowIso && post.scheduledAt <= in24hIso,
   );
 
   return <div className="rounded-[20px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance" style={{ animationDelay: "180ms" }}>
@@ -663,8 +668,8 @@ export default function Generator({
     {/* Due posts banner */}
     {role === "admin" && duePosts.length > 0 && (
       <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3">
-        <p className="text-xs font-extrabold text-[var(--danger-text)]">⏰ {duePosts.length} approved post{duePosts.length === 1 ? "" : "s"} past {duePosts.length === 1 ? "its" : "their"} scheduled time</p>
-        <button type="button" onClick={handlePublishDue} disabled={publishingDue} className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"><Rocket size={13} /> {publishingDue ? "Publishing…" : "Publish due now"}</button>
+        <p className="text-xs font-extrabold text-[var(--danger-text)]">⏰ {duePosts.length} bài đã duyệt quá giờ hẹn đăng{upcomingDue.length > 0 ? ` · ${upcomingDue.length} bài sẽ đăng trong 24 giờ tới` : ""}</p>
+        <button type="button" onClick={handlePublishDue} disabled={publishingDue} className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"><Rocket size={13} /> {publishingDue ? "Đang đăng…" : "Đăng ngay các bài đến hạn"}</button>
       </div>
     )}
 
@@ -786,7 +791,14 @@ export default function Generator({
             </p>
       {permissions.canGenerateAI ? <div className="rounded-xl border border-[rgba(167,139,250,.35)] bg-[rgba(167,139,250,.06)] p-4"><p className="mb-3 flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[.14em] text-[var(--accent)]"><WandSparkles size={13} /> Viết bằng AI</p>
         <label className="mb-2 block text-xs font-extrabold" htmlFor="topic">Viết về chủ đề gì?</label><textarea suppressHydrationWarning id="topic" value={topic} maxLength={240} onChange={(event) => setTopic(event.target.value)} placeholder="VD: workshop làm gốm cho người mới vào thứ 6..." className="min-h-28 w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3 text-sm outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--line-strong)] focus:ring-2 focus:ring-[var(--accent)]" />
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="font-mono text-[11px] text-[var(--muted)]">{topic.length}/240 ký tự</p><button disabled={!topic.trim() || loading} onClick={generatePost} className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[var(--surface-2)] disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle className="animate-spin" size={15} /> : <WandSparkles size={15} />} {loading ? "Đang viết..." : "Viết bằng AI"}</button></div>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="font-mono text-[11px] text-[var(--muted)]">{topic.length}/240 ký tự</p><label className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--muted)]">Giọng điệu
+          <select value={tone} onChange={(e) => setTone(e.target.value)} className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-bold text-[var(--ink)] outline-none focus:border-[var(--accent)]" aria-label="Giọng điệu bài viết">
+            <option value="default">Mặc định (giọng của Page)</option>
+            <option value="friendly">Thân thiện</option>
+            <option value="formal">Trang trọng</option>
+            <option value="playful">Hài hước, trẻ trung</option>
+            <option value="inspiring">Truyền cảm hứng</option>
+          </select></label><button disabled={!topic.trim() || loading} onClick={generatePost} className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[var(--surface-2)] disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle className="animate-spin" size={15} /> : <WandSparkles size={15} />} {loading ? "Đang viết..." : "Viết bằng AI"}</button></div>
       </div> : <p className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--surface-2)] px-4 py-3 text-xs leading-relaxed text-[var(--muted)]">{role === "admin" ? <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Crown size={13} /> Admin mode</strong> — bạn chỉ duyệt và đăng bài. Viết bài là việc của writer, hình ảnh là việc của designer. Mở từng bài viết để xem preview, duyệt hoặc trả về.</> : <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Palette size={13} /> Media Creator mode</strong> — the writer&apos;s draft loads automatically below (read-only for you). Attach visuals, then mark the post ready for review.</>}</p>}
       {error && <p className="mt-4 rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
             <div className="mt-5">
@@ -1061,7 +1073,7 @@ export default function Generator({
                   </div>
                   <button
                     type="button"
-                    onClick={() => useFormat(format.id)}
+                    onClick={() => applyFormat(format.id)}
                     className="shrink-0 rounded-xl bg-[var(--accent)] px-3.5 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5"
                   >
                     Dùng

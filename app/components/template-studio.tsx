@@ -366,6 +366,21 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: numb
   ctx.drawImage(img, x + (w - dw) * fx, y + (h - dh) * fy, dw, dh);
 }
 
+let measureCtx: CanvasRenderingContext2D | null = null;
+/** Wrapped height (px, canvas units) of a text element at its current size. */
+function textHeightOf(el: CanvasElement): number {
+  if (el.type !== "text" || !el.text?.trim()) return 0;
+  if (typeof document === "undefined") return 0;
+  if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
+  if (!measureCtx) return 0;
+  measureCtx.font = fontOf(el);
+  return wrapLines(measureCtx, el.text, el.w).length * (el.fontSize ?? 48) * 1.25;
+}
+/** Text spilling past the canvas bottom is lost in the exported image. */
+function textOverflowsCanvas(el: CanvasElement): boolean {
+  return el.type === "text" && el.y + textHeightOf(el) > SIZE + 1;
+}
+
 function fontOf(el: CanvasElement): string {
   const style = el.italic ? "italic " : "";
   const weight = el.bold ? "800 " : "400 ";
@@ -813,6 +828,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   }
 
   async function handleSave() {
+    if (overflowIds.size > 0 && !window.confirm("Có khối chữ đang tràn khỏi khung — phần chữ tràn sẽ bị mất trong ảnh xuất ra. Vẫn lưu?")) return;
     try {
       const dataUrl = await canvasToDataUrl(await renderCanvas(), "image/jpeg", 0.92);
       onSave(dataUrl);
@@ -1140,6 +1156,28 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     }
   }
 
+  const overflowIds = new Set(elements.filter(textOverflowsCanvas).map((el) => el.id));
+
+  /** Shrink the selected text's font until its wrapped height fits the
+   *  space down to the next element below it (or the canvas bottom). */
+  function fitSelectedText() {
+    if (!selected || selected.type !== "text") return;
+    const el = selected;
+    const below = elements
+      .filter((o) => o.id !== el.id && o.y >= el.y + 4 && o.x < el.x + el.w && el.x < o.x + o.w)
+      .map((o) => o.y);
+    const limit = (below.length ? Math.min(...below) : SIZE) - 8;
+    let size = el.fontSize ?? 48;
+    const probe: CanvasElement = { ...el };
+    while (size > 14) {
+      probe.fontSize = size;
+      if (el.y + textHeightOf(probe) <= limit) break;
+      size -= 2;
+    }
+    pushHistory();
+    updateEl(el.id, { fontSize: size });
+  }
+
   const textStyleOf = (el: CanvasElement): React.CSSProperties => ({
     fontSize: el.fontSize,
     color: el.color,
@@ -1250,7 +1288,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                   onPointerDown={(e) => { if (!el.locked) onElPointerDown(e, el); }}
                   onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text" && !el.locked) { pushHistory(); setEditingId(el.id); } }}
                   className="absolute"
-                  style={{ left: el.x, top: el.y, width: el.w, cursor: el.locked ? "default" : "move", outline: isSel ? "2px solid #1877F2" : "none", outlineOffset: 2 }}
+                  style={{ left: el.x, top: el.y, width: el.w, cursor: el.locked ? "default" : "move", outline: isSel ? "2px solid #1877F2" : overflowIds.has(el.id) ? "2px dashed #F87171" : "none", outlineOffset: 2 }}
                 >
                   {el.type === "text" ? (
                     isEditing ? (
@@ -1284,6 +1322,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </div>
         </div>
         <p className="mt-1.5 text-[11px] text-[var(--muted)]">Nhấn để chọn · kéo để di chuyển · nhấn đúp vào chữ để sửa · kéo chấm xanh để đổi kích thước · phím Delete để xóa.</p>
+        {overflowIds.size > 0 && (
+          <p className="mt-1.5 rounded-lg border border-[var(--danger-border)] bg-[var(--danger-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--danger-text)]">
+            ⚠ Có {overflowIds.size} khối chữ đang tràn khỏi mép dưới khung — phần tràn sẽ bị mất khi xuất ảnh. Hãy rút gọn chữ, giảm cỡ chữ, hoặc chọn khối chữ rồi bấm “Chữ vừa khung”.
+          </p>
+        )}
       </div>
 
       {/* Side panel */}
@@ -1358,6 +1401,14 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                       className="w-full"
                     />
                   </div>
+                  {overflowIds.has(selected.id) && (
+                    <p className="rounded-lg bg-[var(--danger-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--danger-text)]">
+                      ⚠ Khối chữ này đang tràn khỏi khung — chữ phía dưới sẽ bị mất khi xuất ảnh.
+                    </p>
+                  )}
+                  <button type="button" onClick={fitSelectedText} className="w-full rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]">
+                    ⤢ Chữ vừa khung (tự giảm cỡ chữ)
+                  </button>
                   <div className="flex items-center gap-2">
                     <label className="text-[11px] font-bold text-[var(--muted)]">Màu</label>
                     <input type="color" value={selected.color ?? "#ffffff"} onChange={(e) => updateEl(selected.id, { color: e.target.value })} className="h-8 w-12 cursor-pointer rounded border border-[var(--line)]" />

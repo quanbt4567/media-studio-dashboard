@@ -19,6 +19,7 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -78,6 +79,10 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
     }
   }
 
+  const visibleItems = query.trim()
+    ? items.filter((m) => m.name.toLowerCase().includes(query.trim().toLowerCase()) || (m.uploadedBy ?? "").toLowerCase().includes(query.trim().toLowerCase()))
+    : items;
+
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-3">
@@ -96,6 +101,18 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
           </button>
         )}
       </div>
+      {items.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Tìm ảnh theo tên hoặc người tải…"
+            aria-label="Tìm ảnh trong thư viện"
+            className="w-full max-w-xs rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2.5 text-xs outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
+          />
+          <span className="text-[11px] font-bold text-[var(--muted)]">{visibleItems.length}/{items.length} ảnh</span>
+        </div>
+      )}
       <input
         ref={fileRef}
         type="file"
@@ -107,19 +124,23 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
           e.target.value = "";
         }}
       />
-      {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+      {error && <p className="text-sm font-bold text-[var(--danger-text-2)] mb-3">{error}</p>}
       {loading ? (
         <p className="text-sm text-[var(--muted)]">Đang tải thư viện...</p>
+      ) : items.length > 0 && visibleItems.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[var(--line)] p-8 text-center text-sm text-[var(--muted)]">
+          Không tìm thấy ảnh nào khớp “{query}”.
+        </div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] p-8 text-center text-sm text-[var(--muted)]">
+        <div className="rounded-2xl border border-dashed border-[var(--line)] p-8 text-center text-sm text-[var(--muted)]">
           Thư viện trống. {canManage ? "Bấm “Thêm ảnh” để upload ảnh đầu tiên." : "Nhờ team Media upload ảnh nhé."}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {items.map((item) => (
+          {visibleItems.map((item) => (
             <div
               key={item.id}
-              className={`group relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] ${onPick ? "cursor-pointer hover:ring-2 hover:ring-[var(--brand)]" : ""}`}
+              className={`group relative overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] ${onPick ? "cursor-pointer hover:ring-2 hover:ring-[var(--accent)]" : ""}`}
               onClick={() => onPick?.(item)}
               title={onPick ? "Bấm để chọn ảnh này" : item.name}
             >

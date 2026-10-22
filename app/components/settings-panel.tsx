@@ -55,6 +55,10 @@ export default function SettingsPanel() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [brandVoice, setBrandVoice] = useState("");
+  const [bvSaving, setBvSaving] = useState(false);
+  const [bvSaved, setBvSaved] = useState(false);
+  const [bvError, setBvError] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -76,6 +80,36 @@ export default function SettingsPanel() {
     load();
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [load]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/prefs")
+      .then((res) => res.json())
+      .then((data) => { if (!cancelled && typeof data.brandVoice === "string") setBrandVoice(data.brandVoice); })
+      .catch(() => { /* brand voice is optional */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function handleSaveBrandVoice() {
+    setBvSaving(true);
+    setBvError("");
+    setBvSaved(false);
+    try {
+      const res = await fetch("/api/prefs", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandVoice }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Không lưu được giọng văn.");
+      setBrandVoice(data.brandVoice ?? "");
+      setBvSaved(true);
+    } catch (err) {
+      setBvError(err instanceof Error ? err.message : "Không lưu được giọng văn.");
+    } finally {
+      setBvSaving(false);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -163,6 +197,39 @@ export default function SettingsPanel() {
 
           {error && <p className="rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
           {saved && <p className="rounded-lg bg-[var(--green-tint)] px-3 py-2 text-xs font-bold text-[var(--green-text)]">Đã lưu. Các tính năng sẽ dùng key mới ngay lập tức.</p>}
+
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <label htmlFor="brand-voice" className="text-xs font-extrabold">Giọng văn thương hiệu (Brand Voice)</label>
+              <span className="rounded-full bg-[var(--fill)] px-2 py-0.5 text-[11px] font-bold text-[var(--muted)]">AI sẽ bám theo khi viết bài & gợi ý ý tưởng</span>
+            </div>
+            <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">
+              Viết ngắn gọn cách Page muốn nói chuyện: xưng hô (ví dụ “anh em BCN”), từ nên dùng/tránh dùng, mức độ emoji, điều không bao giờ hứa hẹn… Tối đa 1000 ký tự. Để trống = dùng giọng mặc định của Page.
+            </p>
+            <textarea
+              id="brand-voice"
+              value={brandVoice}
+              maxLength={1000}
+              onChange={(e) => setBrandVoice(e.target.value)}
+              rows={4}
+              placeholder="VD: Xưng hô “anh em”, giọng trẻ trung nhưng không suồng sã; luôn có CTA đăng ký; không dùng từ “cam kết đậu”…"
+              className="w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3.5 py-2.5 text-xs leading-relaxed outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--line-strong)] focus:ring-2 focus:ring-[var(--accent)]"
+            />
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={handleSaveBrandVoice}
+                disabled={bvSaving}
+                className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
+              >
+                {bvSaving && <LoaderCircle size={14} className="animate-spin" />}
+                {bvSaving ? "Đang lưu..." : "Lưu giọng văn"}
+              </button>
+              <span className="font-mono text-[11px] text-[var(--muted)]">{brandVoice.length}/1000</span>
+              {bvSaved && <span className="text-[11px] font-bold text-[var(--green-text)]">✓ Đã lưu — AI sẽ dùng ngay ở lần viết tiếp theo.</span>}
+              {bvError && <span className="text-[11px] font-bold text-[var(--danger-text)]">{bvError}</span>}
+            </div>
+          </div>
 
           <div className="flex items-center gap-3">
             <button

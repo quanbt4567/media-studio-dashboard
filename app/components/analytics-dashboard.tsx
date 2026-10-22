@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, BarChart3, ExternalLink, Lightbulb, MessageCircle, Minus, RefreshCw, Search, Share2, TrendingDown, TrendingUp, TriangleAlert, Trophy } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CountUp } from "./fx/motion";
+import AnalyticsQnA from "./analytics-qna";
 
 interface PostStats {
   id: string;
@@ -583,6 +584,12 @@ export default function AnalyticsDashboard() {
                   Chưa đủ bài trong kỳ (cần tối thiểu 3) để rút ra nhận định giờ/ngày đăng đáng tin cậy — app không kết luận khi dữ liệu quá ít.
                 </p>
               )}
+
+              <AnalyticsQnA
+                current={currentRows.map((r) => ({ snippet: r.snippet, engagement: r.engagement, reactions: r.reactions, comments: r.comments, shares: r.shares, date: r.date, hasPicture: r.hasPicture }))}
+                previous={previousRows.map((r) => ({ engagement: r.engagement }))}
+                hasPrevious={hasPrevious}
+              />
 
               {/* Ranking table */}
               <section className="rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-4">
