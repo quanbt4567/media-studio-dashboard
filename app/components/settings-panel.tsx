@@ -105,9 +105,9 @@ export default function SettingsPanel() {
   }
 
   return (
-    <div className="rounded-[28px] border border-white/75 bg-white/70 p-4 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl sm:p-7">
+    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7">
       <div className="mb-6 flex items-center gap-2">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--lime)]">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]">
           <KeyRound size={14} />
         </span>
         <span className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">
@@ -128,18 +128,18 @@ export default function SettingsPanel() {
           {FIELDS.map((field) => {
             const state = settings?.[field.key];
             return (
-              <div key={field.key} className="rounded-2xl border border-[var(--line)] bg-white p-4">
+              <div key={field.key} className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="mb-1 flex flex-wrap items-center gap-2">
                   <label htmlFor={`setting-${field.key}`} className="text-xs font-extrabold">
                     {field.label}
                   </label>
                   {state?.configured && (
-                    <span className="rounded-full bg-[#e7f6e9] px-2 py-0.5 text-[10px] font-extrabold text-[#28733f]">
+                    <span className="rounded-full bg-[#12251a] px-2 py-0.5 text-[10px] font-extrabold text-[#4cc26e]">
                       ✓ đã cấu hình
                     </span>
                   )}
                   {state?.fromEnv && (
-                    <span className="rounded-full bg-[#eef1e8] px-2 py-0.5 text-[10px] font-bold text-[var(--muted)]">
+                    <span className="rounded-full bg-[var(--fill)] px-2 py-0.5 text-[10px] font-bold text-[var(--muted)]">
                       từ .env
                     </span>
                   )}
@@ -155,21 +155,21 @@ export default function SettingsPanel() {
                   value={inputs[field.key] || ""}
                   onChange={(e) => setInputs((prev) => ({ ...prev, [field.key]: e.target.value }))}
                   placeholder={field.placeholder}
-                  className="w-full rounded-xl border border-[var(--line)] bg-[#fafbf7] px-3.5 py-2.5 font-mono text-xs outline-none transition placeholder:text-[#a8b0a7] focus:border-[var(--ink)] focus:ring-2 focus:ring-[var(--lime)]"
+                  className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3.5 py-2.5 font-mono text-xs outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--line-strong)] focus:ring-2 focus:ring-[var(--accent)]"
                 />
               </div>
             );
           })}
 
-          {error && <p className="rounded-lg bg-[#fff0ec] px-3 py-2 text-xs font-bold text-[#b8543c]">{error}</p>}
-          {saved && <p className="rounded-lg bg-[#e7f6e9] px-3 py-2 text-xs font-bold text-[#28733f]">Đã lưu. Các tính năng sẽ dùng key mới ngay lập tức.</p>}
+          {error && <p className="rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
+          {saved && <p className="rounded-lg bg-[#12251a] px-3 py-2 text-xs font-bold text-[#4cc26e]">Đã lưu. Các tính năng sẽ dùng key mới ngay lập tức.</p>}
 
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-[var(--ink)] px-5 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
             >
               {saving && <LoaderCircle size={14} className="animate-spin" />}
               {saving ? "Đang lưu..." : "Lưu cài đặt"}

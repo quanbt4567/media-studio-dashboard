@@ -3,17 +3,34 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #1877f2;
+  --color-primary: #8b5cf6;
 }
 
+/**
+ * Futuristic Dark design tokens (Media Studio Dashboard redesign).
+ * Deep charcoal base (never pure black), layered surfaces, one violet
+ * primary accent + one cyan secondary accent, used sparingly.
+ * Legacy token names (--ink/--paper/--line/--muted) are kept so every
+ * existing component picks up the new theme through the variables.
+ */
 :root {
-  --ink: #162522;
-  --muted: #6c7b74;
-  --paper: #f5f5ef;
-  --lime: #d9f56a;
-  --orange: #ff815f;
-  --line: #d8dfd3;
-  --brand: #2f7d46;
+  color-scheme: dark;
+
+  --paper: #0a0c11;        /* app background — deep charcoal */
+  --surface: #12151d;      /* cards / panels */
+  --surface-2: #171b25;    /* raised surfaces, inner wells */
+  --fill: #1b2029;         /* soft chips, subtle fills */
+  --ink: #e9ecf3;          /* primary text */
+  --muted: #9aa4b5;        /* secondary text */
+  --faint: #78818f;        /* tertiary text */
+  --line: #232936;         /* hairline borders */
+  --line-strong: #3a4356;  /* emphasis borders */
+  --accent: #8b5cf6;       /* violet — primary actions, active states */
+  --accent-strong: #7c4dff;
+  --accent-2: #22d3ee;     /* cyan — data highlights, kickers */
+  --brand: #3ecf74;        /* success */
+  --orange: #fb923c;       /* scheduled / warning signal */
+  --danger: #f28b82;
 }
 
 * { box-sizing: border-box; }
@@ -22,20 +39,37 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--paper);
-  font-family: var(--font-manrope), sans-serif;
+  font-family: var(--font-inter), var(--font-manrope), sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 button, textarea { font: inherit; }
 
-::selection { background: var(--lime); color: var(--ink); }
+::selection { background: rgba(139, 92, 246, .45); color: #fff; }
+
+/* Slim dark scrollbars that match the surfaces. */
+* { scrollbar-width: thin; scrollbar-color: #2b3242 transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #2b3242; border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Consistent, visible keyboard focus across the app. */
+:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, .75);
+  outline-offset: 2px;
+}
 
 .dotted-grid {
-  background-image: radial-gradient(#bec8bb 0.8px, transparent 0.8px);
+  background-image: radial-gradient(rgba(148, 163, 184, .13) 0.8px, transparent 0.8px);
   background-size: 15px 15px;
 }
 
+/* Ambient backdrop: two restrained accent glows over deep charcoal. */
 .studio-canvas {
-  background: radial-gradient(circle at 12% 8%, rgba(217, 245, 106, .25), transparent 28%), radial-gradient(circle at 92% 18%, rgba(185, 221, 218, .36), transparent 24%), var(--paper);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(139, 92, 246, .10), transparent 30%),
+    radial-gradient(circle at 92% 18%, rgba(34, 211, 238, .07), transparent 26%),
+    var(--paper);
 }
 
 .entrance { animation: entrance 650ms cubic-bezier(.2,.8,.2,1) both; }
@@ -43,4 +77,36 @@ button, textarea { font: inherit; }
 @keyframes entrance {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading shimmer for skeleton blocks. */
+.skeleton {
+  background: linear-gradient(100deg, var(--surface-2) 40%, var(--fill) 50%, var(--surface-2) 60%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-wave {
+  from { background-position: 120% 0; }
+  to { background-position: -80% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entrance, .skeleton, .stagger-item, .orb-drift-a, .orb-drift-b { animation: none; }
+}
+
+/* Login entrance stagger + ambient orb drift. */
+.stagger-item { animation: entrance 550ms cubic-bezier(.2,.8,.2,1) both; }
+
+.orb-drift-a { animation: orb-drift-a 22s ease-in-out infinite alternate; }
+.orb-drift-b { animation: orb-drift-b 26s ease-in-out infinite alternate; }
+
+@keyframes orb-drift-a {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(46px, 30px) scale(1.08); }
+}
+
+@keyframes orb-drift-b {
+  from { transform: translate(0, 0) scale(1.05); }
+  to { transform: translate(-40px, -26px) scale(0.98); }
 }

@@ -130,9 +130,9 @@ export default function IdeaGenerator({
   }
 
   return (
-    <div className="rounded-[28px] border border-white/75 bg-white/70 p-4 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex items-center gap-2">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--lime)]"><Lightbulb size={14} /></span>
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><Lightbulb size={14} /></span>
         <div>
           <p className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">AI idea generator</p>
           <h2 className="text-xl font-black tracking-[-.04em]">Never run out of ideas.</h2>
@@ -148,7 +148,7 @@ export default function IdeaGenerator({
               key={preset.id}
               type="button"
               onClick={() => { setEventId(active ? "" : preset.id); setCustomTopic(""); }}
-              className={`rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${active ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--line)] bg-white/60 hover:border-[var(--ink)]"}`}
+              className={`rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${active ? "border-[var(--line-strong)] bg-[var(--accent)] text-white" : "border-[var(--line)] bg-white/[0.05] hover:border-[var(--accent)]"}`}
             >
               {preset.label}
             </button>
@@ -162,20 +162,20 @@ export default function IdeaGenerator({
           onChange={(e) => { setCustomTopic(e.target.value); setEventId(""); }}
           placeholder="Or describe a custom topic…"
           maxLength={200}
-          className="min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-[#fafbf7] px-3 py-2.5 text-sm outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+          className="min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5 text-sm outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
         />
         <button
           type="button"
           onClick={generate}
           disabled={loading}
-          className="flex items-center gap-2 rounded-xl bg-[var(--ink)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+          className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
         >
           {loading ? <LoaderCircle size={15} className="animate-spin" /> : <Sparkles size={15} />}
           {loading ? "Đang nghĩ…" : "Tạo ý tưởng"}
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-[#fff0ec] px-3 py-2 text-xs font-bold text-[#b8543c]">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
 
       {topicUsed && ideas.length > 0 && (
         <p className="mb-3 font-mono text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">
@@ -184,14 +184,14 @@ export default function IdeaGenerator({
       )}
       <div ref={gridRef} className="grid gap-3 md:grid-cols-2">
         {ideas.map((idea, index) => (
-          <div key={index} className="flex flex-col rounded-2xl border border-[var(--line)] bg-white/70 p-4">
+          <div key={index} className="flex flex-col rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-4">
             <p className="text-sm font-extrabold leading-snug">{idea.title}</p>
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-[var(--muted)]">{idea.angle}</p>
-            <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-[#1877F2]"><Hash size={11} />{idea.hashtags.join(" ")}</p>
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-[var(--accent-2)]"><Hash size={11} />{idea.hashtags.join(" ")}</p>
             <p className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-[var(--muted)]"><Clock size={11} />Giờ đăng gợi ý: {idea.bestTime || "—"}</p>
             {canCreate ? (
               draftFor === index ? (
-                <div className="mt-3 rounded-xl border border-[var(--ink)] bg-[#fafbf7] p-3">
+                <div className="mt-3 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-3">
                   <label htmlFor={`brief-${index}`} className="mb-1.5 block text-[11px] font-extrabold">
                     Bạn muốn viết gì?
                   </label>
@@ -202,14 +202,14 @@ export default function IdeaGenerator({
                     rows={4}
                     autoFocus
                     placeholder="Thêm chi tiết: thời gian, địa điểm, đối tượng, giọng văn, ý bắt buộc có…"
-                    className="w-full rounded-lg border border-[var(--line)] bg-white px-2.5 py-2 text-xs leading-relaxed outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+                    className="w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2 text-xs leading-relaxed outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
                   />
                   <div className="mt-2 flex gap-2">
                     <button
                       type="button"
                       onClick={() => handleGenerateDraft(idea, index)}
                       disabled={writing}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
                     >
                       {writing ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
                       {writing ? "AI đang viết…" : "AI viết bài & tạo nháp"}
@@ -218,7 +218,7 @@ export default function IdeaGenerator({
                       type="button"
                       onClick={() => setDraftFor(null)}
                       disabled={writing}
-                      className="rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-[11px] font-bold text-[var(--muted)] transition hover:text-[var(--ink)] disabled:opacity-40"
+                      className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[11px] font-bold text-[var(--muted)] transition hover:text-[var(--ink)] disabled:opacity-40"
                     >
                       Hủy
                     </button>
@@ -229,7 +229,7 @@ export default function IdeaGenerator({
                   type="button"
                   onClick={() => openDraftComposer(idea, index)}
                   disabled={writing}
-                  className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                  className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--accent)] px-3 py-2 text-[11px] font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
                 >
                   <Plus size={13} /> Dùng làm bản nháp
                 </button>
@@ -241,7 +241,7 @@ export default function IdeaGenerator({
         ))}
       </div>
       {!loading && ideas.length === 0 && (
-        <p className="rounded-xl border border-dashed border-[var(--line)] bg-[#fafbf7] px-4 py-8 text-center text-xs text-[var(--muted)]">
+        <p className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--surface-2)] px-4 py-8 text-center text-xs text-[var(--muted)]">
           Pick an event above and let Gemini brainstorm your next 5 posts.
         </p>
       )}

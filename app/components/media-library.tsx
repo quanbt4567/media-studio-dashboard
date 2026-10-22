@@ -89,7 +89,7 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
           >
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
             {uploading ? "Đang tải..." : "Thêm ảnh"}
@@ -119,7 +119,7 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
           {items.map((item) => (
             <div
               key={item.id}
-              className={`group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white ${onPick ? "cursor-pointer hover:ring-2 hover:ring-[var(--brand)]" : ""}`}
+              className={`group relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] ${onPick ? "cursor-pointer hover:ring-2 hover:ring-[var(--brand)]" : ""}`}
               onClick={() => onPick?.(item)}
               title={onPick ? "Bấm để chọn ảnh này" : item.name}
             >

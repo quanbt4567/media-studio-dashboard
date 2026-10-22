@@ -47,7 +47,7 @@ export default function ActivityFeed({
   if (items.length === 0) return null;
 
   return (
-    <div className="mb-4 rounded-2xl border border-[var(--line)] bg-white p-3">
+    <div className="mb-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3">
       <p className="mb-2 flex items-center gap-1.5 px-1 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">
         <Activity size={12} /> Hoạt động gần đây
       </p>
@@ -57,9 +57,9 @@ export default function ActivityFeed({
             <button
               type="button"
               onClick={() => onSelectPost(item.postId)}
-              className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-[#f2f4ec]"
+              className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-[var(--fill)]"
             >
-              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--lime)]" />
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
               <span className="shrink-0 text-[var(--muted)]">{timeAgo(item.at)}</span>
               <span className="min-w-0 flex-1 truncate">
                 <strong>{item.by}</strong> {item.action}

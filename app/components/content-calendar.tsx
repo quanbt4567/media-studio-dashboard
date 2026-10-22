@@ -72,32 +72,32 @@ export default function ContentCalendar({
   }
 
   return (
-    <div className="rounded-[28px] border border-white/75 bg-white/70 p-4 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--lime)]"><CalendarDays size={14} /></span>
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><CalendarDays size={14} /></span>
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Content calendar</p>
             <h2 className="text-xl font-black tracking-[-.04em]">Plan the month.</h2>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month" className="rounded-full border border-[var(--line)] bg-white/70 px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">←</button>
+          <button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">←</button>
           <span className="min-w-[140px] text-center text-sm font-extrabold">{monthLabel}</span>
-          <button type="button" onClick={() => moveMonth(1)} aria-label="Next month" className="rounded-full border border-[var(--line)] bg-white/70 px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">→</button>
+          <button type="button" onClick={() => moveMonth(1)} aria-label="Next month" className="rounded-full border border-[var(--line)] bg-white/[0.06] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">→</button>
         </div>
       </div>
 
       {role === "admin" && dueCount > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[#f3c2b8] bg-[#fff0ec] px-4 py-3">
-          <p className="flex items-center gap-2 text-xs font-extrabold text-[#a74331]">
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[#5c2b28] bg-[#2b1a1e] px-4 py-3">
+          <p className="flex items-center gap-2 text-xs font-extrabold text-[#f28b82]">
             <Clock size={14} /> {dueCount} post{dueCount === 1 ? "" : "s"} past {dueCount === 1 ? "its" : "their"} scheduled time
           </p>
           <button
             type="button"
             onClick={onPublishDue}
             disabled={publishingDue}
-            className="ml-auto flex items-center gap-1.5 rounded-xl bg-[#1877F2] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
+            className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"
           >
             <Rocket size={13} /> {publishingDue ? "Publishing…" : "Publish due now"}
           </button>
@@ -119,14 +119,14 @@ export default function ContentCalendar({
               key={key}
               type="button"
               onClick={() => setSelectedDay(selected ? null : key)}
-              className={`min-h-[74px] rounded-xl border p-1.5 text-left transition ${selected ? "border-[var(--ink)] bg-white shadow-[0_8px_20px_rgba(22,37,34,.12)]" : "border-[var(--line)] bg-white/50 hover:border-[var(--ink)]"} ${isToday ? "ring-2 ring-[var(--lime)]" : ""}`}
+              className={`min-h-[74px] rounded-xl border p-1.5 text-left transition ${selected ? "border-[var(--line-strong)] bg-[var(--surface)] shadow-[0_8px_20px_rgba(0,0,0,.12)]" : "border-[var(--line)] bg-[var(--surface)]/50 hover:border-[var(--accent)]"} ${isToday ? "ring-2 ring-[var(--accent)]" : ""}`}
             >
               <span className={`text-[11px] font-extrabold ${isToday ? "text-[var(--ink)]" : "text-[var(--muted)]"}`}>{date.getDate()}</span>
               <div className="mt-1 space-y-1">
                 {list.slice(0, 2).map((post) => (
                   <span
                     key={post.id}
-                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold leading-snug ${post.status === "Published" ? "bg-[#1877F2] text-white" : "bg-[#fff1d6] text-[#8b5d16]"}`}
+                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold leading-snug ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[#2b2113] text-[#e0a93e]"}`}
                   >
                     {post.status === "Published" ? "✓ " : "◷ "}{(post.content.split("\n")[0] || "Untitled").slice(0, 42)}
                   </span>
@@ -139,7 +139,7 @@ export default function ContentCalendar({
       </div>
 
       {selectedDay && (
-        <div className="mt-4 rounded-2xl border border-[var(--line)] bg-white/60 p-4">
+        <div className="mt-4 rounded-2xl border border-[var(--line)] bg-white/[0.04] p-4">
           <p className="mb-2 text-xs font-extrabold">
             {new Date(`${selectedDay}T12:00:00`).toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })}
             <span className="ml-2 font-medium text-[var(--muted)]">{selectedPosts.length} post{selectedPosts.length === 1 ? "" : "s"}</span>
@@ -153,9 +153,9 @@ export default function ContentCalendar({
                   key={post.id}
                   type="button"
                   onClick={() => onSelectPost(post.id)}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-white px-3 py-2.5 text-left transition hover:border-[var(--ink)]"
+                  className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left transition hover:border-[var(--accent)]"
                 >
-                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[#1877F2] text-white" : "bg-[#fff1d6] text-[#8b5d16]"}`}>{post.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[#2b2113] text-[#e0a93e]"}`}>{post.status}</span>
                   <span className="min-w-0 flex-1 truncate text-xs font-bold">{(post.content.split("\n")[0] || "Untitled draft").slice(0, 60)}</span>
                   <span className="shrink-0 font-mono text-[10px] text-[var(--muted)]">
                     {new Date(post.publishedAt || post.scheduledAt || "").toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}

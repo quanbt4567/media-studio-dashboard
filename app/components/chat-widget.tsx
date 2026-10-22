@@ -135,7 +135,7 @@ export default function ChatWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         title="Tin nhắn nhóm"
-        className="fixed bottom-5 right-5 z-[80] flex items-center justify-center rounded-full bg-[var(--ink)] text-white shadow-xl transition hover:-translate-y-0.5"
+        className="fixed bottom-5 right-5 z-[80] flex items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-xl transition hover:-translate-y-0.5"
         style={{ width: 52, height: 52 }}
       >
         <MessageCircle size={22} />
@@ -148,8 +148,8 @@ export default function ChatWidget() {
 
       {open &&
         createPortal(
-          <div className="fixed bottom-20 right-5 z-[80] flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xl">
-            <div className="flex items-center gap-2 border-b border-[var(--line)] bg-[#fafbf7] px-4 py-3">
+          <div className="fixed bottom-20 right-5 z-[80] flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-2xl">
+            <div className="flex items-center gap-2 border-b border-[var(--line)] bg-[var(--surface-2)] px-4 py-3">
               {activeId && (
                 <button
                   type="button"
@@ -183,9 +183,9 @@ export default function ChatWidget() {
                     key={c.id}
                     type="button"
                     onClick={() => setActiveId(c.id)}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-[#f2f4ec]"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-[var(--fill)]"
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ink)] text-white">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-white">
                       {c.type === "group" ? <Users size={16} /> : <span className="text-xs font-extrabold">{c.title.slice(0, 1).toUpperCase()}</span>}
                     </span>
                     <span className="min-w-0 flex-1">
@@ -221,7 +221,7 @@ export default function ChatWidget() {
                     const mine = m.from === user.username;
                     return (
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${mine ? "rounded-br-md bg-[var(--ink)] text-white" : "rounded-bl-md bg-[#f2f4ec] text-[var(--ink)]"}`}>
+                        <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${mine ? "rounded-br-md bg-[var(--accent)] text-white" : "rounded-bl-md bg-[var(--fill)] text-[var(--ink)]"}`}>
                           {!mine && active?.type === "group" && (
                             <p className="mb-0.5 text-[10px] font-extrabold text-[var(--brand)]">{m.from}</p>
                           )}
@@ -241,13 +241,13 @@ export default function ChatWidget() {
                       onKeyDown={(e) => { if (e.key === "Enter") send(); }}
                       placeholder="Nhắn tin…"
                       maxLength={2000}
-                      className="flex-1 rounded-xl border border-[var(--line)] bg-[#fafbf7] px-3 py-2 text-xs outline-none focus:border-[var(--ink)]"
+                      className="flex-1 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2 text-xs outline-none focus:border-[var(--line-strong)]"
                     />
                     <button
                       type="button"
                       onClick={send}
                       disabled={sending || !draft.trim()}
-                      className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--ink)] text-white disabled:opacity-40"
+                      className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent)] text-white disabled:opacity-40"
                     >
                       <Send size={15} />
                     </button>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Manrope } from "next/font/google";
+import { Inter, JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-inter" });
 const manrope = Manrope({ subsets: ["latin", "vietnamese"], variable: "--font-manrope" });
 const mono = JetBrains_Mono({ subsets: ["latin", "vietnamese"], weight: ["400", "500"], variable: "--font-mono" });
 
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           rel="stylesheet"
         />
       </head>
-      <body suppressHydrationWarning className={`${manrope.variable} ${mono.variable}`}>{children}</body>
+      <body suppressHydrationWarning className={`${inter.variable} ${manrope.variable} ${mono.variable}`}>{children}</body>
     </html>
   );
 }

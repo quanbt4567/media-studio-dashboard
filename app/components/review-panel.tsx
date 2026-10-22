@@ -5,9 +5,9 @@ import { useState } from "react";
 import type { Post } from "../lib/posts-store";
 
 const roleBadge: Record<string, string> = {
-  admin: "bg-[#e6d9f5] text-[#5b2d8e]",
-  content: "bg-[#eef1e8] text-[var(--ink)]",
-  media: "bg-[#fff1d6] text-[#8b5d16]",
+  admin: "bg-[#2a1f3d] text-[#c4a7f5]",
+  content: "bg-[var(--fill)] text-[var(--ink)]",
+  media: "bg-[#2b2113] text-[#e0a93e]",
 };
 
 function timeAgo(iso: string): string {
@@ -85,32 +85,32 @@ export default function ReviewPanel({
   const inReview = post.status === "Review Pending";
 
   return (
-    <div className="rounded-2xl border border-white/80 bg-white/65 p-4 shadow-[0_14px_40px_rgba(22,37,34,.08)] backdrop-blur-xl sm:p-5">
+    <div className="rounded-2xl border border-white/10 bg-[var(--surface)]/65 p-4 shadow-[0_14px_40px_rgba(0,0,0,.08)] backdrop-blur-xl sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">Duyệt bài</p>
           <p className="mt-1 text-sm font-black tracking-tight">Thảo luận & duyệt</p>
         </div>
-        <span className="flex items-center gap-1.5 rounded-full bg-[#eef1e8] px-2.5 py-1 text-[10px] font-bold text-[var(--muted)]">
+        <span className="flex items-center gap-1.5 rounded-full bg-[var(--fill)] px-2.5 py-1 text-[10px] font-bold text-[var(--muted)]">
           <MessageSquare size={12} /> {post.comments.length}
         </span>
       </div>
 
       {/* One-click review for admins — sticky so it's always reachable */}
       {role === "admin" && (
-        <div className="sticky top-4 z-10 mb-4 rounded-xl border border-[var(--ink)] bg-[#fafbf7] p-3 shadow-[0_8px_24px_rgba(22,37,34,.12)]">
+        <div className="sticky top-4 z-10 mb-4 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-3 shadow-[0_8px_24px_rgba(0,0,0,.12)]">
           {inReview ? (
             <>
               <p className="mb-2 text-xs font-extrabold">Duyệt nhanh — một chạm, không cần Zalo</p>
               {post.visualSkipped && (
-                <p className="mb-2 rounded-lg bg-[#fff8e6] px-2.5 py-2 text-[11px] font-bold text-[#8b5d16]"><Zap size={12} className="mr-1 inline-block align-[-2px]" /> Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
+                <p className="mb-2 rounded-lg bg-[#2b2113] px-2.5 py-2 text-[11px] font-bold text-[#e0a93e]"><Zap size={12} className="mr-1 inline-block align-[-2px]" /> Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
               )}
               <textarea
                 value={reviewNote}
                 onChange={(e) => setReviewNote(e.target.value)}
                 placeholder="Note for the team (required when rejecting)…"
                 rows={2}
-                className="mb-2 w-full resize-none rounded-xl border border-[var(--line)] bg-white p-2.5 text-xs outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+                className="mb-2 w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 text-xs outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
               />
               <div className="flex gap-2">
                 <button
@@ -152,7 +152,7 @@ export default function ReviewPanel({
             </p>
           )}
           {post.review && (
-            <p className={`mt-2 rounded-lg px-2.5 py-2 text-[11px] font-bold ${post.review.decision === "approved" ? "bg-[#e7f6e9] text-[#28733f]" : "bg-[#fff0ec] text-[#a74331]"}`}>
+            <p className={`mt-2 rounded-lg px-2.5 py-2 text-[11px] font-bold ${post.review.decision === "approved" ? "bg-[#12251a] text-[#4cc26e]" : "bg-[#2b1a1e] text-[#f28b82]"}`}>
               {post.review.decision === "approved" ? "✓ Đã duyệt" : <span className="flex items-center gap-1"><X size={12} /> Trả về cho {post.review.sendBackTo === "designer" ? "designer" : "writer"}</span>} bởi {post.review.by}
               {post.review.note && <span className="mt-0.5 block font-medium">“{post.review.note}”</span>}
             </p>
@@ -160,20 +160,20 @@ export default function ReviewPanel({
         </div>
       )}
 
-      {error && <p className="mb-3 rounded-lg bg-[#fff0ec] px-3 py-2 text-xs font-bold text-[#b8543c]">{error}</p>}
+      {error && <p className="mb-3 rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
 
       {/* Comments */}
       <div className="mb-3 max-h-56 space-y-2.5 overflow-y-auto pr-1">
         {post.comments.length === 0 && (
-          <p className="rounded-xl bg-[#fafbf7] px-3 py-4 text-center text-[11px] text-[var(--muted)]">
+          <p className="rounded-xl bg-[var(--surface-2)] px-3 py-4 text-center text-[11px] text-[var(--muted)]">
             No comments yet — discuss the draft right here instead of Zalo.
           </p>
         )}
         {post.comments.map((c) => (
-          <div key={c.id} className="rounded-xl bg-[#fafbf7] px-3 py-2.5">
+          <div key={c.id} className="rounded-xl bg-[var(--surface-2)] px-3 py-2.5">
             <div className="mb-1 flex items-center gap-2">
               <span className="text-[11px] font-extrabold">{c.author}</span>
-              <span className={`rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase ${roleBadge[c.role] ?? "bg-[#eef1e8]"}`}>{c.role}</span>
+              <span className={`rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase ${roleBadge[c.role] ?? "bg-[var(--fill)]"}`}>{c.role}</span>
               <span className="ml-auto font-mono text-[9px] text-[var(--muted)]">{timeAgo(c.createdAt)}</span>
             </div>
             <p className="whitespace-pre-wrap text-xs leading-relaxed">{c.text}</p>
@@ -181,7 +181,7 @@ export default function ReviewPanel({
         ))}
       </div>
       {post.status === "Published" ? (
-        <p className="rounded-xl bg-[#eef1e8] px-3 py-2.5 text-center text-[11px] font-bold text-[var(--muted)]">
+        <p className="rounded-xl bg-[var(--fill)] px-3 py-2.5 text-center text-[11px] font-bold text-[var(--muted)]">
           <Lock size={12} className="mr-1 inline-block align-[-2px]" /> Bài đã xuất bản — chỉ xem lại, không thể bình luận thêm.
         </p>
       ) : (
@@ -193,14 +193,14 @@ export default function ReviewPanel({
           onKeyDown={(e) => { if (e.key === "Enter") sendComment(); }}
           placeholder="Write a comment for the team…"
           maxLength={2000}
-          className="min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-xs outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+          className="min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
         />
         <button
           type="button"
           onClick={sendComment}
           disabled={!comment.trim() || sending}
           aria-label="Send comment"
-          className="flex items-center justify-center rounded-xl bg-[var(--ink)] px-3.5 text-white transition hover:bg-[#263b35] disabled:opacity-40"
+          className="flex items-center justify-center rounded-xl bg-[var(--accent)] px-3.5 text-white transition hover:bg-[var(--surface-2)] disabled:opacity-40"
         >
           <Send size={14} />
         </button>
@@ -216,7 +216,7 @@ export default function ReviewPanel({
           <ul className="mt-2 space-y-1.5">
             {post.activity.slice(0, 12).map((entry) => (
               <li key={entry.id} className="flex items-baseline gap-2 text-[11px]">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--lime)]" />
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
                 <span className="text-[var(--muted)]">{timeAgo(entry.at)}</span>
                 <span><strong>{entry.by}</strong> {entry.action}</span>
               </li>

@@ -65,15 +65,15 @@ const sections: { title: string; body: string[] }[] = [
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-[#f4f5ef] px-4 py-10 text-[#1d241c] sm:px-8">
-      <div className="mx-auto max-w-3xl rounded-[28px] border border-white/75 bg-white/80 p-6 shadow-[0_24px_80px_rgba(22,37,34,.12)] backdrop-blur-2xl sm:p-10">
+    <main className="min-h-screen studio-canvas px-4 py-10 text-[var(--ink)] sm:px-8">
+      <div className="mx-auto max-w-3xl rounded-[28px] border border-white/75 bg-[var(--surface)]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-10">
         <p className="mb-2 font-mono text-[11px] uppercase tracking-[.2em] text-[#b3541e]">
           BCN Media Desk
         </p>
         <h1 className="text-3xl font-black tracking-[-.04em] sm:text-4xl">
           Chính sách quyền riêng tư
         </h1>
-        <p className="mt-2 text-sm text-[#6b7268]">
+        <p className="mt-2 text-sm text-[var(--muted)]">
           Áp dụng cho ứng dụng Clubhouse Media Desk App — công cụ quản lý
           Fanpage nội bộ của Ban Công Nghệ (IUH).
         </p>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
             </section>
           ))}
         </div>
-        <p className="mt-10 border-t border-[#e3e6dd] pt-4 font-mono text-[10px] uppercase tracking-[.18em] text-[#6b7268]">
+        <p className="mt-10 border-t border-[#e3e6dd] pt-4 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">
           Cập nhật lần cuối: 20/10/2026
         </p>
       </div>

@@ -120,7 +120,7 @@ export default function StudioWorkspace() {
 
   return (
     <main className="min-h-screen lg:grid lg:grid-cols-[220px_1fr]">
-      <aside className="flex border-b border-[var(--line)] bg-white/55 px-5 py-5 backdrop-blur-xl lg:min-h-screen lg:flex-col lg:border-b-0 lg:border-r">
+      <aside className="flex border-b border-[var(--line)] bg-[#0c0f16]/85 px-5 py-5 backdrop-blur-xl lg:min-h-screen lg:flex-col lg:border-b-0 lg:border-r">
         <ClubLogo />
         <nav className="ml-auto grid grid-cols-6 gap-1 lg:ml-0 lg:mt-10 lg:block lg:space-y-1">
           {tabs
@@ -130,7 +130,7 @@ export default function StudioWorkspace() {
                 key={id}
                 type="button"
                 onClick={() => setTab(id)}
-                className={`flex items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold lg:justify-start ${tab === id ? "bg-white shadow-[0_8px_24px_rgba(22,37,34,.08)]" : "text-[var(--muted)] hover:bg-white/70"}`}
+                className={`flex items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold lg:justify-start ${tab === id ? "bg-[rgba(139,92,246,.16)] text-[var(--ink)] shadow-[inset_0_0_0_1px_rgba(139,92,246,.35)]" : "text-[var(--muted)] hover:bg-white/[0.06] hover:text-[var(--ink)]"}`}
               >
                 <Icon size={16} strokeWidth={1.8} />
                 <span className="hidden sm:inline">{label}</span>
@@ -138,7 +138,7 @@ export default function StudioWorkspace() {
             ))}
         </nav>
         <div className="mt-auto hidden border-t border-[var(--line)] pt-5 lg:block">
-          <p className="mt-8 flex items-center gap-2 px-3 font-mono text-[10px] uppercase tracking-[.15em] text-[#a4afa5]">
+          <p className="mt-8 flex items-center gap-2 px-3 font-mono text-[10px] uppercase tracking-[.15em] text-[var(--faint)]">
             © {new Date().getFullYear()} · Media — Ban Công Nghệ
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function StudioWorkspace() {
         <div className="mx-auto max-w-[1440px]">
           <header className="mb-8 flex items-end justify-between gap-5 entrance">
             <div>
-              <p className="mb-2 font-mono text-[11px] uppercase tracking-[.2em] text-[var(--orange)]">
+              <p className="mb-2 font-mono text-[11px] uppercase tracking-[.2em] text-[var(--accent-2)]">
                 {tab === "studio"
                   ? "Create & collaborate"
                   : tab === "ideas"
@@ -195,13 +195,13 @@ export default function StudioWorkspace() {
                   href={pageUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-white/80 px-4 py-2.5 text-xs font-extrabold shadow-sm backdrop-blur sm:flex"
+                  className="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-4 py-2.5 text-xs font-extrabold shadow-sm backdrop-blur sm:flex"
                 >
                   View live site <ArrowUpRight size={14} />
                 </a>
               ) : (
                 <span
-                  className="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-white/80 px-4 py-2.5 text-xs font-extrabold text-[var(--muted)] shadow-sm backdrop-blur sm:flex"
+                  className="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-4 py-2.5 text-xs font-extrabold text-[var(--muted)] shadow-sm backdrop-blur sm:flex"
                   title="Admin chưa cấu hình Facebook Page ID"
                 >
                   View live site <ArrowUpRight size={14} />
@@ -212,7 +212,7 @@ export default function StudioWorkspace() {
           </header>
 
           {loadError && (
-            <p className="mb-6 rounded-xl bg-[#fff0ec] px-4 py-3 text-xs font-bold text-[#b8543c]">
+            <p className="mb-6 rounded-xl bg-[#2b1a1e] px-4 py-3 text-xs font-bold text-[#f0957e]">
               {loadError}
             </p>
           )}

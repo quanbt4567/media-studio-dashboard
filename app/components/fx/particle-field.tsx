@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Ambient Three.js particle field for the login screen: soft graphite dots
- * with a few olive accents drifting slowly, with gentle mouse parallax.
+ * Ambient Three.js particle field for the login screen: soft violet-gray dots
+ * with a few cyan accents drifting slowly, with gentle mouse parallax.
  * Three.js is imported lazily so it never lands in the studio bundle.
  * Honors prefers-reduced-motion (renders one static frame) and pauses
  * while the tab is hidden.
@@ -69,8 +69,8 @@ export default function ParticleField() {
         group.add(points);
         return points;
       };
-      makeCloud(110, 0x39413c, 0.13, 0.5, 32);
-      makeCloud(30, 0x7d9038, 0.2, 0.65, 27);
+      makeCloud(110, 0x8f8ab0, 0.13, 0.42, 32);
+      makeCloud(30, 0x67c7d9, 0.2, 0.55, 27);
 
       let mouseX = 0;
       let mouseY = 0;

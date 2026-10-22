@@ -82,7 +82,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
         onClick={toggle}
         aria-label="Thông báo"
         title="Thông báo"
-        className="relative flex items-center justify-center rounded-full border border-[var(--line)] bg-white/80 p-2.5 text-[var(--ink)] shadow-sm backdrop-blur transition hover:-translate-y-0.5"
+        className="relative flex items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]/80 p-2.5 text-[var(--ink)] shadow-sm backdrop-blur transition hover:-translate-y-0.5"
       >
         <Bell size={16} />
         {unread > 0 && (
@@ -95,7 +95,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
         <>
           <div className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />
           <div
-            className="fixed z-[70] max-h-[70vh] w-80 overflow-y-auto rounded-2xl border border-[var(--line)] bg-white p-2 shadow-[0_24px_60px_rgba(22,37,34,.18)]"
+            className="fixed z-[70] max-h-[70vh] w-80 overflow-y-auto rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_24px_60px_rgba(0,0,0,.18)]"
             style={{ top: pos.top, right: pos.right }}
           >
             <p className="flex items-center gap-1.5 px-2.5 py-2 text-xs font-extrabold"><Bell size={13} /> Thông báo</p>
@@ -108,7 +108,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
                   type="button"
                   onClick={() => goToPost(item)}
                   disabled={!item.postId}
-                  className="mb-1 block w-full rounded-xl px-2.5 py-2 text-left transition hover:bg-[#f4f6ef] disabled:cursor-default"
+                  className="mb-1 block w-full rounded-xl px-2.5 py-2 text-left transition hover:bg-[var(--fill)] disabled:cursor-default"
                 >
                   <p className="text-xs font-bold leading-snug">{item.message}</p>
                   <p className="mt-0.5 font-mono text-[10px] text-[var(--muted)]">{timeAgo(item.createdAt)}</p>

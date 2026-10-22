@@ -69,7 +69,7 @@ export default function ImageCropper({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
-        className="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-2xl"
+        className="w-full max-w-2xl rounded-2xl bg-[var(--surface)] p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
@@ -118,14 +118,14 @@ export default function ImageCropper({
           <button
             type="button"
             onClick={() => onChange(0.5, 0.5)}
-            className="rounded-xl border border-[var(--line)] px-4 py-2 text-xs font-extrabold hover:border-[var(--ink)]"
+            className="rounded-xl border border-[var(--line)] px-4 py-2 text-xs font-extrabold hover:border-[var(--accent)]"
           >
             Về giữa
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-[var(--ink)] px-6 py-2 text-xs font-extrabold text-white"
+            className="rounded-xl bg-[var(--accent)] px-6 py-2 text-xs font-extrabold text-white"
           >
             Xong
           </button>

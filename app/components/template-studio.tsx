@@ -1161,29 +1161,29 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       {/* Stage */}
       <div>
         {visualBrief && (
-          <div className="mb-2 flex items-start gap-2 rounded-xl border border-[#bce4c5] bg-[#f2f9f3] px-3 py-2">
-            <Sparkles size={14} className="mt-0.5 shrink-0 text-[#28733f]" />
+          <div className="mb-2 flex items-start gap-2 rounded-xl border border-[#26503a] bg-[var(--fill)] px-3 py-2">
+            <Sparkles size={14} className="mt-0.5 shrink-0 text-[#4cc26e]" />
             <p className="text-xs leading-relaxed text-[var(--ink)]">
               <strong>AI gợi ý visual:</strong> {visualBrief}
             </p>
           </div>
         )}
         <div className="mb-2 flex flex-wrap items-center gap-1.5">
-          <button type="button" onClick={undo} disabled={pastRef.current.length === 0} title="Hoàn tác (Ctrl+Z)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--ink)] disabled:opacity-40">
+          <button type="button" onClick={undo} disabled={pastRef.current.length === 0} title="Hoàn tác (Ctrl+Z)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--accent)] disabled:opacity-40">
             <Undo2 size={13} />
           </button>
-          <button type="button" onClick={redo} disabled={futureRef.current.length === 0} title="Làm lại (Ctrl+Y)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--ink)] disabled:opacity-40">
+          <button type="button" onClick={redo} disabled={futureRef.current.length === 0} title="Làm lại (Ctrl+Y)" className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-extrabold hover:border-[var(--accent)] disabled:opacity-40">
             <Redo2 size={13} />
           </button>
           <span className="mx-1 h-5 w-px bg-[var(--line)]" />
-          <button type="button" onClick={addText} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
+          <button type="button" onClick={addText} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">
             <Type size={13} /> + Chữ
           </button>
-          <button type="button" onClick={() => elFileRef.current?.click()} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
+          <button type="button" onClick={() => elFileRef.current?.click()} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">
             <ImagePlus size={13} /> + Ảnh
           </button>
           <input ref={elFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleElFile(e.target.files?.[0])} />
-          <button type="button" onClick={() => { setElLibraryMode("add"); setShowElLibrary(true); }} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-extrabold hover:border-[var(--ink)]">
+          <button type="button" onClick={() => { setElLibraryMode("add"); setShowElLibrary(true); }} className="flex items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs font-extrabold hover:border-[var(--accent)]">
             <Images size={13} /> Từ thư viện
           </button>
           {photoCount > 0 && (
@@ -1196,7 +1196,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                   type="button"
                   onClick={() => setPhotoGrid(n)}
                   title={`Khung chứa ${n} ảnh`}
-                  className={`h-7 w-7 rounded-lg text-xs font-extrabold transition ${n === photoCount ? "bg-[var(--ink)] text-white" : "border border-[var(--line)] bg-white hover:border-[var(--ink)]"}`}
+                  className={`h-7 w-7 rounded-lg text-xs font-extrabold transition ${n === photoCount ? "bg-[var(--accent)] text-white" : "border border-[var(--line)] bg-[var(--surface)] hover:border-[var(--accent)]"}`}
                 >
                   {n}
                 </button>
@@ -1209,7 +1209,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               key={kind}
               type="button"
               onClick={() => applyPreset(kind)}
-              className="rounded-xl bg-[#f2f4ec] px-3 py-1.5 text-xs font-bold text-[var(--muted)] hover:bg-[#e7ecdd] hover:text-[var(--ink)]"
+              className="rounded-xl bg-[var(--fill)] px-3 py-1.5 text-xs font-bold text-[var(--muted)] hover:bg-[var(--fill)] hover:text-[var(--ink)]"
             >
               {kind === "title" ? "Mẫu: Tiêu đề" : kind === "announce" ? "Mẫu: Thông báo" : "Mẫu: Trích dẫn"}
             </button>
@@ -1218,7 +1218,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           <button
             type="button"
             onClick={() => { loadDesignTemplates(); setShowTplPicker(true); }}
-            className="flex items-center gap-1.5 rounded-xl border border-[var(--ink)] bg-white px-3 py-1.5 text-xs font-extrabold text-[var(--ink)] hover:bg-[#f2f4ec]"
+            className="flex items-center gap-1.5 rounded-xl border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-extrabold text-[var(--ink)] hover:bg-[var(--fill)]"
           >
             <LayoutTemplate size={13} /> Mẫu thiết kế
           </button>
@@ -1227,13 +1227,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             onClick={() => void fillTemplateWithAI(elements, appliedBuiltInId ?? "")}
             disabled={fillingAI || !postContent.trim()}
             title="AI tự điền tiêu đề & nội dung từ bài viết vào các ô còn trống"
-            className="flex items-center gap-1.5 rounded-xl border border-dashed border-[var(--ink)] bg-white px-3 py-1.5 text-xs font-extrabold text-[var(--ink)] hover:bg-[#f2f4ec] disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-xl border border-dashed border-[var(--line-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-extrabold text-[var(--ink)] hover:bg-[var(--fill)] disabled:opacity-40"
           >
             {fillingAI ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />} AI điền nội dung
           </button>
         </div>
 
-        <div ref={stageWrapRef} className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[#e8ebe4]" onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
+        <div ref={stageWrapRef} className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[#0d0f14]" onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: SIZE, height: SIZE, transform: `scale(${scale})` }}>
             {bg.kind === "gradient" ? (
               <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${bg.from}, ${bg.to})` }} />
@@ -1260,7 +1260,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         onChange={(e) => updateEl(el.id, { text: e.target.value })}
                         onBlur={() => setEditingId(null)}
                         onPointerDown={(e) => e.stopPropagation()}
-                        className="w-full resize-none rounded bg-white/90 p-1 outline-none"
+                        className="w-full resize-none rounded bg-[var(--surface)]/90 p-1 outline-none"
                         style={{ ...textStyleOf(el), userSelect: "text" }}
                         rows={3}
                       />
@@ -1274,7 +1274,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                   {isSel && !isEditing && !el.geometryLocked && (
                     <div
                       onPointerDown={(e) => onResizePointerDown(e, el)}
-                      className="absolute -bottom-2 -right-2 h-5 w-5 cursor-nwse-resize rounded-full border-2 border-white bg-[#1877F2] shadow"
+                      className="absolute -bottom-2 -right-2 h-5 w-5 cursor-nwse-resize rounded-full border-2 border-white bg-[var(--accent)] shadow"
                       title="Kéo để đổi kích thước"
                     />
                   )}
@@ -1288,23 +1288,23 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
 
       {/* Side panel */}
       <div className="space-y-3">
-        <div className="rounded-xl border border-[var(--line)] bg-white p-3">
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-3">
           <p className="mb-2 text-xs font-extrabold">Lớp đang chọn</p>
           {!selected ? (
             <p className="text-[11px] text-[var(--muted)]">Chưa chọn lớp nào. Nhấn vào chữ/ảnh trên canvas.</p>
           ) : (
             <div className="space-y-2.5">
               {selected.geometryLocked && (
-                <p className="rounded-lg bg-[#eef4ff] px-2.5 py-1.5 text-[10px] font-bold text-[#2451a8]">
+                <p className="rounded-lg bg-[#1a2030] px-2.5 py-1.5 text-[10px] font-bold text-[#7ea6f8]">
                   🔒 Phần của mẫu — chỉ sửa nội dung, không dời/kéo/xóa được.
                 </p>
               )}
               <div className="flex flex-wrap gap-1.5">
                 {!selected.geometryLocked && (
                   <>
-                    <button type="button" onClick={duplicateSelected} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">⧉ Nhân bản</button>
-                    <button type="button" onClick={() => moveLayer(1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↑ Lớp trên</button>
-                    <button type="button" onClick={() => moveLayer(-1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]">↓ Lớp dưới</button>
+                    <button type="button" onClick={duplicateSelected} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]">⧉ Nhân bản</button>
+                    <button type="button" onClick={() => moveLayer(1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]">↑ Lớp trên</button>
+                    <button type="button" onClick={() => moveLayer(-1)} className="rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]">↓ Lớp dưới</button>
                   </>
                 )}
                 {selected.type === "image" && (
@@ -1315,7 +1315,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         replaceImgRef.current = selected.id;
                         elFileRef.current?.click();
                       }}
-                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]"
                     >
                       <RefreshCw size={12} /> Thay ảnh
                     </button>
@@ -1327,7 +1327,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         setShowElLibrary(true);
                       }}
                       title="Thay ảnh đang chọn bằng ảnh từ thư viện dùng chung"
-                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]"
                     >
                       <Images size={12} /> Thư viện
                     </button>
@@ -1338,13 +1338,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         setCropElId(selected.id);
                       }}
                       title="Kéo để chọn vùng ảnh hiển thị trong khung"
-                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--ink)]"
+                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]"
                     >
                       <Crop size={12} /> Căn ảnh
                     </button>
                   </>
                 )}
-                <button type="button" onClick={deleteSelected} className={`flex items-center gap-1 rounded-lg border border-[#f3c2b8] px-2.5 py-1.5 text-[11px] font-bold text-[#a74331] hover:bg-[#fff0ec] ${selected.geometryLocked ? "hidden" : ""}`}>
+                <button type="button" onClick={deleteSelected} className={`flex items-center gap-1 rounded-lg border border-[#5c2b28] px-2.5 py-1.5 text-[11px] font-bold text-[#f28b82] hover:bg-[#2b1a1e] ${selected.geometryLocked ? "hidden" : ""}`}>
                   <Trash2 size={12} /> Xóa
                 </button>
               </div>
@@ -1362,12 +1362,12 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     <label className="text-[11px] font-bold text-[var(--muted)]">Màu</label>
                     <input type="color" value={selected.color ?? "#ffffff"} onChange={(e) => updateEl(selected.id, { color: e.target.value })} className="h-8 w-12 cursor-pointer rounded border border-[var(--line)]" />
                     <div className="flex gap-1">
-                      <button type="button" onClick={() => updateEl(selected.id, { bold: !selected.bold })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-extrabold ${selected.bold ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--line)]"}`}>B</button>
-                      <button type="button" onClick={() => updateEl(selected.id, { italic: !selected.italic })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] italic ${selected.italic ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--line)]"}`}>I</button>
+                      <button type="button" onClick={() => updateEl(selected.id, { bold: !selected.bold })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-extrabold ${selected.bold ? "border-[var(--line-strong)] bg-[var(--accent)] text-white" : "border-[var(--line)]"}`}>B</button>
+                      <button type="button" onClick={() => updateEl(selected.id, { italic: !selected.italic })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] italic ${selected.italic ? "border-[var(--line-strong)] bg-[var(--accent)] text-white" : "border-[var(--line)]"}`}>I</button>
                     </div>
                     <div className="flex gap-1">
                       {(["left", "center", "right"] as const).map((a) => (
-                        <button key={a} type="button" onClick={() => updateEl(selected.id, { align: a })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] ${selected.align === a ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--line)]"}`}>
+                        <button key={a} type="button" onClick={() => updateEl(selected.id, { align: a })} className={`rounded-lg border px-2.5 py-1.5 text-[11px] ${selected.align === a ? "border-[var(--line-strong)] bg-[var(--accent)] text-white" : "border-[var(--line)]"}`}>
                           {a === "left" ? "⇤" : a === "center" ? "⇔" : "⇥"}
                         </button>
                       ))}
@@ -1378,7 +1378,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     <select
                       value={selected.fontFamily ?? "system"}
                       onChange={(e) => updateEl(selected.id, { fontFamily: e.target.value })}
-                      className="w-full rounded-lg border border-[var(--line)] bg-white px-2 py-1.5 text-xs"
+                      className="w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-2 py-1.5 text-xs"
                     >
                       {FONTS.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
@@ -1405,7 +1405,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           )}
         </div>
 
-        <div className="rounded-xl border border-[var(--line)] bg-white p-3">
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-3">
           <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Palette size={13} /> Nền</p>
           <div className="mb-2 flex gap-1.5">
             {BG_PRESETS.map((p) => (
@@ -1414,22 +1414,22 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 type="button"
                 title={p.name}
                 onClick={() => { pushHistory(); setBg({ kind: "gradient", from: p.from, to: p.to }); }}
-                className={`h-9 flex-1 rounded-lg border-2 ${bg.kind === "gradient" && bg.from === p.from ? "border-[var(--ink)]" : "border-transparent"}`}
+                className={`h-9 flex-1 rounded-lg border-2 ${bg.kind === "gradient" && bg.from === p.from ? "border-[var(--line-strong)]" : "border-transparent"}`}
                 style={{ background: `linear-gradient(135deg, ${p.from}, ${p.to})` }}
               />
             ))}
           </div>
           <div className="flex gap-1.5">
             <input ref={bgFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleBgFile(e.target.files?.[0])} />
-            <button type="button" onClick={() => bgFileRef.current?.click()} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-dashed border-[var(--line)] px-2 py-2 text-[11px] font-extrabold text-[var(--muted)] hover:border-[var(--ink)] hover:text-[var(--ink)]">
+            <button type="button" onClick={() => bgFileRef.current?.click()} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-dashed border-[var(--line)] px-2 py-2 text-[11px] font-extrabold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]">
               <ImagePlus size={13} /> Tải nền
             </button>
-            <button type="button" onClick={() => setShowBgLibrary(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--line)] px-2 py-2 text-[11px] font-extrabold hover:border-[var(--ink)]">
+            <button type="button" onClick={() => setShowBgLibrary(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--line)] px-2 py-2 text-[11px] font-extrabold hover:border-[var(--accent)]">
               <Images size={13} /> Thư viện
             </button>
           </div>
 
-          <div className="mt-2.5 rounded-xl border border-[var(--line)] bg-[#fafbf7] p-2.5">
+          <div className="mt-2.5 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-2.5">
             <p className="mb-1.5 flex items-center gap-1.5 text-xs font-extrabold"><Sparkles size={13} /> Nền AI</p>
             <div className="flex gap-1.5">
               <input
@@ -1437,14 +1437,14 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 onChange={(e) => setAiPrompt(e.target.value)}
                 disabled={aiGenerating}
                 placeholder="VD: hoàng hôn trên sân trường, bóng bay..."
-                className="min-w-0 flex-1 rounded-lg border border-[var(--line)] bg-white px-2.5 py-2 text-xs outline-none focus:border-[var(--ink)] disabled:opacity-60"
+                className="min-w-0 flex-1 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2 text-xs outline-none focus:border-[var(--line-strong)] disabled:opacity-60"
                 onKeyDown={(e) => { if (e.key === "Enter") handleAiBackground(); }}
               />
               <button
                 type="button"
                 onClick={handleAiBackground}
                 disabled={aiGenerating || !aiPrompt.trim()}
-                className="flex items-center gap-1.5 rounded-lg bg-[var(--ink)] px-3 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+                className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
               >
                 {aiGenerating ? "..." : "Vẽ"}
               </button>
@@ -1456,18 +1456,18 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={aiResult} alt="AI background" className="h-20 w-full rounded-lg object-cover" />
                 <div className="mt-1.5 flex gap-1.5">
-                  <button type="button" onClick={() => { pushHistory(); setBg({ kind: "image", src: aiResult }); setAiResult(null); }} className="flex-1 rounded-lg bg-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold text-white">Đặt làm nền</button>
-                  <button type="button" onClick={() => { addImageElement(aiResult); setAiResult(null); }} className="flex-1 rounded-lg border border-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold">+ Thêm vào canvas</button>
+                  <button type="button" onClick={() => { pushHistory(); setBg({ kind: "image", src: aiResult }); setAiResult(null); }} className="flex-1 rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[11px] font-extrabold text-white">Đặt làm nền</button>
+                  <button type="button" onClick={() => { addImageElement(aiResult); setAiResult(null); }} className="flex-1 rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-[11px] font-extrabold">+ Thêm vào canvas</button>
                 </div>
               </div>
             )}
             {libraryNote && (
-              <p className={`mt-1.5 text-[10px] ${libraryNote.startsWith("✓") ? "text-[#28733f]" : "text-red-600"}`}>{libraryNote}</p>
+              <p className={`mt-1.5 text-[10px] ${libraryNote.startsWith("✓") ? "text-[#4cc26e]" : "text-red-600"}`}>{libraryNote}</p>
             )}
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--line)] bg-white p-3">
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-3">
           <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><LayoutTemplate size={13} /> Mẫu thiết kế dùng lại</p>
           <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">Lưu bố cục hiện tại làm mẫu — lần sau chỉ cần đổi chữ & thay ảnh.</p>
           <div className="flex gap-1.5">
@@ -1475,20 +1475,20 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               value={tplName}
               onChange={(e) => setTplName(e.target.value)}
               placeholder="Tên mẫu: Thông báo sự kiện..."
-              className="min-w-0 flex-1 rounded-lg border border-[var(--line)] bg-white px-2.5 py-2 text-xs outline-none placeholder:text-[#a8b0a7] focus:border-[var(--ink)]"
+              className="min-w-0 flex-1 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2 text-xs outline-none placeholder:text-[var(--faint)] focus:border-[var(--line-strong)]"
               onKeyDown={(e) => { if (e.key === "Enter") handleSaveTemplate(); }}
             />
             <button
               type="button"
               onClick={handleSaveTemplate}
               disabled={savingTpl || elements.length === 0}
-              className="flex items-center gap-1.5 rounded-lg bg-[var(--ink)] px-3 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
+              className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-40"
             >
               {savingTpl ? "..." : (<span className="flex items-center gap-1.5"><Save size={13} /> Lưu</span>)}
             </button>
           </div>
           {tplNote && (
-            <p className={`mt-1.5 text-[10px] ${tplNote.startsWith("✓") ? "text-[#28733f]" : "text-red-600"}`}>{tplNote}</p>
+            <p className={`mt-1.5 text-[10px] ${tplNote.startsWith("✓") ? "text-[#4cc26e]" : "text-red-600"}`}>{tplNote}</p>
           )}
         </div>
 
@@ -1496,7 +1496,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           <button
             type="button"
             onClick={handleSave}
-            className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 ${dirty ? "bg-[#b3541e]" : "bg-[var(--ink)]"}`}
+            className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 ${dirty ? "bg-[#b3541e]" : "bg-[var(--accent)]"}`}
           >
             <Save size={14} /> {savedFlash ? "Đã lưu ✓" : dirty ? "Lưu vào bài viết •" : "Lưu vào bài viết"}
           </button>
@@ -1504,13 +1504,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             type="button"
             onClick={handleDownload}
             aria-label="Tải thiết kế xuống"
-            className="flex items-center justify-center rounded-xl border border-[var(--line)] bg-white/70 px-3.5 text-[var(--muted)] transition hover:border-[var(--ink)] hover:text-[var(--ink)]"
+            className="flex items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface)]/[0.07] px-3.5 text-[var(--muted)] transition hover:border-[var(--accent)] hover:text-[var(--ink)]"
           >
             <Download size={15} />
           </button>
         </div>
         {dirty && (
-          <p className="mt-1.5 rounded-lg bg-[#fff4e8] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
+          <p className="mt-1.5 rounded-lg bg-[#2b2113] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
             Có thay đổi chưa lưu — bấm “Lưu vào bài viết” để preview và bài đăng cập nhật.
           </p>
         )}
@@ -1518,7 +1518,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       </div>
 
       {showBgLibrary && (
-        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-extrabold">Chọn nền từ thư viện</h3>
             <button type="button" onClick={() => setShowBgLibrary(false)} className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
@@ -1529,7 +1529,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         </div>
       )}
       {showElLibrary && (
-        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(480px,94vw)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-extrabold">{elLibraryMode === "replace" ? "Thay ảnh từ thư viện" : "Chèn ảnh từ thư viện"}</h3>
             <button type="button" onClick={() => { setShowElLibrary(false); setElLibraryMode("add"); replaceImgRef.current = null; }} className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)]">Đóng</button>
@@ -1566,7 +1566,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         );
       })()}
       {showTplPicker && (
-        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(680px,95vw)] rounded-2xl border border-[var(--line)] bg-white p-5 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+        <div ref={popInRef} className="absolute right-0 top-0 z-40 w-[min(680px,95vw)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
           <div className="max-h-[75vh] overflow-y-auto pr-1">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-extrabold"><LayoutTemplate size={18} /> Mẫu thiết kế</h3>
@@ -1576,7 +1576,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Sparkles size={13} /> Mẫu có sẵn — dùng cho mọi hoạt động</p>
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {BUILT_IN_TEMPLATES.map((tpl) => (
-                <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[#fafbf7]">
+                <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-2)]">
                   <div className="relative aspect-square w-full overflow-hidden">
                     {tpl.id === suggestedTemplateId && (
                       <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[10px] font-extrabold text-[#3a2c00]">
@@ -1601,7 +1601,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     <button
                       type="button"
                       onClick={() => applyBuiltIn(tpl)}
-                      className="mt-2 w-full rounded-lg bg-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold text-white"
+                      className="mt-2 w-full rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[11px] font-extrabold text-white"
                     >
                       Dùng mẫu
                     </button>
@@ -1611,11 +1611,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             </div>
             <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold"><Save size={13} /> Mẫu designer đã lưu</p>
             {designTemplates.length === 0 ? (
-              <p className="rounded-xl bg-[#fafbf7] px-4 py-8 text-center text-xs text-[var(--muted)]">Chưa có mẫu nào. Thiết kế một bố cục rồi bấm “Lưu” ở panel bên phải.</p>
+              <p className="rounded-xl bg-[var(--surface-2)] px-4 py-8 text-center text-xs text-[var(--muted)]">Chưa có mẫu nào. Thiết kế một bố cục rồi bấm “Lưu” ở panel bên phải.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {designTemplates.map((tpl) => (
-                  <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[#fafbf7]">
+                  <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-2)]">
                     {tpl.thumbnail ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={tpl.thumbnail} alt={tpl.name} className="aspect-square w-full object-cover" />
@@ -1629,7 +1629,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                         <button
                           type="button"
                           onClick={() => applyDesignTemplate(tpl)}
-                          className="flex-1 rounded-lg bg-[var(--ink)] px-2 py-1.5 text-[11px] font-extrabold text-white"
+                          className="flex-1 rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[11px] font-extrabold text-white"
                         >
                           Dùng mẫu
                         </button>
@@ -1637,7 +1637,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                           type="button"
                           onClick={() => handleDeleteTemplate(tpl.id)}
                           title="Xóa mẫu"
-                          className="rounded-lg border border-[#f3c2b8] px-2 py-1.5 text-[11px] font-bold text-[#a74331] hover:bg-[#fff0ec]"
+                          className="rounded-lg border border-[#5c2b28] px-2 py-1.5 text-[11px] font-bold text-[#f28b82] hover:bg-[#2b1a1e]"
                         >
                           <Trash2 size={13} />
                         </button>

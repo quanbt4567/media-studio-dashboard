@@ -33,7 +33,7 @@ export default function UserBadge() {
   return (
     <div className="flex items-center gap-2" aria-label="Logged-in user">
       <span
-        className="hidden items-center gap-1.5 rounded-full bg-[var(--ink)] px-3 py-2 text-[11px] font-extrabold text-white sm:flex"
+        className="hidden items-center gap-1.5 rounded-full bg-[var(--accent)] px-3 py-2 text-[11px] font-extrabold text-white sm:flex"
         title={`Logged in as ${user.username}`}
       >
         {Icon && <Icon size={13} />}
@@ -45,7 +45,7 @@ export default function UserBadge() {
         onClick={handleLogout}
         disabled={loggingOut}
         title="Log out"
-        className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-white/80 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] shadow-sm backdrop-blur transition hover:border-[var(--ink)] hover:text-[var(--ink)] disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] shadow-sm backdrop-blur transition hover:border-[var(--accent)] hover:text-[var(--ink)] disabled:opacity-50"
       >
         <LogOut size={13} />
         <span className="hidden sm:inline">{loggingOut ? "..." : "Log out"}</span>
