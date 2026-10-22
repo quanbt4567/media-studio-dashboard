@@ -66,7 +66,7 @@ const sections: { title: string; body: string[] }[] = [
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen studio-canvas px-4 py-10 text-[var(--ink)] sm:px-8">
-      <div className="mx-auto max-w-3xl rounded-[28px] border border-white/75 bg-[var(--surface)]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-10">
+      <div className="mx-auto max-w-3xl rounded-[20px] border border-white/75 bg-[var(--surface)]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-10">
         <p className="mb-2 font-mono text-[11px] uppercase tracking-[.2em] text-[#b3541e]">
           BCN Media Desk
         </p>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
             </section>
           ))}
         </div>
-        <p className="mt-10 border-t border-[#e3e6dd] pt-4 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">
+        <p className="mt-10 border-t border-[#e3e6dd] pt-4 font-mono text-[11px] uppercase tracking-[.18em] text-[var(--muted)]">
           Cập nhật lần cuối: 20/10/2026
         </p>
       </div>

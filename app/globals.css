@@ -16,27 +16,27 @@
 :root {
   color-scheme: dark;
 
-  --paper: #0a0c11;        /* app background — deep charcoal */
-  --surface: #12151d;      /* cards / panels */
-  --surface-2: #171b25;    /* raised surfaces, inner wells */
-  --fill: #1b2029;         /* soft chips, subtle fills */
-  --ink: #e9ecf3;          /* primary text */
-  --muted: #9aa4b5;        /* secondary text */
-  --faint: #78818f;        /* tertiary text */
-  --line: #232936;         /* hairline borders */
-  --line-strong: #3a4356;  /* emphasis borders */
-  --accent: #8b5cf6;       /* violet — primary actions, active states */
-  --accent-strong: #7c4dff;
-  --accent-2: #22d3ee;     /* cyan — data highlights, kickers */
-  --brand: #3ecf74;        /* success */
-  --orange: #fb923c;       /* scheduled / warning signal */
-  --danger: #f28b82;
+  --paper: #0B0F17;        /* app background — deep charcoal */
+  --surface: #171F2D;      /* cards / panels */
+  --surface-2: #1B2434;    /* raised surfaces, inner wells */
+  --fill: #202B3B;         /* soft chips, subtle fills */
+  --ink: #F1F5F9;          /* primary text */
+  --muted: #A3AEC2;        /* secondary text */
+  --faint: #79839A;        /* tertiary text */
+  --line: #27334A;         /* hairline borders */
+  --line-strong: #3B4A63;  /* emphasis borders */
+  --accent: #A78BFA;       /* violet — primary actions, active states */
+  --accent-strong: #8B5CF6;
+  --accent-2: #67E8F9;     /* cyan — data highlights, kickers */
+  --brand: #34D399;        /* success */
+  --orange: #FBBF24;       /* scheduled / warning signal */
+  --danger: #F87171;
 
   /* Surfaces that differ structurally per theme. */
-  --glass: rgba(18, 21, 29, .80);
+  --glass: rgba(19, 26, 38, .85);
   --glass-border: rgba(255, 255, 255, .10);
-  --sidebar-bg: rgba(12, 15, 22, .85);
-  --stage: #0d0f14;
+  --sidebar-bg: rgba(17, 24, 36, .92);
+  --stage: #0D1219;
   --card-shadow: 0 24px 80px rgba(0, 0, 0, .55);
 
   /* Status tints + readable status text on tinted/dark surfaces. */
@@ -46,12 +46,12 @@
   --violet-tint: #2a1f3d;
   --cyan-tint: #12303a;
   --blue-tint: #1a2030;
-  --danger-text: #f28b82;
+  --danger-text: #F87171;
   --danger-text-2: #f0957e;
-  --green-text: #4cc26e;
-  --amber-text: #e0a93e;
+  --green-text: #34D399;
+  --amber-text: #FBBF24;
   --violet-text: #c4a7f5;
-  --cyan-text: #67d7e8;
+  --cyan-text: #67E8F9;
   --blue-text: #7ea6f8;
   --fb-blue: #5ea0ff;
   --danger-border: #5c2b28;
@@ -75,8 +75,8 @@
   --faint: #8a93a3;
   --line: #e0e3ea;
   --line-strong: #c2c8d2;
-  --accent: #8b5cf6;
-  --accent-strong: #7c4dff;
+  --accent: #A78BFA;
+  --accent-strong: #8B5CF6;
   --accent-2: #0891b2;
   --brand: #2f9e57;
   --orange: #e06c1f;
@@ -118,17 +118,17 @@ body {
 
 button, textarea { font: inherit; }
 
-::selection { background: rgba(139, 92, 246, .45); color: #fff; }
+::selection { background: rgba(167, 139, 250, .45); color: #fff; }
 
 /* Slim dark scrollbars that match the surfaces. */
-* { scrollbar-width: thin; scrollbar-color: #2b3242 transparent; }
+* { scrollbar-width: thin; scrollbar-color: #2E3A4F transparent; }
 *::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-thumb { background: #2b3242; border-radius: 8px; }
+*::-webkit-scrollbar-thumb { background: #2E3A4F; border-radius: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
 
 /* Consistent, visible keyboard focus across the app. */
 :focus-visible {
-  outline: 2px solid rgba(139, 92, 246, .75);
+  outline: 2px solid rgba(167, 139, 250, .75);
   outline-offset: 2px;
 }
 
@@ -140,8 +140,8 @@ button, textarea { font: inherit; }
 /* Ambient backdrop: two restrained accent glows over deep charcoal. */
 .studio-canvas {
   background:
-    radial-gradient(circle at 12% 8%, rgba(139, 92, 246, .10), transparent 30%),
-    radial-gradient(circle at 92% 18%, rgba(34, 211, 238, .07), transparent 26%),
+    radial-gradient(circle at 12% 8%, rgba(167, 139, 250, .10), transparent 30%),
+    radial-gradient(circle at 92% 18%, rgba(103, 232, 249, .06), transparent 26%),
     var(--paper);
 }
 

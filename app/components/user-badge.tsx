@@ -45,7 +45,7 @@ export default function UserBadge() {
         onClick={handleLogout}
         disabled={loggingOut}
         title="Log out"
-        className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] shadow-sm backdrop-blur transition hover:border-[var(--accent)] hover:text-[var(--ink)] disabled:opacity-50"
+        className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-3 py-2 text-[11px] font-extrabold text-[var(--muted)] shadow-sm backdrop-blur transition hover:border-[var(--accent)] hover:text-[var(--ink)] disabled:opacity-50"
       >
         <LogOut size={13} />
         <span className="hidden sm:inline">{loggingOut ? "..." : "Log out"}</span>

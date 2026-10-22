@@ -72,12 +72,12 @@ export default function ContentCalendar({
   }
 
   return (
-    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[20px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><CalendarDays size={14} /></span>
           <div>
-            <p className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Content calendar</p>
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Content calendar</p>
             <h2 className="text-xl font-black tracking-[-.04em]">Plan the month.</h2>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function ContentCalendar({
 
       <div className="grid grid-cols-7 gap-1.5">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="pb-1 text-center font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">{d}</div>
+          <div key={d} className="pb-1 text-center font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">{d}</div>
         ))}
         {cells.map((date, i) => {
           if (!date) return <div key={`empty-${i}`} />;
@@ -126,12 +126,12 @@ export default function ContentCalendar({
                 {list.slice(0, 2).map((post) => (
                   <span
                     key={post.id}
-                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold leading-snug ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}
+                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[11px] font-bold leading-snug ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}
                   >
                     {post.status === "Published" ? "✓ " : "◷ "}{(post.content.split("\n")[0] || "Untitled").slice(0, 42)}
                   </span>
                 ))}
-                {list.length > 2 && <span className="block px-1.5 text-[9px] font-bold text-[var(--muted)]">+{list.length - 2} more</span>}
+                {list.length > 2 && <span className="block px-1.5 text-[11px] font-bold text-[var(--muted)]">+{list.length - 2} more</span>}
               </div>
             </button>
           );
@@ -155,9 +155,9 @@ export default function ContentCalendar({
                   onClick={() => onSelectPost(post.id)}
                   className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left transition hover:border-[var(--accent)]"
                 >
-                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}>{post.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}>{post.status}</span>
                   <span className="min-w-0 flex-1 truncate text-xs font-bold">{(post.content.split("\n")[0] || "Untitled draft").slice(0, 60)}</span>
-                  <span className="shrink-0 font-mono text-[10px] text-[var(--muted)]">
+                  <span className="shrink-0 font-mono text-[11px] text-[var(--muted)]">
                     {new Date(post.publishedAt || post.scheduledAt || "").toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </button>
@@ -167,7 +167,7 @@ export default function ContentCalendar({
         </div>
       )}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-[var(--muted)]">
+      <p className="mt-4 text-[11px] leading-relaxed text-[var(--muted)]">
         Schedule a post from the Studio tab — approved posts go out automatically via the <span className="font-mono">/api/publish-due</span> endpoint.
         Vercel Cron hits it every 5 minutes (see <span className="font-mono">vercel.json</span>; authentication is automatic).
       </p>

@@ -105,12 +105,12 @@ export default function SettingsPanel() {
   }
 
   return (
-    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7">
+    <div className="rounded-[20px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7">
       <div className="mb-6 flex items-center gap-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]">
           <KeyRound size={14} />
         </span>
-        <span className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">
           API keys · chỉ admin
         </span>
       </div>
@@ -134,17 +134,17 @@ export default function SettingsPanel() {
                     {field.label}
                   </label>
                   {state?.configured && (
-                    <span className="rounded-full bg-[var(--green-tint)] px-2 py-0.5 text-[10px] font-extrabold text-[var(--green-text)]">
+                    <span className="rounded-full bg-[var(--green-tint)] px-2 py-0.5 text-[11px] font-extrabold text-[var(--green-text)]">
                       ✓ đã cấu hình
                     </span>
                   )}
                   {state?.fromEnv && (
-                    <span className="rounded-full bg-[var(--fill)] px-2 py-0.5 text-[10px] font-bold text-[var(--muted)]">
+                    <span className="rounded-full bg-[var(--fill)] px-2 py-0.5 text-[11px] font-bold text-[var(--muted)]">
                       từ .env
                     </span>
                   )}
                   {state?.masked && (
-                    <code className="font-mono text-[10px] text-[var(--muted)]">{state.masked}</code>
+                    <code className="font-mono text-[11px] text-[var(--muted)]">{state.masked}</code>
                   )}
                 </div>
                 <p className="mb-2 text-[11px] text-[var(--muted)]">{field.hint}</p>

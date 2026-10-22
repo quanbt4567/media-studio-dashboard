@@ -1295,7 +1295,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           ) : (
             <div className="space-y-2.5">
               {selected.geometryLocked && (
-                <p className="rounded-lg bg-[var(--blue-tint)] px-2.5 py-1.5 text-[10px] font-bold text-[var(--blue-text)]">
+                <p className="rounded-lg bg-[var(--blue-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--blue-text)]">
                   🔒 Phần của mẫu — chỉ sửa nội dung, không dời/kéo/xóa được.
                 </p>
               )}
@@ -1449,8 +1449,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 {aiGenerating ? "..." : "Vẽ"}
               </button>
             </div>
-            {aiGenerating && <p className="mt-1.5 text-[10px] text-[var(--muted)]">Đang vẽ, có thể mất khoảng 1 phút...</p>}
-            {aiError && <p className="mt-1.5 text-[10px] text-red-600">{aiError}</p>}
+            {aiGenerating && <p className="mt-1.5 text-[11px] text-[var(--muted)]">Đang vẽ, có thể mất khoảng 1 phút...</p>}
+            {aiError && <p className="mt-1.5 text-[11px] text-red-600">{aiError}</p>}
             {aiResult && (
               <div className="mt-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1462,7 +1462,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               </div>
             )}
             {libraryNote && (
-              <p className={`mt-1.5 text-[10px] ${libraryNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{libraryNote}</p>
+              <p className={`mt-1.5 text-[11px] ${libraryNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{libraryNote}</p>
             )}
           </div>
         </div>
@@ -1488,7 +1488,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             </button>
           </div>
           {tplNote && (
-            <p className={`mt-1.5 text-[10px] ${tplNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{tplNote}</p>
+            <p className={`mt-1.5 text-[11px] ${tplNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{tplNote}</p>
           )}
         </div>
 
@@ -1510,11 +1510,11 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </button>
         </div>
         {dirty && (
-          <p className="mt-1.5 rounded-lg bg-[var(--amber-tint)] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
+          <p className="mt-1.5 rounded-lg bg-[var(--amber-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[#b3541e]">
             Có thay đổi chưa lưu — bấm “Lưu vào bài viết” để preview và bài đăng cập nhật.
           </p>
         )}
-        <p className="flex items-center gap-1 text-[10px] text-[var(--muted)]"><Plus size={11} /> Thiết kế 1080×1080, lưu dưới dạng JPEG chất lượng cao.</p>
+        <p className="flex items-center gap-1 text-[11px] text-[var(--muted)]"><Plus size={11} /> Thiết kế 1080×1080, lưu dưới dạng JPEG chất lượng cao.</p>
       </div>
 
       {showBgLibrary && (
@@ -1579,7 +1579,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                 <div key={tpl.id} className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-2)]">
                   <div className="relative aspect-square w-full overflow-hidden">
                     {tpl.id === suggestedTemplateId && (
-                      <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[10px] font-extrabold text-[#3a2c00]">
+                      <span className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#ffb300] px-2 py-0.5 text-[11px] font-extrabold text-[#3a2c00]">
                         <Sparkles size={11} /> AI gợi ý
                       </span>
                     )}
@@ -1597,7 +1597,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                   </div>
                   <div className="p-2.5">
                     <p className="truncate text-xs font-extrabold">{tpl.name}</p>
-                    <p className="truncate text-[10px] text-[var(--muted)]">{tpl.desc}</p>
+                    <p className="truncate text-[11px] text-[var(--muted)]">{tpl.desc}</p>
                     <button
                       type="button"
                       onClick={() => applyBuiltIn(tpl)}
@@ -1624,7 +1624,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     )}
                     <div className="p-2.5">
                       <p className="truncate text-xs font-extrabold">{tpl.name}</p>
-                      <p className="truncate text-[10px] text-[var(--muted)]">bởi {tpl.createdBy}{tpl.useCount > 0 ? ` · đã dùng ${tpl.useCount} lần` : ""}</p>
+                      <p className="truncate text-[11px] text-[var(--muted)]">bởi {tpl.createdBy}{tpl.useCount > 0 ? ` · đã dùng ${tpl.useCount} lần` : ""}</p>
                       <div className="mt-2 flex gap-1.5">
                         <button
                           type="button"

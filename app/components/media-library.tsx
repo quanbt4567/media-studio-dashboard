@@ -127,7 +127,7 @@ export default function MediaLibrary({ onPick, onChanged }: MediaLibraryProps) {
               <img src={item.dataUrl} alt={item.name} className="aspect-square w-full object-cover" />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 pt-6">
                 <p className="truncate text-xs font-medium text-white">{item.name}</p>
-                {item.uploadedBy && <p className="text-[10px] text-white/70">bởi {item.uploadedBy}</p>}
+                {item.uploadedBy && <p className="text-[11px] text-white/70">bởi {item.uploadedBy}</p>}
               </div>
               {canManage && !onPick && (
                 <button

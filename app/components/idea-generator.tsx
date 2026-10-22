@@ -130,11 +130,11 @@ export default function IdeaGenerator({
   }
 
   return (
-    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[20px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex items-center gap-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><Lightbulb size={14} /></span>
         <div>
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">AI idea generator</p>
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">AI idea generator</p>
           <h2 className="text-xl font-black tracking-[-.04em]">Never run out of ideas.</h2>
         </div>
       </div>
@@ -178,7 +178,7 @@ export default function IdeaGenerator({
       {error && <p className="mb-4 rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
 
       {topicUsed && ideas.length > 0 && (
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-[.15em] text-[var(--muted)]">
           5 ideas for “{topicUsed}”
         </p>
       )}
@@ -188,7 +188,7 @@ export default function IdeaGenerator({
             <p className="text-sm font-extrabold leading-snug">{idea.title}</p>
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-[var(--muted)]">{idea.angle}</p>
             <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-[var(--accent-2)]"><Hash size={11} />{idea.hashtags.join(" ")}</p>
-            <p className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-[var(--muted)]"><Clock size={11} />Giờ đăng gợi ý: {idea.bestTime || "—"}</p>
+            <p className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-[var(--muted)]"><Clock size={11} />Giờ đăng gợi ý: {idea.bestTime || "—"}</p>
             {canCreate ? (
               draftFor === index ? (
                 <div className="mt-3 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-3">
@@ -235,7 +235,7 @@ export default function IdeaGenerator({
                 </button>
               )
             ) : (
-              <p className="mt-3 text-[10px] text-[var(--muted)]">Đăng nhập vai trò writer để tạo bản nháp từ ý tưởng này.</p>
+              <p className="mt-3 text-[11px] text-[var(--muted)]">Đăng nhập vai trò writer để tạo bản nháp từ ý tưởng này.</p>
             )}
           </div>
         ))}

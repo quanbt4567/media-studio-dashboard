@@ -9,7 +9,7 @@ import {
   Lightbulb,
   Settings,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useSession } from "../../context/SessionContext";
 import type { Post } from "../lib/posts-store";
 import AnalyticsDashboard from "./analytics-dashboard";
@@ -127,26 +127,33 @@ export default function StudioWorkspace() {
           {tabs
             .filter((t) => !t.adminOnly || role === "admin")
             .map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTab(id)}
-                className={`flex items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold lg:justify-start ${tab === id ? "bg-[rgba(139,92,246,.16)] text-[var(--ink)] shadow-[inset_0_0_0_1px_rgba(139,92,246,.35)]" : "text-[var(--muted)] hover:bg-white/[0.06] hover:text-[var(--ink)]"}`}
-              >
-                <Icon size={16} strokeWidth={1.8} />
-                <span className="hidden sm:inline">{label}</span>
-              </button>
+              <Fragment key={id}>
+                {id === "analytics" && (
+                  <div className="hidden lg:block" aria-hidden="true">
+                    <div className="mx-3 mb-2 mt-4 border-t border-[var(--line)]" />
+                    <p className="px-3 pb-1 font-mono text-[10px] uppercase tracking-[.18em] text-[var(--faint)]">Hệ thống</p>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setTab(id)}
+                  className={`flex items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold lg:justify-start ${tab === id ? "bg-[rgba(167,139,250,.16)] text-[var(--ink)] shadow-[inset_0_0_0_1px_rgba(167,139,250,.35)] lg:shadow-[inset_3px_0_0_var(--accent),inset_0_0_0_1px_rgba(167,139,250,.35)]" : "text-[var(--muted)] hover:bg-white/[0.06] hover:text-[var(--ink)]"}`}
+                >
+                  <Icon size={16} strokeWidth={1.8} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              </Fragment>
             ))}
         </nav>
         <div className="mt-auto hidden border-t border-[var(--line)] pt-5 lg:block">
-          <p className="mt-8 flex items-center gap-2 px-3 font-mono text-[10px] uppercase tracking-[.15em] text-[var(--faint)]">
+          <p className="mt-8 flex items-center gap-2 px-3 font-mono text-[11px] uppercase tracking-[.15em] text-[var(--faint)]">
             © {new Date().getFullYear()} · Media — Ban Công Nghệ
           </p>
         </div>
       </aside>
-      <section className="studio-canvas min-h-screen px-4 py-6 sm:px-8 sm:py-10 lg:px-12">
+      <section className="studio-canvas min-h-screen px-4 py-5 sm:px-8 sm:py-7 lg:px-10">
         <div className="mx-auto max-w-[1440px]">
-          <header className="mb-8 flex items-end justify-between gap-5 entrance">
+          <header className="mb-6 flex flex-wrap items-end justify-between gap-5 entrance">
             <div>
               <p className="mb-2 font-mono text-[11px] uppercase tracking-[.2em] text-[var(--accent-2)]">
                 {tab === "studio"
@@ -162,7 +169,7 @@ export default function StudioWorkspace() {
                           : "Configuration"}{" "}
                 / Media Desk
               </p>
-              <h1 className="text-3xl font-black tracking-[-.06em] sm:text-5xl">
+              <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">
                 {tab === "studio"
                   ? "Content, with intention."
                   : tab === "ideas"
@@ -189,7 +196,7 @@ export default function StudioWorkspace() {
                           : "Paste API keys once for the whole team — no redeploy needed."}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 max-sm:ml-auto">
               <ThemeToggle />
               <NotificationBell onSelectPost={handleSelectPost} />
               {pageUrl ? (
@@ -197,7 +204,7 @@ export default function StudioWorkspace() {
                   href={pageUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-4 py-2.5 text-xs font-extrabold shadow-sm backdrop-blur sm:flex"
+                  className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-[var(--line)] bg-[var(--surface)]/80 px-4 py-2.5 text-xs font-extrabold shadow-sm backdrop-blur sm:flex"
                 >
                   View live site <ArrowUpRight size={14} />
                 </a>

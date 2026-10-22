@@ -86,7 +86,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
       >
         <Bell size={16} />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d43d2a] px-1 text-[10px] font-extrabold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d43d2a] px-1 text-[11px] font-extrabold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -111,7 +111,7 @@ export default function NotificationBell({ onSelectPost }: { onSelectPost: (id: 
                   className="mb-1 block w-full rounded-xl px-2.5 py-2 text-left transition hover:bg-[var(--fill)] disabled:cursor-default"
                 >
                   <p className="text-xs font-bold leading-snug">{item.message}</p>
-                  <p className="mt-0.5 font-mono text-[10px] text-[var(--muted)]">{timeAgo(item.createdAt)}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-[var(--muted)]">{timeAgo(item.createdAt)}</p>
                 </button>
               ))
             )}

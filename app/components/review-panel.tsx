@@ -88,10 +88,10 @@ export default function ReviewPanel({
     <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--surface)]/65 p-4 shadow-[0_14px_40px_rgba(0,0,0,.08)] backdrop-blur-xl sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">Duyệt bài</p>
+          <p className="font-mono text-[11px] uppercase tracking-[.18em] text-[var(--muted)]">Duyệt bài</p>
           <p className="mt-1 text-sm font-black tracking-tight">Thảo luận & duyệt</p>
         </div>
-        <span className="flex items-center gap-1.5 rounded-full bg-[var(--fill)] px-2.5 py-1 text-[10px] font-bold text-[var(--muted)]">
+        <span className="flex items-center gap-1.5 rounded-full bg-[var(--fill)] px-2.5 py-1 text-[11px] font-bold text-[var(--muted)]">
           <MessageSquare size={12} /> {post.comments.length}
         </span>
       </div>
@@ -122,7 +122,7 @@ export default function ReviewPanel({
                   <Check size={14} /> {reviewing ? "Đang xử lý…" : "Đồng ý duyệt"}
                 </button>
               </div>
-              <p className="mb-1.5 mt-3 text-[10px] font-extrabold uppercase tracking-wider text-[var(--muted)]">Trả bài về cho:</p>
+              <p className="mb-1.5 mt-3 text-[11px] font-extrabold uppercase tracking-wider text-[var(--muted)]">Trả bài về cho:</p>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -174,7 +174,7 @@ export default function ReviewPanel({
             <div className="mb-1 flex items-center gap-2">
               <span className="text-[11px] font-extrabold">{c.author}</span>
               <span className={`rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase ${roleBadge[c.role] ?? "bg-[var(--fill)]"}`}>{c.role}</span>
-              <span className="ml-auto font-mono text-[9px] text-[var(--muted)]">{timeAgo(c.createdAt)}</span>
+              <span className="ml-auto font-mono text-[11px] text-[var(--muted)]">{timeAgo(c.createdAt)}</span>
             </div>
             <p className="whitespace-pre-wrap text-xs leading-relaxed">{c.text}</p>
           </div>

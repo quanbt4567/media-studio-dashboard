@@ -140,7 +140,7 @@ export default function ChatWidget() {
       >
         <MessageCircle size={22} />
         {totalUnread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#e5484d] px-1 text-[10px] font-extrabold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#e5484d] px-1 text-[11px] font-extrabold text-white">
             {totalUnread > 99 ? "99+" : totalUnread}
           </span>
         )}
@@ -163,7 +163,7 @@ export default function ChatWidget() {
                 {active ? active.title : "Tin nhắn"}
               </p>
               {active?.type === "group" && (
-                <span className="flex items-center gap-1 text-[10px] font-bold text-[var(--muted)]">
+                <span className="flex items-center gap-1 text-[11px] font-bold text-[var(--muted)]">
                   <Users size={11} /> {active.participants.length} thành viên
                 </span>
               )}
@@ -192,7 +192,7 @@ export default function ChatWidget() {
                       <span className="flex items-center gap-2">
                         <span className="truncate text-xs font-extrabold">{c.title}</span>
                         {c.type === "dm" && roleOf(c.title) && (
-                          <span className="rounded-full bg-[var(--line)] px-1.5 py-0.5 text-[9px] font-bold text-[var(--muted)]">{roleOf(c.title)}</span>
+                          <span className="rounded-full bg-[var(--line)] px-1.5 py-0.5 text-[11px] font-bold text-[var(--muted)]">{roleOf(c.title)}</span>
                         )}
                       </span>
                       <span className="block truncate text-[11px] text-[var(--muted)]">
@@ -200,7 +200,7 @@ export default function ChatWidget() {
                       </span>
                     </span>
                     {c.unread > 0 && (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#e5484d] px-1 text-[10px] font-extrabold text-white">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#e5484d] px-1 text-[11px] font-extrabold text-white">
                         {c.unread}
                       </span>
                     )}
@@ -223,10 +223,10 @@ export default function ChatWidget() {
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                         <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${mine ? "rounded-br-md bg-[var(--accent)] text-white" : "rounded-bl-md bg-[var(--fill)] text-[var(--ink)]"}`}>
                           {!mine && active?.type === "group" && (
-                            <p className="mb-0.5 text-[10px] font-extrabold text-[var(--brand)]">{m.from}</p>
+                            <p className="mb-0.5 text-[11px] font-extrabold text-[var(--brand)]">{m.from}</p>
                           )}
                           <p className="whitespace-pre-wrap break-words text-xs leading-relaxed">{m.text}</p>
-                          <p className={`mt-1 text-[9px] ${mine ? "text-white/60" : "text-[var(--muted)]"}`}>{timeAgo(m.createdAt)}</p>
+                          <p className={`mt-1 text-[11px] ${mine ? "text-white/60" : "text-[var(--muted)]"}`}>{timeAgo(m.createdAt)}</p>
                         </div>
                       </div>
                     );
