@@ -79,7 +79,7 @@ export interface Post {
   /** Facebook post id returned by the Graph API. */
   facebookPostId?: string;
   /** Last-fetched Facebook engagement numbers. */
-  metrics?: { likes: number; comments: number; shares: number; updatedAt: string };
+  metrics?: { likes: number; comments: number; shares: number; reactions?: Record<string, number>; updatedAt: string };
   comments: PostComment[];
   activity: ActivityEntry[];
   review?: ReviewDecision;
@@ -197,10 +197,13 @@ export interface PostUpdate {
   reminderSentAt?: string;
   publishedAt?: string;
   facebookPostId?: string;
-  metrics?: { likes: number; comments: number; shares: number; updatedAt: string };
+  metrics?: { likes: number; comments: number; shares: number; reactions?: Record<string, number>; updatedAt: string };
   review?: ReviewDecision;
   /** Human-readable description appended to the activity timeline. */
   activityAction?: string;
+  /** Silent writes (e.g. analytics metric refreshes): no activity entry,
+   *  and the post's updatedBy/updatedAt display fields stay untouched. */
+  silent?: boolean;
 }
 
 export async function updatePost(
@@ -213,7 +216,11 @@ export async function updatePost(
     const index = posts.findIndex((post) => post.id === id);
     if (index === -1) return undefined;
     const current = normalize(posts[index]);
-    const next: Post = { ...current, updatedBy, updatedAt: new Date().toISOString() };
+    const next: Post = {
+      ...current,
+      updatedBy: patch.silent ? current.updatedBy : updatedBy,
+      updatedAt: patch.silent ? current.updatedAt : new Date().toISOString(),
+    };
     if (patch.content !== undefined) next.content = patch.content;
     if (patch.status !== undefined) next.status = patch.status;
     if (patch.clearImage) {
@@ -241,7 +248,7 @@ export async function updatePost(
     if (patch.reminderSentAt !== undefined) next.reminderSentAt = patch.reminderSentAt;
     if (patch.metrics !== undefined) next.metrics = patch.metrics;
     if (patch.review !== undefined) next.review = patch.review;
-    addActivity(next, updatedBy, patch.activityAction || "updated the post");
+    if (!patch.silent) addActivity(next, updatedBy, patch.activityAction || "updated the post");
     posts[index] = next;
     await writePostsFile(posts);
     return normalize(next);
