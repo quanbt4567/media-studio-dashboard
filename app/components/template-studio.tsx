@@ -62,6 +62,7 @@ const ICON_QUOTE = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.o
 const ICON_CLOCK = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23e8e8e8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Cpath%20d%3D%22M12%206v6l4%202%22%2F%3E%3C%2Fsvg%3E";
 const ICON_PIN = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23e8e8e8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2010c0%206-8%2012-8%2012s-8-6-8-12a8%208%200%200%201%2016%200Z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2210%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E";
 const ICON_CODE = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23e8e8e8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m16%2018%206-6-6-6%22%2F%3E%3Cpath%20d%3D%22m8%206-6%206%206%206%22%2F%3E%3C%2Fsvg%3E";
+const FLAG_VIOLET = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%224.6%22%20y%3D%223%22%20width%3D%221.8%22%20height%3D%2218%22%20rx%3D%220.9%22%20fill%3D%22%23A78BFA%22%2F%3E%3Cpath%20d%3D%22M6.4%203.6c2.6-1%204.6-1.4%207.1-.9%202.5.5%204.5%201.3%206.5%201.3v8.5c-2%200-4-.8-6.5-1.3-2.5-.5-4.5-.1-7.1.9z%22%20fill%3D%22%23A78BFA%22%2F%3E%3C%2Fsvg%3E";
 /** Violet (#A78BFA) variants of the line icons, for the poster templates. */
 const ICON_MEGAPHONE_VIOLET = ICON_MEGAPHONE.replaceAll("%23e8e8e8", "%23A78BFA");
 const ICON_CALENDAR_VIOLET = ICON_CALENDAR.replaceAll("%23e8e8e8", "%23A78BFA");
@@ -223,22 +224,46 @@ function getShade(kind: "left" | "fade" | "quote" | "top", w: number, h: number)
   // Legibility bands baked into the same shade: a top band keeps the logo
   // lockup and the top-right category label readable on bright photos, and
   // a bottom band does the same for the info rows on full-bleed layouts.
+  if (kind === "left" || kind === "quote") {
+    ctx.fillStyle = "rgba(7,7,11,0.16)";
+    ctx.fillRect(0, 0, w, h);
+  }
   if (kind === "left" || kind === "quote" || kind === "fade") {
     const top = ctx.createLinearGradient(0, 0, 0, h * 0.34);
-    top.addColorStop(0, "rgba(7,7,11,0.66)");
+    top.addColorStop(0, "rgba(7,7,11,0.8)");
     top.addColorStop(1, "rgba(7,7,11,0)");
     ctx.fillStyle = top;
     ctx.fillRect(0, 0, w, h * 0.34);
   }
   if (kind === "left") {
-    const bottom = ctx.createLinearGradient(0, h * 0.6, 0, h);
+    const bottom = ctx.createLinearGradient(0, h * 0.48, 0, h);
     bottom.addColorStop(0, "rgba(7,7,11,0)");
-    bottom.addColorStop(1, "rgba(7,7,11,0.62)");
+    bottom.addColorStop(1, "rgba(7,7,11,0.82)");
     ctx.fillStyle = bottom;
-    ctx.fillRect(0, h * 0.6, w, h * 0.4);
+    ctx.fillRect(0, h * 0.48, w, h * 0.52);
   }
   url = canvas.toDataURL("image/png");
   shadeCache.set(key, url);
+  return url;
+}
+
+/** Translucent dark panel placed behind text blocks that sit on a photo
+ *  (info rows, role lists) — guarantees a calm, readable zone over even
+ *  the brightest pavement/sky areas. The element's radius rounds it. */
+const panelCache = new Map<string, string>();
+function getPanel(w: number, h: number): string {
+  const key = `${w}x${h}`;
+  let url = panelCache.get(key);
+  if (url) return url;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+  ctx.fillStyle = "rgba(7,7,11,0.52)";
+  ctx.fillRect(0, 0, w, h);
+  url = canvas.toDataURL("image/png");
+  panelCache.set(key, url);
   return url;
 }
 
@@ -331,195 +356,199 @@ function adaptElementsToHeight<T extends { y: number; h: number; slot?: string; 
   });
 }
 
-const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [{
-  id: "bcn-announce",
-  name: "Thông báo",
-  desc: "Mọi loại thông báo",
-  shiftFromY: 690,
-  bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
-  elements: [
-    { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-    { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-    { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 238, w: 6, h: 56, src: "__violet__" },
-    { type: "text", x: 70, y: 246, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-    { type: "text", x: 48, y: 306, w: 720, h: 210, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-    { type: "text", x: 48, y: 540, w: 600, h: 110, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 700, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
-    { type: "text", x: 94, y: 700, w: 560, h: 34, text: "[Ngày diễn ra]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 764, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
-    { type: "text", x: 94, y: 764, w: 560, h: 34, text: "[Giờ diễn ra]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 828, w: 30, h: 30, src: ICON_PIN_VIOLET },
-    { type: "text", x: 94, y: 828, w: 560, h: 34, text: "[Địa điểm]", fontSize: 25, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-    { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-    { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
-  ],
-  variants: [
-    {
-      id: "nophoto", label: "Không ảnh", elements: [
-        { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-        { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-        { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
-        { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-        { type: "text", x: 48, y: 270, w: 984, h: 220, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-        { type: "text", x: 48, y: 518, w: 900, h: 118, text: "[Nội dung chi tiết]", role: "body", fontSize: 28, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 674, w: 984, h: 2, src: "__hairline__" },
-        { type: "image", x: 48, y: 706, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
-        { type: "text", x: 88, y: 706, w: 560, h: 30, text: "[Ngày diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 768, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
-        { type: "text", x: 88, y: 768, w: 560, h: 30, text: "[Giờ diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 830, w: 26, h: 26, src: ICON_PIN_VIOLET },
-        { type: "text", x: 88, y: 830, w: 560, h: 30, text: "[Địa điểm]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 930, w: 984, h: 2, src: "__hairline__" },
-        { type: "image", x: 1018, y: 922, w: 10, h: 18, src: "__violet__" },
-        { type: "text", x: 48, y: 944, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
-      ]
-    },
-  ],
-},
-{
-  id: "bcn-event",
-  name: "Sự kiện",
-  desc: "Workshop, họp mặt, ngoại khóa",
-  shiftFromY: 620,
-  bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
-  elements: [
-    { type: "image", x: 0, y: 0, w: 1080, h: 600, src: "__photo-slot__", overlay: "__photo-fade__" },
-    { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-    { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 652, w: 54, h: 8, src: "__violet__" },
-    { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
-    { type: "text", x: 48, y: 690, w: 984, h: 100, text: "[Tên sự kiện]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-    { type: "text", x: 48, y: 800, w: 984, h: 40, text: "[Mô tả ngắn]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 884, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
-    { type: "text", x: 88, y: 886, w: 220, h: 32, text: "[Ngày]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 330, y: 884, w: 2, h: 32, src: "__hairline__" },
-    { type: "image", x: 352, y: 884, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
-    { type: "text", x: 392, y: 886, w: 200, h: 32, text: "[Giờ]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 614, y: 884, w: 2, h: 32, src: "__hairline__" },
-    { type: "image", x: 636, y: 884, w: 30, h: 30, src: ICON_PIN_VIOLET },
-    { type: "text", x: 676, y: 886, w: 356, h: 32, text: "[Địa điểm]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 948, w: 308, h: 56, src: "__violet__", radius: 28 },
-    { type: "text", x: 48, y: 961, w: 308, h: 30, text: "ĐĂNG KÝ NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
-    { type: "image", x: 48, y: 1028, w: 984, h: 2, src: "__hairline__" },
-    { type: "image", x: 1018, y: 1020, w: 10, h: 18, src: "__violet__" },
-  ],
-  variants: [
-    {
-      id: "portrait", label: "Ảnh dọc", elements: [
-        { type: "image", x: 0, y: 0, w: 1080, h: 740, src: "__photo-slot__", overlay: "__photo-fade__" },
-        { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-        { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-        { type: "image", x: 48, y: 772, w: 54, h: 8, src: "__violet__" },
-        { type: "text", x: 114, y: 762, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
-        { type: "text", x: 48, y: 806, w: 984, h: 78, text: "[Tên sự kiện]", role: "headline", fontSize: 54, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-        { type: "text", x: 48, y: 896, w: 984, h: 36, text: "[Mô tả ngắn]", role: "body", fontSize: 24, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 952, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
-        { type: "text", x: 84, y: 954, w: 200, h: 30, text: "[Ngày]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 300, y: 952, w: 2, h: 28, src: "__hairline__" },
-        { type: "image", x: 318, y: 952, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
-        { type: "text", x: 354, y: 954, w: 170, h: 30, text: "[Giờ]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 540, y: 952, w: 2, h: 28, src: "__hairline__" },
-        { type: "image", x: 558, y: 952, w: 26, h: 26, src: ICON_PIN_VIOLET },
-        { type: "text", x: 594, y: 954, w: 438, h: 30, text: "[Địa điểm]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 1018, w: 984, h: 2, src: "__hairline__" },
-        { type: "image", x: 1018, y: 1010, w: 10, h: 18, src: "__violet__" },
-      ]
-    },
-  ],
-},
-{
-  id: "bcn-recap",
-  name: "Recap",
-  desc: "Tổng kết sau sự kiện",
-  shiftFromY: 580,
-  bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
-  elements: [
-    { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
-    { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-    { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
-    { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
-    { type: "text", x: 48, y: 652, w: 700, h: 90, text: "[Tên hoạt động]", role: "headline", fontSize: 56, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-    { type: "text", x: 48, y: 756, w: 700, h: 40, text: "[Điểm nổi bật]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
-    { type: "text", x: 800, y: 652, w: 232, h: 22, text: "KIẾN THỨC", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-    { type: "text", x: 800, y: 684, w: 232, h: 22, text: "KẾT NỐI", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-    { type: "text", x: 800, y: 716, w: 232, h: 22, text: "TRẢI NGHIỆM", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-    { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-    { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
-  ],
-},
-{
-  id: "bcn-recruit",
-  name: "Tuyển thành viên",
-  desc: "Tuyển quân, casting",
-  shiftFromY: 920,
-  bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
-  elements: [
-    { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
-    { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-    { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TUYỂN THÀNH VIÊN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 262, w: 6, h: 52, src: "__violet__" },
-    { type: "text", x: 70, y: 270, w: 460, h: 36, text: "TUYỂN THÀNH VIÊN", fontSize: 24, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
-    { type: "text", x: 48, y: 326, w: 620, h: 170, text: "[Vị trí cần tuyển]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
-    { type: "text", x: 48, y: 512, w: 540, h: 120, text: "[Mô tả & quyền lợi]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
-    { type: "image", x: 48, y: 664, w: 330, h: 58, src: "__violet__", radius: 29 },
-    { type: "text", x: 48, y: 678, w: 330, h: 30, text: "ĐIỀN ĐƠN NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
-    { type: "image", x: 716, y: 540, w: 26, h: 26, src: ICON_CAMERA_VIOLET },
-    { type: "text", x: 756, y: 540, w: 276, h: 30, text: "Sản xuất nội dung", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 716, y: 602, w: 26, h: 26, src: ICON_MEGAPHONE_VIOLET },
-    { type: "text", x: 756, y: 602, w: 276, h: 30, text: "Thiết kế & Truyền thông", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 716, y: 664, w: 26, h: 26, src: ICON_CODE_VIOLET },
-    { type: "text", x: 756, y: 664, w: 276, h: 30, text: "Kỹ thuật & Website", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 716, y: 726, w: 26, h: 26, src: ICON_USERS_VIOLET },
-    { type: "text", x: 756, y: 726, w: 276, h: 30, text: "Tổ chức sự kiện", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "text", x: 716, y: 934, w: 316, h: 20, text: "HẠN ĐĂNG KÝ", fontSize: 13, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
-    { type: "text", x: 716, y: 958, w: 316, h: 32, text: "[Hạn đăng ký]", fontSize: 23, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-    { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-  ],
-},
-{
-  id: "bcn-quote",
-  name: "Trích dẫn",
-  desc: "Câu nói hay, cảm nghĩ",
-  shiftFromY: 690,
-  bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
-  elements: [
-    { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-quote__" },
-    { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-    { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-    { type: "text", x: 48, y: 186, w: 140, h: 110, text: "“", fontSize: 130, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
-    { type: "text", x: 48, y: 330, w: 780, h: 320, text: "[Câu nói hay]", role: "headline", fontSize: 54, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
-    { type: "image", x: 48, y: 706, w: 4, h: 46, src: "__violet__" },
-    { type: "text", x: 68, y: 710, w: 620, h: 40, text: "— [Tên người nói]", role: "body", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
-    { type: "image", x: 1004, y: 196, w: 2, h: 430, src: "__hairline__" },
-    { type: "text", x: 824, y: 690, w: 208, h: 20, text: "CÔNG NGHỆ", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
-    { type: "text", x: 824, y: 718, w: 208, h: 20, text: "CỘNG ĐỒNG", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
-    { type: "text", x: 824, y: 746, w: 208, h: 20, text: "CÂU CHUYỆN", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
-    { type: "text", x: 824, y: 774, w: 208, h: 20, text: "HỌC ĐƯỜNG", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
-    { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-    { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-    { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
-  ],
-  variants: [
-    {
-      id: "nophoto", label: "Không ảnh", elements: [
-        { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
-        { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 16, color: "rgba(255,255,255,0.85)", bold: true, align: "right", fontFamily: "system" },
-        { type: "text", x: 48, y: 220, w: 140, h: 110, text: "“", fontSize: 140, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
-        { type: "text", x: 48, y: 370, w: 984, h: 330, text: "[Câu nói hay]", role: "headline", fontSize: 60, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
-        { type: "image", x: 48, y: 756, w: 4, h: 46, src: "__violet__" },
-        { type: "text", x: 68, y: 760, w: 620, h: 40, text: "— [Tên người nói]", role: "body", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
-        { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
-        { type: "image", x: 1018, y: 998, w: 10, h: 18, src: "__violet__" },
-        { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
-      ]
-    },
-  ],
-},
+const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [  {
+    id: "bcn-announce",
+    name: "Thông báo",
+    desc: "Mọi loại thông báo",
+    shiftFromY: 690,
+    bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
+    elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 32, y: 682, w: 648, h: 200, src: "__panel__", radius: 20 },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 238, w: 6, h: 56, src: "__violet__" },
+      { type: "text", x: 70, y: 246, w: 500, h: 40, text: "THÔNG BÁO", fontSize: 30, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 306, w: 720, h: 210, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 540, w: 600, h: 110, text: "[Nội dung chi tiết]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 700, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 94, y: 700, w: 560, h: 34, text: "[Ngày diễn ra]", fontSize: 25, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 764, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 94, y: 764, w: 560, h: 34, text: "[Giờ diễn ra]", fontSize: 25, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 828, w: 30, h: 30, src: ICON_PIN_VIOLET },
+      { type: "text", x: 94, y: 828, w: 560, h: 34, text: "[Địa điểm]", fontSize: 25, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
+      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+    ],
+    variants: [
+      { id: "nophoto", label: "Không ảnh", elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ THÔNG BÁO", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 204, w: 6, h: 48, src: "__violet__" },
+      { type: "text", x: 70, y: 212, w: 500, h: 36, text: "THÔNG BÁO", fontSize: 28, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 270, w: 984, h: 220, text: "[Tên thông báo]", role: "headline", fontSize: 84, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 518, w: 900, h: 118, text: "[Nội dung chi tiết]", role: "body", fontSize: 28, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 674, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 48, y: 706, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 88, y: 706, w: 560, h: 30, text: "[Ngày diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 768, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 88, y: 768, w: 560, h: 30, text: "[Giờ diễn ra]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 830, w: 26, h: 26, src: ICON_PIN_VIOLET },
+      { type: "text", x: 88, y: 830, w: 560, h: 30, text: "[Địa điểm]", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 930, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 904, w: 32, h: 32, src: FLAG_VIOLET },
+      { type: "text", x: 48, y: 944, w: 700, h: 20, text: "CẬP NHẬT THÔNG TIN TẠI FANPAGE", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+      ] },
+    ],
+  },
+  {
+    id: "bcn-event",
+    name: "Sự kiện",
+    desc: "Workshop, họp mặt, ngoại khóa",
+    shiftFromY: 620,
+    bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
+    elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 600, src: "__photo-slot__", overlay: "__photo-fade__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 652, w: 54, h: 8, src: "__violet__" },
+      { type: "text", x: 114, y: 642, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 690, w: 984, h: 100, text: "[Tên sự kiện]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 800, w: 984, h: 40, text: "[Mô tả ngắn]", role: "body", fontSize: 26, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 884, w: 30, h: 30, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 88, y: 886, w: 220, h: 32, text: "[Ngày]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 330, y: 884, w: 2, h: 32, src: "__hairline__" },
+      { type: "image", x: 352, y: 884, w: 30, h: 30, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 392, y: 886, w: 200, h: 32, text: "[Giờ]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 614, y: 884, w: 2, h: 32, src: "__hairline__" },
+      { type: "image", x: 636, y: 884, w: 30, h: 30, src: ICON_PIN_VIOLET },
+      { type: "text", x: 676, y: 886, w: 356, h: 32, text: "[Địa điểm]", fontSize: 24, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 948, w: 308, h: 56, src: "__violet__", radius: 28 },
+      { type: "text", x: 48, y: 961, w: 308, h: 30, text: "ĐĂNG KÝ NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
+      { type: "image", x: 48, y: 1028, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 1002, w: 32, h: 32, src: FLAG_VIOLET },
+    ],
+    variants: [
+      { id: "portrait", label: "Ảnh dọc", elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 740, src: "__photo-slot__", overlay: "__photo-fade__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ SỰ KIỆN", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 772, w: 54, h: 8, src: "__violet__" },
+      { type: "text", x: 114, y: 762, w: 500, h: 30, text: "SỰ KIỆN", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 806, w: 984, h: 78, text: "[Tên sự kiện]", role: "headline", fontSize: 54, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 896, w: 984, h: 36, text: "[Mô tả ngắn]", role: "body", fontSize: 24, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 952, w: 26, h: 26, src: ICON_CALENDAR_VIOLET },
+      { type: "text", x: 84, y: 954, w: 200, h: 30, text: "[Ngày]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 300, y: 952, w: 2, h: 28, src: "__hairline__" },
+      { type: "image", x: 318, y: 952, w: 26, h: 26, src: ICON_CLOCK_VIOLET },
+      { type: "text", x: 354, y: 954, w: 170, h: 30, text: "[Giờ]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 540, y: 952, w: 2, h: 28, src: "__hairline__" },
+      { type: "image", x: 558, y: 952, w: 26, h: 26, src: ICON_PIN_VIOLET },
+      { type: "text", x: 594, y: 954, w: 438, h: 30, text: "[Địa điểm]", fontSize: 22, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 1018, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 992, w: 32, h: 32, src: FLAG_VIOLET },
+      ] },
+    ],
+  },
+  {
+    id: "bcn-recap",
+    name: "Recap",
+    desc: "Tổng kết sau sự kiện",
+    shiftFromY: 580,
+    bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
+    elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 560, src: "__photo-slot__", overlay: "__shade-top__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ RECAP", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 612, w: 54, h: 8, src: "__violet__" },
+      { type: "text", x: 114, y: 602, w: 300, h: 30, text: "RECAP", fontSize: 21, color: "#A78BFA", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 652, w: 700, h: 90, text: "[Tên hoạt động]", role: "headline", fontSize: 56, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 756, w: 700, h: 40, text: "[Điểm nổi bật]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.85)", align: "left", fontFamily: "system" },
+      { type: "text", x: 800, y: 652, w: 232, h: 22, text: "KIẾN THỨC", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "text", x: 800, y: 684, w: 232, h: 22, text: "KẾT NỐI", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "text", x: 800, y: 716, w: 232, h: 22, text: "TRẢI NGHIỆM", fontSize: 15, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
+      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+    ],
+  },
+  {
+    id: "bcn-recruit",
+    name: "Tuyển thành viên",
+    desc: "Tuyển quân, casting",
+    shiftFromY: 920,
+    bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
+    elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-left__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 694, y: 520, w: 352, h: 244, src: "__panel__", radius: 20 },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TUYỂN THÀNH VIÊN", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 262, w: 6, h: 52, src: "__violet__" },
+      { type: "text", x: 70, y: 270, w: 460, h: 36, text: "TUYỂN THÀNH VIÊN", fontSize: 24, color: "#ffffff", bold: true, align: "left", fontFamily: "system" },
+      { type: "text", x: 48, y: 326, w: 620, h: 170, text: "[Vị trí cần tuyển]", role: "headline", fontSize: 60, color: "#ffffff", bold: true, align: "left", fontFamily: "display" },
+      { type: "text", x: 48, y: 512, w: 540, h: 120, text: "[Mô tả & quyền lợi]", role: "body", fontSize: 25, color: "rgba(255,255,255,0.97)", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 664, w: 330, h: 58, src: "__violet__", radius: 29 },
+      { type: "text", x: 48, y: 678, w: 330, h: 30, text: "ĐIỀN ĐƠN NGAY →", fontSize: 20, color: "#1B1B22", bold: true, align: "center", fontFamily: "system" },
+      { type: "image", x: 716, y: 540, w: 26, h: 26, src: ICON_CAMERA_VIOLET },
+      { type: "text", x: 756, y: 540, w: 276, h: 30, text: "Sản xuất nội dung", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 716, y: 602, w: 26, h: 26, src: ICON_MEGAPHONE_VIOLET },
+      { type: "text", x: 756, y: 602, w: 276, h: 30, text: "Thiết kế & Truyền thông", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 716, y: 664, w: 26, h: 26, src: ICON_CODE_VIOLET },
+      { type: "text", x: 756, y: 664, w: 276, h: 30, text: "Kỹ thuật & Website", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 716, y: 726, w: 26, h: 26, src: ICON_USERS_VIOLET },
+      { type: "text", x: 756, y: 726, w: 276, h: 30, text: "Tổ chức sự kiện", fontSize: 21, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "text", x: 716, y: 934, w: 316, h: 20, text: "HẠN ĐĂNG KÝ", fontSize: 13, color: "rgba(255,255,255,0.6)", align: "right", fontFamily: "system" },
+      { type: "text", x: 716, y: 958, w: 316, h: 32, text: "[Hạn đăng ký]", fontSize: 23, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
+    ],
+  },
+  {
+    id: "bcn-quote",
+    name: "Trích dẫn",
+    desc: "Câu nói hay, cảm nghĩ",
+    shiftFromY: 690,
+    bg: { kind: "gradient", from: "#17171a", to: "#0a0a0d" },
+    elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 1080, src: "__photo-slot__", overlay: "__shade-quote__" },
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 48, y: 186, w: 140, h: 110, text: "“", fontSize: 130, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
+      { type: "text", x: 48, y: 330, w: 780, h: 320, text: "[Câu nói hay]", role: "headline", fontSize: 54, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
+      { type: "image", x: 48, y: 706, w: 4, h: 46, src: "__violet__" },
+      { type: "text", x: 68, y: 710, w: 620, h: 40, text: "— [Tên người nói]", role: "body", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 1004, y: 196, w: 2, h: 430, src: "__hairline__" },
+      { type: "text", x: 824, y: 690, w: 208, h: 20, text: "CÔNG NGHỆ", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
+      { type: "text", x: 824, y: 718, w: 208, h: 20, text: "CỘNG ĐỒNG", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
+      { type: "text", x: 824, y: 746, w: 208, h: 20, text: "CÂU CHUYỆN", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
+      { type: "text", x: 824, y: 774, w: 208, h: 20, text: "HỌC ĐƯỜNG", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "right", fontFamily: "system" },
+      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
+      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+    ],
+    variants: [
+      { id: "nophoto", label: "Không ảnh", elements: [
+      { type: "image", x: 0, y: 0, w: 1080, h: 148, src: "__header-band__" },
+      { type: "image", x: 24, y: 14, w: 408, h: 114, src: "__bcn-wordmark__" },
+      { type: "text", x: 560, y: 44, w: 472, h: 24, text: "/ TRÍCH DẪN", fontSize: 17, color: "#ffffff", bold: true, align: "right", fontFamily: "system" },
+      { type: "text", x: 48, y: 220, w: 140, h: 110, text: "“", fontSize: 140, color: "#A78BFA", bold: true, align: "left", fontFamily: "playfair" },
+      { type: "text", x: 48, y: 370, w: 984, h: 330, text: "[Câu nói hay]", role: "headline", fontSize: 60, color: "#ffffff", italic: true, align: "left", fontFamily: "playfair" },
+      { type: "image", x: 48, y: 756, w: 4, h: 46, src: "__violet__" },
+      { type: "text", x: 68, y: 760, w: 620, h: 40, text: "— [Tên người nói]", role: "body", fontSize: 23, color: "#ffffff", align: "left", fontFamily: "system" },
+      { type: "image", x: 48, y: 1006, w: 984, h: 2, src: "__hairline__" },
+      { type: "image", x: 1024, y: 980, w: 32, h: 32, src: FLAG_VIOLET },
+      { type: "text", x: 48, y: 1020, w: 700, h: 20, text: "BAN CÔNG NGHỆ — SCHOOL LIFE STORIES", fontSize: 13, color: "rgba(255,255,255,0.55)", align: "left", fontFamily: "system" },
+      ] },
+    ],
+  },
 ]
 
 /** Lucide icon per built-in template (picker thumbnails). */
@@ -539,55 +568,6 @@ interface CanvasSnapshot {
 
 function uid(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
-}
-
-const POSTER_BG: Bg = { kind: "gradient", from: "#17171a", to: "#0a0a0d" };
-
-/**
- * Readable text-poster layout for the quick presets: high-contrast white copy
- * on a dark base (or on a photo with a dark shade), left-aligned with a clear
- * hierarchy — kicker → headline → body → footer — instead of one centered line.
- */
-function buildTextPoster(
-  kind: "title" | "announce" | "quote",
-  head: string,
-  rest: string,
-  onPhoto: boolean,
-): CanvasElement[] {
-  const ACCENT = "#A78BFA";
-  const els: CanvasElement[] = [];
-  const text = (patch: Partial<CanvasElement>): CanvasElement => ({
-    id: uid("el"), type: "text", x: 64, y: 0, w: 952, h: 100,
-    text: "", fontSize: 40, color: "#ffffff", bold: false, align: "left", fontFamily: "system", ...patch,
-  });
-  if (onPhoto) {
-    els.push({ id: uid("el"), type: "image", x: 0, y: 0, w: SIZE, h: SIZE, src: getShade("left", SIZE, SIZE) });
-  }
-  const footer = () => {
-    els.push({ id: uid("el"), type: "image", x: 64, y: 960, w: 952, h: 2, src: getSolid(8, 2, "rgba(255,255,255,0.28)") });
-    els.push(text({ y: 982, h: 36, text: "BAN CÔNG NGHỆ  ·  Theo dõi fanpage để cập nhật", fontSize: 24, color: "rgba(255,255,255,0.78)" }));
-  };
-  if (kind === "quote") {
-    els.push(text({ y: 90, h: 240, w: 300, text: "“", fontSize: 260, color: ACCENT, bold: true, fontFamily: "playfair" }));
-    els.push(text({
-      y: 320, h: 560, text: head, fontSize: head.length > 90 ? 60 : head.length > 50 ? 72 : 84,
-      bold: true, italic: true, fontFamily: "serif",
-    }));
-    footer();
-    return els;
-  }
-  els.push({ id: uid("el"), type: "image", x: 64, y: 100, w: 72, h: 10, src: getSolid(72, 10, ACCENT), radius: 5 });
-  els.push(text({
-    x: 156, y: 84, w: 700, h: 42, text: kind === "announce" ? "THÔNG BÁO" : "BAN CÔNG NGHỆ",
-    fontSize: 32, color: ACCENT, bold: true,
-  }));
-  const hs = head.length > 70 ? 72 : head.length > 40 ? 88 : 108;
-  els.push(text({ y: 190, h: rest ? 400 : 640, text: head, fontSize: hs, bold: true, fontFamily: "display" }));
-  if (rest) {
-    els.push(text({ y: 640, h: 280, w: 920, text: rest, fontSize: 38, color: "rgba(255,255,255,0.92)" }));
-  }
-  footer();
-  return els;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -635,7 +615,7 @@ function fontOf(el: CanvasElement): string {
 
 function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [
-  ];
+];
   for (const paragraph of text.split("\n")) {
     const words = paragraph.split(/\s+/).filter(Boolean);
     if (words.length === 0) { lines.push(""); continue; }
@@ -696,7 +676,7 @@ function BuiltInThumb({ tpl, renderThumb }: { tpl: BuiltInTemplate; renderThumb:
     let alive = true;
     renderThumb(tpl)
       .then((u) => { if (alive) setUrl(u); })
-      .catch(() => { });
+      .catch(() => {});
     return () => { alive = false; };
   }, [tpl, renderThumb]);
 
@@ -707,8 +687,8 @@ function BuiltInThumb({ tpl, renderThumb }: { tpl: BuiltInTemplate; renderThumb:
 
   const label = tpl.id === "bcn-announce" ? "THÔNG BÁO"
     : tpl.id === "bcn-event" ? "SỰ KIỆN"
-      : tpl.id === "bcn-recap" ? "RECAP"
-        : tpl.id === "bcn-recruit" ? "TUYỂN THÀNH VIÊN" : "TRÍCH DẪN";
+    : tpl.id === "bcn-recap" ? "RECAP"
+    : tpl.id === "bcn-recruit" ? "TUYỂN THÀNH VIÊN" : "TRÍCH DẪN";
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#08090D] text-white">
@@ -790,7 +770,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [bg, setBg] = useState<Bg>(() =>
-    postImage ? { kind: "image", src: postImage } : POSTER_BG,
+    postImage ? { kind: "image", src: postImage } : { kind: "gradient", from: BG_PRESETS[0].from, to: BG_PRESETS[0].to },
   );
   const [scale, setScale] = useState(0.35);
   const [aiPrompt, setAiPrompt] = useState("");
@@ -850,7 +830,19 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const lines = postContent.split("\n").map((l) => l.trim()).filter(Boolean);
     const head = (lines[0] ?? "Tiêu đề").slice(0, 90);
     const rest = lines.slice(1, 3).join(" ").slice(0, 160);
-    setElements(buildTextPoster("title", head, rest, bg.kind === "image"));
+    const els: CanvasElement[] = [
+      {
+        id: uid("el"), type: "text", x: 90, y: 400, w: 900, h: 200,
+        text: head, fontSize: 92, color: "#ffffff", bold: true, align: "center", fontFamily: "display",
+      },
+    ];
+    if (rest) {
+      els.push({
+        id: uid("el"), type: "text", x: 140, y: 640, w: 800, h: 160,
+        text: rest, fontSize: 40, color: "rgba(255,255,255,0.82)", align: "center", fontFamily: "system",
+      });
+    }
+    setElements(els);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -932,7 +924,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             if (a < 0.85 && appliedVariant !== "portrait") applyVariant("portrait");
             else if (a > 1.15 && appliedVariant === "portrait") applyVariant(null);
           })
-          .catch(() => { });
+          .catch(() => {});
       }
     } else {
       addImageElement(src);
@@ -1018,9 +1010,24 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     const lines = postContent.split("\n").map((l) => l.trim()).filter(Boolean);
     const head = (lines[0] ?? "Tiêu đề").slice(0, 90);
     const rest = lines.slice(1, 4).join(" ").slice(0, 180);
-    // Dark base keeps the white copy readable; photo backgrounds get a shade overlay instead.
-    if (bg.kind !== "image") setBg(POSTER_BG);
-    setElements(buildTextPoster(kind, head, rest, bg.kind === "image"));
+    const mk = (patch: Partial<CanvasElement>): CanvasElement => ({
+      id: uid("el"), type: "text", x: 90, y: 400, w: 900, h: 200,
+      text: head, fontSize: 88, color: "#ffffff", bold: true, align: "center", fontFamily: "display", ...patch,
+    });
+    let els: CanvasElement[];
+    if (kind === "announce") {
+      els = [
+        mk({ text: "THÔNG BÁO", fontSize: 44, y: 300, fontFamily: "system", color: "#d9d9de" }),
+        mk({ y: 380 }),
+      ];
+      if (rest) els.push(mk({ text: rest, fontSize: 40, y: 620, fontFamily: "system", bold: false, color: "rgba(255,255,255,0.82)" }));
+    } else if (kind === "quote") {
+      els = [mk({ text: `“${head}”`, fontSize: 72, y: 420, fontFamily: "serif", italic: true })];
+    } else {
+      els = [mk({})];
+      if (rest) els.push(mk({ text: rest, fontSize: 40, y: 640, fontFamily: "system", bold: false, color: "rgba(255,255,255,0.82)" }));
+    }
+    setElements(els);
     setSelectedId(null);
   }
 
@@ -1084,17 +1091,17 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         if (tag !== "input" && tag !== "textarea") deleteSelected();
       }
       if (e.key === "Escape") { setSelectedId(null); setEditingId(null); }
-      // Undo/redo via refs so the handler never goes stale.
-      const tag2 = (document.activeElement?.tagName ?? "").toLowerCase();
-      const typing = tag2 === "input" || tag2 === "textarea";
-      if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "z") {
-        e.preventDefault();
-        if (e.shiftKey) redoRef.current(); else undoRef.current();
-      }
-      if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "y") {
-        e.preventDefault();
-        redoRef.current();
-      }
+    // Undo/redo via refs so the handler never goes stale.
+    const tag2 = (document.activeElement?.tagName ?? "").toLowerCase();
+    const typing = tag2 === "input" || tag2 === "textarea";
+    if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "z") {
+      e.preventDefault();
+      if (e.shiftKey) redoRef.current(); else undoRef.current();
+    }
+    if ((e.ctrlKey || e.metaKey) && !typing && e.key.toLowerCase() === "y") {
+      e.preventDefault();
+      redoRef.current();
+    }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -1412,6 +1419,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       if (src === "__vbar__") src = getSolid(8, 330, "#ffffff");
       if (src === "__violet__") src = getSolid(16, 16, "#A78BFA");
       if (src === "__hairline__") src = getSolid(16, 2, "rgba(255,255,255,0.35)");
+      if (src === "__panel__") src = getPanel(el.w, el.h);
+      if (src === "__header-band__") src = getSolid(el.w, el.h, "#0A0A0D");
       let overlay = el.overlay;
       if (overlay === "__shade-left__") overlay = getShade("left", el.w, el.h);
       if (overlay === "__shade-quote__") overlay = getShade("quote", el.w, el.h);
@@ -1536,7 +1545,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     setSelectedId(null);
     setEditingId(null);
     setShowTplPicker(false);
-    fetch(`/api/design-templates/${tpl.id}`, { method: "POST" }).catch(() => { });
+    fetch(`/api/design-templates/${tpl.id}`, { method: "POST" }).catch(() => {});
     loadDesignTemplates();
   }
 
