@@ -33,11 +33,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Chỉ designer được lưu mẫu thiết kế." }, { status: 403 });
   }
   const body = await request.json().catch(() => ({}));
-  const { name, bg, elements, thumbnail } = body as {
+  const { name, bg, elements, thumbnail, canvasH } = body as {
     name?: string;
     bg?: DesignBg;
     elements?: CanvasElement[];
     thumbnail?: string;
+    canvasH?: number;
   };
   if (!bg || !Array.isArray(elements) || elements.length === 0) {
     return NextResponse.json({ error: "Mẫu thiết kế cần có nền và ít nhất một lớp." }, { status: 400 });
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
     bg,
     elements,
     thumbnail: typeof thumbnail === "string" ? thumbnail : undefined,
+    canvasH: typeof canvasH === "number" ? canvasH : undefined,
     createdBy: user.username,
   });
   return NextResponse.json({ template }, { status: 201 });

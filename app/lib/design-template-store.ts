@@ -25,6 +25,17 @@ export interface CanvasElement {
   /** Corner radius (px, at 1080 canvas scale) for image elements. */
   radius?: number;
   /**
+   * Optional overlay image drawn on top of this image element, inside its
+   * clip (e.g. a shade gradient on a full-bleed photo so white poster text
+   * stays readable). Built-in templates set a marker here; it is resolved
+   * to a generated data URL when the template is applied, like src.
+   */
+  overlay?: string;
+  /** Default text this element shipped with in a built-in template. Lets
+   *  layout-variant switches carry the user's edited text over by matching
+   *  defaults, instead of pairing elements by position. */
+  defText?: string;
+  /**
    * Semantic slot for AI auto-fill ("AI điền nội dung"): which template text
    * this element holds. Only built-in templates set this; the filler replaces
    * placeholder text ([...]) in headline/body slots from the post content.
@@ -66,6 +77,8 @@ export interface DesignTemplate {
   elements: CanvasElement[];
   /** Small JPEG preview rendered at save time. */
   thumbnail?: string;
+  /** Canvas height the design was authored at (width is always 1080). */
+  canvasH?: number;
   createdBy: string;
   createdAt: string;
   useCount: number;
@@ -85,6 +98,7 @@ export async function saveDesignTemplate(input: {
   bg: DesignBg;
   elements: CanvasElement[];
   thumbnail?: string;
+  canvasH?: number;
   createdBy: string;
 }): Promise<DesignTemplate> {
   const list = await readDesignTemplates();
@@ -93,6 +107,7 @@ export async function saveDesignTemplate(input: {
     name: input.name.trim() || "Mẫu không tên",
     bg: input.bg,
     elements: input.elements,
+    canvasH: input.canvasH,
     thumbnail: input.thumbnail,
     createdBy: input.createdBy,
     createdAt: new Date().toISOString(),

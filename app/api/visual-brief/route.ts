@@ -15,7 +15,6 @@ const TEMPLATES = [
   { id: "bcn-recap", name: "Recap", desc: "tổng kết sau sự kiện" },
   { id: "bcn-recruit", name: "Tuyển thành viên", desc: "tuyển quân, casting" },
   { id: "bcn-quote", name: "Trích dẫn", desc: "câu nói hay, cảm nghĩ" },
-  { id: "bcn-modern", name: "Hiện đại", desc: "phong cách Linear dark, nội dung ngắn" },
 ];
 const TEMPLATE_IDS = new Set(TEMPLATES.map((t) => t.id));
 
