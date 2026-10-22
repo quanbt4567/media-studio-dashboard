@@ -657,12 +657,12 @@ export default function Generator({
     (post) => post.status === "Approved" && !post.publishedAt && post.scheduledAt && post.scheduledAt <= nowIso,
   );
 
-  return <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance" style={{ animationDelay: "180ms" }}>
+  return <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance" style={{ animationDelay: "180ms" }}>
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3"><div><div className="mb-2 flex items-center gap-2"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><Sparkles size={14} /></span><span className="font-mono text-[10px] font-medium uppercase tracking-[.18em] text-[var(--muted)]">Studio assistant</span></div><h2 className="text-2xl font-black tracking-[-.05em]">Make something people feel.</h2><p className="mt-1 max-w-md text-xs leading-relaxed text-[var(--muted)]">Turn a rough idea into a Facebook-ready post in seconds.</p></div><span className="rounded-full bg-[var(--fill)] px-3 py-1 font-mono text-[9px] uppercase tracking-wider text-[var(--muted)]">AI powered</span></div>
     {/* Due posts banner */}
     {role === "admin" && duePosts.length > 0 && (
-      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[#5c2b28] bg-[#2b1a1e] px-4 py-3">
-        <p className="text-xs font-extrabold text-[#f28b82]">⏰ {duePosts.length} approved post{duePosts.length === 1 ? "" : "s"} past {duePosts.length === 1 ? "its" : "their"} scheduled time</p>
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3">
+        <p className="text-xs font-extrabold text-[var(--danger-text)]">⏰ {duePosts.length} approved post{duePosts.length === 1 ? "" : "s"} past {duePosts.length === 1 ? "its" : "their"} scheduled time</p>
         <button type="button" onClick={handlePublishDue} disabled={publishingDue} className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-extrabold text-white transition hover:-translate-y-0.5 disabled:opacity-50"><Rocket size={13} /> {publishingDue ? "Publishing…" : "Publish due now"}</button>
       </div>
     )}
@@ -744,10 +744,10 @@ export default function Generator({
                 onClick={() => setActiveId(post.id)}
                 className={`min-h-[108px] w-full rounded-xl border p-3 text-left transition ${active ? "border-[var(--line-strong)] bg-[var(--surface)] shadow-[0_8px_24px_rgba(0,0,0,.12)]" : "border-[var(--line)] bg-[var(--surface)]/50 hover:border-[var(--accent)]"}`}
               >
-                <span className={`mb-1.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : post.status === "Approved" ? "bg-[var(--accent)] text-[var(--ink)]" : post.status === "Draft" ? "bg-[var(--fill)] text-[var(--ink)]" : "bg-[#2b2113] text-[#e0a93e]"}`}>{post.status}</span>
+                <span className={`mb-1.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : post.status === "Approved" ? "bg-[var(--accent)] text-[var(--ink)]" : post.status === "Draft" ? "bg-[var(--fill)] text-[var(--ink)]" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}>{post.status}</span>
                 <span className="block line-clamp-2 text-xs font-bold leading-snug">{snippet(post.content)}</span>
                 <span className="mt-1 block truncate font-mono text-[9px] text-[var(--muted)]">{post.updatedBy} · {post.imageDataUrl ? "ảnh" : post.videoUrl ? "video" : "no image"}{post.scheduledAt ? ` · ◷ ${new Date(post.scheduledAt).toLocaleDateString()}` : ""}</span>
-                {post.review?.decision === "rejected" && <span className="mb-1.5 ml-1 inline-block rounded-full bg-[#2b1a1e] px-2 py-0.5 text-[9px] font-extrabold text-[#f28b82]">↩ trả về</span>}
+                {post.review?.decision === "rejected" && <span className="mb-1.5 ml-1 inline-block rounded-full bg-[var(--danger-tint)] px-2 py-0.5 text-[9px] font-extrabold text-[var(--danger-text)]">↩ trả về</span>}
               </button>
               {role === "content" && (
                 <button
@@ -777,7 +777,7 @@ export default function Generator({
                 {permissions.canUploadMedia && <button type="button" onClick={() => setShowLibraryPicker(true)} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><Library size={13} /> Thư viện ảnh</button>}
                 {role === "content" && <button type="button" onClick={() => { loadFormats(); setShowFormats(true); }} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><ClipboardList size={13} /> Mẫu bài viết</button>}
                 {postContent && <button onClick={copyPost} className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--muted)] hover:text-[var(--ink)]"><Clipboard size={13} />{copied ? "Đã chép" : "Sao chép bài"}</button>}
-                {canDelete && <button type="button" onClick={deleteActivePost} className="flex items-center gap-1 rounded-full border border-[#5c2b28] bg-[#2b1a1e] px-2.5 py-1 text-[10px] font-extrabold text-[#f28b82] hover:bg-[#2b1a1e]"><Trash2 size={11} /> Xóa</button>}
+                {canDelete && <button type="button" onClick={deleteActivePost} className="flex items-center gap-1 rounded-full border border-[var(--danger-border)] bg-[var(--danger-tint)] px-2.5 py-1 text-[10px] font-extrabold text-[var(--danger-text)] hover:bg-[var(--danger-tint)]"><Trash2 size={11} /> Xóa</button>}
               </div>
             </div>
             <p className="mb-4 mt-1.5 font-mono text-[9px] uppercase tracking-[.15em] text-[var(--muted)]">
@@ -787,7 +787,7 @@ export default function Generator({
         <label className="mb-2 block text-xs font-extrabold" htmlFor="topic">Viết về chủ đề gì?</label><textarea suppressHydrationWarning id="topic" value={topic} maxLength={240} onChange={(event) => setTopic(event.target.value)} placeholder="VD: workshop làm gốm cho người mới vào thứ 6..." className="min-h-28 w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3 text-sm outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--line-strong)] focus:ring-2 focus:ring-[var(--accent)]" />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="font-mono text-[10px] text-[var(--muted)]">{topic.length}/240 ký tự</p><button disabled={!topic.trim() || loading} onClick={generatePost} className="flex items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[var(--surface-2)] disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle className="animate-spin" size={15} /> : <WandSparkles size={15} />} {loading ? "Đang viết..." : "Viết bằng AI"}</button></div>
       </> : <p className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--surface-2)] px-4 py-3 text-xs leading-relaxed text-[var(--muted)]">{role === "admin" ? <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Crown size={13} /> Admin mode</strong> — bạn chỉ duyệt và đăng bài. Viết bài là việc của writer, hình ảnh là việc của designer. Mở từng bài viết để xem preview, duyệt hoặc trả về.</> : <><strong className="inline-flex items-center gap-1 text-[var(--ink)]"><Palette size={13} /> Media Creator mode</strong> — the writer&apos;s draft loads automatically below (read-only for you). Attach visuals, then mark the post ready for review.</>}</p>}
-      {error && <p className="mt-4 rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
+      {error && <p className="mt-4 rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
             <div className="mt-5">
               <FacebookPostBox value={postContent} onChange={setPostContent} image={mediaFile} onImageChange={handleImageSelect} onBrowseLibrary={permissions.canUploadMedia && !isPublished ? () => setShowLibraryPicker(true) : undefined} onVideoSelect={permissions.canUploadMedia && !isPublished ? handleVideoSelect : undefined} videoUploading={uploadingVideo} userName={process.env.NEXT_PUBLIC_CLUB_NAME || "BCN"} placeholder="Bài AI viết sẽ hiện ở đây. Chỉnh sử trước khi gửi..." textReadOnly={!permissions.canEditText || isPublished} hideImageControls={!permissions.canUploadMedia || isPublished} hideSubmit />
               {uploadingVideo && (
@@ -828,8 +828,8 @@ export default function Generator({
                     </button>
                   </div>
                   {visualBrief && (
-                    <div className="mt-2 rounded-xl border border-[#26503a] bg-[var(--fill)] p-3 text-left">
-                      <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#4cc26e]">
+                    <div className="mt-2 rounded-xl border border-[var(--green-border)] bg-[var(--fill)] p-3 text-left">
+                      <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-[var(--green-text)]">
                         <Sparkles size={12} /> Gợi ý cho designer
                       </p>
                       <p className="mt-1 text-xs leading-relaxed text-[var(--ink)]">{visualBrief.imageBrief}</p>
@@ -883,7 +883,7 @@ export default function Generator({
                   {scoring ? "Đang chấm..." : scoreResult ? "Chấm lại" : "Chấm điểm"}
                 </button>
               </div>
-              {scoreError && <p className="mt-2 text-xs font-bold text-[#f0957e]">{scoreError}</p>}
+              {scoreError && <p className="mt-2 text-xs font-bold text-[var(--danger-text-2)]">{scoreError}</p>}
               {scoreResult && (
                 <div className="mt-3">
                   <div className="flex items-center gap-3">
@@ -1002,11 +1002,11 @@ export default function Generator({
               <FacebookPreview generatedText={postContent} image={previewImage} video={ticketVideo} onRemoveImage={previewImage && permissions.canUploadMedia ? handleRemoveImage : undefined} onRemoveVideo={ticketVideo && permissions.canUploadMedia ? handleRemoveVideo : undefined} />
           {permissions.canPublish ? <>
             <button type="button" onClick={handlePublishToFacebook} disabled={!postContent.trim() || publishing || isPublished || status !== "Approved"} className="flex w-full items-center justify-center gap-3 rounded-xl bg-[var(--accent)] px-5 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_28px_rgba(24,119,242,.22)] transition hover:-translate-y-0.5 hover:bg-[#166fe5] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
-              {publishing ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" /> : <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--surface)] text-sm font-black leading-none text-[#5ea0ff]" aria-hidden="true">f</span>}
+              {publishing ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" /> : <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--surface)] text-sm font-black leading-none text-[var(--fb-blue)]" aria-hidden="true">f</span>}
               {publishing ? "Publishing to Fanpage..." : isPublished ? "Published ✓" : "Publish to Facebook"}
             </button>
             {status !== "Approved" && !isPublished && <p className="text-center text-[11px] text-[var(--muted)]">Publishing unlocks once the post is approved.</p>}
-            {publishError && <p role="alert" className="rounded-xl border border-[#5c2b28] bg-[#2b1a1e] px-4 py-3 text-xs font-bold leading-relaxed text-[#f28b82]">{publishError}</p>}
+            {publishError && <p role="alert" className="rounded-xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3 text-xs font-bold leading-relaxed text-[var(--danger-text)]">{publishError}</p>}
           </> : <p className="rounded-xl bg-[var(--fill)] px-4 py-3 text-center text-[11px] font-bold text-[var(--muted)]"><Crown size={12} className="mr-1 inline-block align-[-2px]" /> Publishing to Facebook is restricted to the Admin / Leader role.</p>}
             </div>
           </section>
@@ -1059,7 +1059,7 @@ export default function Generator({
                     type="button"
                     onClick={() => deleteFormat(format.id)}
                     title="Xóa mẫu này"
-                    className="shrink-0 rounded-xl border border-[#5c2b28] bg-[var(--surface)] px-2.5 py-2 text-xs font-bold text-[#f28b82] hover:bg-[#2b1a1e]"
+                    className="shrink-0 rounded-xl border border-[var(--danger-border)] bg-[var(--surface)] px-2.5 py-2 text-xs font-bold text-[var(--danger-text)] hover:bg-[var(--danger-tint)]"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -1070,6 +1070,6 @@ export default function Generator({
         </div>
       </div>
     )}
-    {showSuccessToast && <div role="status" className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border border-[#26503a] bg-[var(--surface)] px-4 py-3 text-sm font-bold text-[#4cc26e] shadow-[0_16px_40px_rgba(0,0,0,.16)]"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#12251a]">✓</span>Post successfully published to Facebook Page!</div>}
+    {showSuccessToast && <div role="status" className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border border-[var(--green-border)] bg-[var(--surface)] px-4 py-3 text-sm font-bold text-[var(--green-text)] shadow-[0_16px_40px_rgba(0,0,0,.16)]"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--green-tint)]">✓</span>Post successfully published to Facebook Page!</div>}
   </div>;
 }

@@ -1161,8 +1161,8 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
       {/* Stage */}
       <div>
         {visualBrief && (
-          <div className="mb-2 flex items-start gap-2 rounded-xl border border-[#26503a] bg-[var(--fill)] px-3 py-2">
-            <Sparkles size={14} className="mt-0.5 shrink-0 text-[#4cc26e]" />
+          <div className="mb-2 flex items-start gap-2 rounded-xl border border-[var(--green-border)] bg-[var(--fill)] px-3 py-2">
+            <Sparkles size={14} className="mt-0.5 shrink-0 text-[var(--green-text)]" />
             <p className="text-xs leading-relaxed text-[var(--ink)]">
               <strong>AI gợi ý visual:</strong> {visualBrief}
             </p>
@@ -1233,7 +1233,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </button>
         </div>
 
-        <div ref={stageWrapRef} className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[#0d0f14]" onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
+        <div ref={stageWrapRef} className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--stage)]" onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: SIZE, height: SIZE, transform: `scale(${scale})` }}>
             {bg.kind === "gradient" ? (
               <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${bg.from}, ${bg.to})` }} />
@@ -1295,7 +1295,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           ) : (
             <div className="space-y-2.5">
               {selected.geometryLocked && (
-                <p className="rounded-lg bg-[#1a2030] px-2.5 py-1.5 text-[10px] font-bold text-[#7ea6f8]">
+                <p className="rounded-lg bg-[var(--blue-tint)] px-2.5 py-1.5 text-[10px] font-bold text-[var(--blue-text)]">
                   🔒 Phần của mẫu — chỉ sửa nội dung, không dời/kéo/xóa được.
                 </p>
               )}
@@ -1344,7 +1344,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     </button>
                   </>
                 )}
-                <button type="button" onClick={deleteSelected} className={`flex items-center gap-1 rounded-lg border border-[#5c2b28] px-2.5 py-1.5 text-[11px] font-bold text-[#f28b82] hover:bg-[#2b1a1e] ${selected.geometryLocked ? "hidden" : ""}`}>
+                <button type="button" onClick={deleteSelected} className={`flex items-center gap-1 rounded-lg border border-[var(--danger-border)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--danger-text)] hover:bg-[var(--danger-tint)] ${selected.geometryLocked ? "hidden" : ""}`}>
                   <Trash2 size={12} /> Xóa
                 </button>
               </div>
@@ -1462,7 +1462,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
               </div>
             )}
             {libraryNote && (
-              <p className={`mt-1.5 text-[10px] ${libraryNote.startsWith("✓") ? "text-[#4cc26e]" : "text-red-600"}`}>{libraryNote}</p>
+              <p className={`mt-1.5 text-[10px] ${libraryNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{libraryNote}</p>
             )}
           </div>
         </div>
@@ -1488,7 +1488,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
             </button>
           </div>
           {tplNote && (
-            <p className={`mt-1.5 text-[10px] ${tplNote.startsWith("✓") ? "text-[#4cc26e]" : "text-red-600"}`}>{tplNote}</p>
+            <p className={`mt-1.5 text-[10px] ${tplNote.startsWith("✓") ? "text-[var(--green-text)]" : "text-red-600"}`}>{tplNote}</p>
           )}
         </div>
 
@@ -1510,7 +1510,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </button>
         </div>
         {dirty && (
-          <p className="mt-1.5 rounded-lg bg-[#2b2113] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
+          <p className="mt-1.5 rounded-lg bg-[var(--amber-tint)] px-2.5 py-1.5 text-[10px] font-bold text-[#b3541e]">
             Có thay đổi chưa lưu — bấm “Lưu vào bài viết” để preview và bài đăng cập nhật.
           </p>
         )}
@@ -1637,7 +1637,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                           type="button"
                           onClick={() => handleDeleteTemplate(tpl.id)}
                           title="Xóa mẫu"
-                          className="rounded-lg border border-[#5c2b28] px-2 py-1.5 text-[11px] font-bold text-[#f28b82] hover:bg-[#2b1a1e]"
+                          className="rounded-lg border border-[var(--danger-border)] px-2 py-1.5 text-[11px] font-bold text-[var(--danger-text)] hover:bg-[var(--danger-tint)]"
                         >
                           <Trash2 size={13} />
                         </button>

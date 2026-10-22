@@ -95,11 +95,11 @@ export default function AnalyticsDashboard() {
           Chưa cấu hình <code>FB_PAGE_ACCESS_TOKEN</code> nên chỉ hiện số liệu đã lưu. Thêm key để kéo số liệu mới từ Facebook.
         </p>
       )}
-      {error && <p className="mb-4 text-sm font-bold text-[#f0957e]">{error}</p>}
+      {error && <p className="mb-4 text-sm font-bold text-[var(--danger-text-2)]">{error}</p>}
       {statsErrors.length > 0 && (
-        <div className="mb-4 rounded-xl border border-[#5c2b28] bg-[#2b1a1e] px-4 py-3">
+        <div className="mb-4 rounded-xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3">
           {statsErrors.map((e) => (
-            <p key={e.postId} className="text-xs font-bold leading-relaxed text-[#f28b82]"><TriangleAlert size={13} className="mr-1 inline-block align-[-2px]" /> {e.error}</p>
+            <p key={e.postId} className="text-xs font-bold leading-relaxed text-[var(--danger-text)]"><TriangleAlert size={13} className="mr-1 inline-block align-[-2px]" /> {e.error}</p>
           ))}
         </div>
       )}

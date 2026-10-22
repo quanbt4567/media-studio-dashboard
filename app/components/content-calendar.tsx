@@ -72,7 +72,7 @@ export default function ContentCalendar({
   }
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><CalendarDays size={14} /></span>
@@ -89,8 +89,8 @@ export default function ContentCalendar({
       </div>
 
       {role === "admin" && dueCount > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[#5c2b28] bg-[#2b1a1e] px-4 py-3">
-          <p className="flex items-center gap-2 text-xs font-extrabold text-[#f28b82]">
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--danger-border)] bg-[var(--danger-tint)] px-4 py-3">
+          <p className="flex items-center gap-2 text-xs font-extrabold text-[var(--danger-text)]">
             <Clock size={14} /> {dueCount} post{dueCount === 1 ? "" : "s"} past {dueCount === 1 ? "its" : "their"} scheduled time
           </p>
           <button
@@ -126,7 +126,7 @@ export default function ContentCalendar({
                 {list.slice(0, 2).map((post) => (
                   <span
                     key={post.id}
-                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold leading-snug ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[#2b2113] text-[#e0a93e]"}`}
+                    className={`block line-clamp-2 rounded-md px-1.5 py-0.5 text-[9px] font-bold leading-snug ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}
                   >
                     {post.status === "Published" ? "✓ " : "◷ "}{(post.content.split("\n")[0] || "Untitled").slice(0, 42)}
                   </span>
@@ -155,7 +155,7 @@ export default function ContentCalendar({
                   onClick={() => onSelectPost(post.id)}
                   className="flex w-full items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left transition hover:border-[var(--accent)]"
                 >
-                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[#2b2113] text-[#e0a93e]"}`}>{post.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${post.status === "Published" ? "bg-[var(--accent)] text-white" : "bg-[var(--amber-tint)] text-[var(--amber-text)]"}`}>{post.status}</span>
                   <span className="min-w-0 flex-1 truncate text-xs font-bold">{(post.content.split("\n")[0] || "Untitled draft").slice(0, 60)}</span>
                   <span className="shrink-0 font-mono text-[10px] text-[var(--muted)]">
                     {new Date(post.publishedAt || post.scheduledAt || "").toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}

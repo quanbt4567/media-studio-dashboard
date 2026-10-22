@@ -105,7 +105,7 @@ export default function SettingsPanel() {
   }
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7">
+    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7">
       <div className="mb-6 flex items-center gap-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]">
           <KeyRound size={14} />
@@ -134,7 +134,7 @@ export default function SettingsPanel() {
                     {field.label}
                   </label>
                   {state?.configured && (
-                    <span className="rounded-full bg-[#12251a] px-2 py-0.5 text-[10px] font-extrabold text-[#4cc26e]">
+                    <span className="rounded-full bg-[var(--green-tint)] px-2 py-0.5 text-[10px] font-extrabold text-[var(--green-text)]">
                       ✓ đã cấu hình
                     </span>
                   )}
@@ -161,8 +161,8 @@ export default function SettingsPanel() {
             );
           })}
 
-          {error && <p className="rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
-          {saved && <p className="rounded-lg bg-[#12251a] px-3 py-2 text-xs font-bold text-[#4cc26e]">Đã lưu. Các tính năng sẽ dùng key mới ngay lập tức.</p>}
+          {error && <p className="rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
+          {saved && <p className="rounded-lg bg-[var(--green-tint)] px-3 py-2 text-xs font-bold text-[var(--green-text)]">Đã lưu. Các tính năng sẽ dùng key mới ngay lập tức.</p>}
 
           <div className="flex items-center gap-3">
             <button

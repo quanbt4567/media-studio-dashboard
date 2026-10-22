@@ -19,6 +19,7 @@ import Generator from "./generator";
 import IdeaGenerator from "./idea-generator";
 import MediaLibrary from "./media-library";
 import NotificationBell from "./notification-bell";
+import ThemeToggle from "./theme-toggle";
 import UserBadge from "./user-badge";
 import ChatWidget from "./chat-widget";
 import ActivityFeed from "./activity-feed";
@@ -120,7 +121,7 @@ export default function StudioWorkspace() {
 
   return (
     <main className="min-h-screen lg:grid lg:grid-cols-[220px_1fr]">
-      <aside className="flex border-b border-[var(--line)] bg-[#0c0f16]/85 px-5 py-5 backdrop-blur-xl lg:min-h-screen lg:flex-col lg:border-b-0 lg:border-r">
+      <aside className="flex border-b border-[var(--line)] bg-[var(--sidebar-bg)] px-5 py-5 backdrop-blur-xl lg:min-h-screen lg:flex-col lg:border-b-0 lg:border-r">
         <ClubLogo />
         <nav className="ml-auto grid grid-cols-6 gap-1 lg:ml-0 lg:mt-10 lg:block lg:space-y-1">
           {tabs
@@ -189,6 +190,7 @@ export default function StudioWorkspace() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <NotificationBell onSelectPost={handleSelectPost} />
               {pageUrl ? (
                 <a
@@ -212,7 +214,7 @@ export default function StudioWorkspace() {
           </header>
 
           {loadError && (
-            <p className="mb-6 rounded-xl bg-[#2b1a1e] px-4 py-3 text-xs font-bold text-[#f0957e]">
+            <p className="mb-6 rounded-xl bg-[var(--danger-tint)] px-4 py-3 text-xs font-bold text-[var(--danger-text-2)]">
               {loadError}
             </p>
           )}

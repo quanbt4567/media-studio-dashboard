@@ -130,7 +130,7 @@ export default function IdeaGenerator({
   }
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[#12151d]/80 p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
+    <div className="rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-4 shadow-[0_24px_80px_rgba(0,0,0,.12)] backdrop-blur-2xl sm:p-7 entrance">
       <div className="mb-6 flex items-center gap-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)]"><Lightbulb size={14} /></span>
         <div>
@@ -175,7 +175,7 @@ export default function IdeaGenerator({
         </button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
+      {error && <p className="mb-4 rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
 
       {topicUsed && ideas.length > 0 && (
         <p className="mb-3 font-mono text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">

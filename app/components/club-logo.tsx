@@ -12,10 +12,16 @@ const BCN_LOGO_LIGHT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWUAAABkCA
  * Club branding shown in the app header and on the login page: the club's
  * actual logo lockup ("BAN CÔNG NGHỆ — School Life Stories").
  */
+const BCN_LOGO_DARK = "data:image/png;base64,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";
+
 export default function ClubLogo({ size = "md" }: ClubLogoProps) {
   const h = size === "lg" ? "h-12" : "h-9";
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={BCN_LOGO_LIGHT} alt="BCN — Ban Công Nghệ" className={`${h} w-auto select-none`} draggable={false} />
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={BCN_LOGO_LIGHT} alt="BCN — Ban Công Nghệ" className={`logo-on-dark ${h} w-auto select-none`} draggable={false} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={BCN_LOGO_DARK} alt="" aria-hidden="true" className={`logo-on-light ${h} w-auto select-none`} draggable={false} />
+    </>
   );
 }

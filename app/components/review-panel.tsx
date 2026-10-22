@@ -5,9 +5,9 @@ import { useState } from "react";
 import type { Post } from "../lib/posts-store";
 
 const roleBadge: Record<string, string> = {
-  admin: "bg-[#2a1f3d] text-[#c4a7f5]",
+  admin: "bg-[var(--violet-tint)] text-[var(--violet-text)]",
   content: "bg-[var(--fill)] text-[var(--ink)]",
-  media: "bg-[#2b2113] text-[#e0a93e]",
+  media: "bg-[var(--amber-tint)] text-[var(--amber-text)]",
 };
 
 function timeAgo(iso: string): string {
@@ -85,7 +85,7 @@ export default function ReviewPanel({
   const inReview = post.status === "Review Pending";
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[var(--surface)]/65 p-4 shadow-[0_14px_40px_rgba(0,0,0,.08)] backdrop-blur-xl sm:p-5">
+    <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--surface)]/65 p-4 shadow-[0_14px_40px_rgba(0,0,0,.08)] backdrop-blur-xl sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[.18em] text-[var(--muted)]">Duyệt bài</p>
@@ -103,7 +103,7 @@ export default function ReviewPanel({
             <>
               <p className="mb-2 text-xs font-extrabold">Duyệt nhanh — một chạm, không cần Zalo</p>
               {post.visualSkipped && (
-                <p className="mb-2 rounded-lg bg-[#2b2113] px-2.5 py-2 text-[11px] font-bold text-[#e0a93e]"><Zap size={12} className="mr-1 inline-block align-[-2px]" /> Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
+                <p className="mb-2 rounded-lg bg-[var(--amber-tint)] px-2.5 py-2 text-[11px] font-bold text-[var(--amber-text)]"><Zap size={12} className="mr-1 inline-block align-[-2px]" /> Writer gửi thẳng (bài text-only, không qua designer) — duyệt là đăng được ngay.</p>
               )}
               <textarea
                 value={reviewNote}
@@ -152,7 +152,7 @@ export default function ReviewPanel({
             </p>
           )}
           {post.review && (
-            <p className={`mt-2 rounded-lg px-2.5 py-2 text-[11px] font-bold ${post.review.decision === "approved" ? "bg-[#12251a] text-[#4cc26e]" : "bg-[#2b1a1e] text-[#f28b82]"}`}>
+            <p className={`mt-2 rounded-lg px-2.5 py-2 text-[11px] font-bold ${post.review.decision === "approved" ? "bg-[var(--green-tint)] text-[var(--green-text)]" : "bg-[var(--danger-tint)] text-[var(--danger-text)]"}`}>
               {post.review.decision === "approved" ? "✓ Đã duyệt" : <span className="flex items-center gap-1"><X size={12} /> Trả về cho {post.review.sendBackTo === "designer" ? "designer" : "writer"}</span>} bởi {post.review.by}
               {post.review.note && <span className="mt-0.5 block font-medium">“{post.review.note}”</span>}
             </p>
@@ -160,7 +160,7 @@ export default function ReviewPanel({
         </div>
       )}
 
-      {error && <p className="mb-3 rounded-lg bg-[#2b1a1e] px-3 py-2 text-xs font-bold text-[#f0957e]">{error}</p>}
+      {error && <p className="mb-3 rounded-lg bg-[var(--danger-tint)] px-3 py-2 text-xs font-bold text-[var(--danger-text-2)]">{error}</p>}
 
       {/* Comments */}
       <div className="mb-3 max-h-56 space-y-2.5 overflow-y-auto pr-1">

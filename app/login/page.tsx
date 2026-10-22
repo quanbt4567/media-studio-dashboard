@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ClubLogo from "../components/club-logo";
 import ParticleField from "../components/fx/particle-field";
+import ThemeToggle from "../components/theme-toggle";
 
 /**
  * Login — futuristic dark glass card over an ambient particle field and
@@ -77,8 +78,11 @@ export default function LoginPage() {
         <div className="orb-drift-b absolute -right-32 bottom-[-20%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,.14),transparent_65%)] blur-3xl" />
       </div>
       <ParticleField />
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
 
-      <div className="entrance relative z-10 w-full max-w-sm overflow-hidden rounded-[28px] border border-white/10 bg-[#12151d]/75 p-8 shadow-[0_24px_80px_rgba(0,0,0,.55)] backdrop-blur-2xl">
+      <div className="entrance relative z-10 w-full max-w-sm overflow-hidden rounded-[28px] border border-[var(--glass-border)] bg-[var(--glass)] p-8 shadow-[var(--card-shadow)] backdrop-blur-2xl">
         <div aria-hidden="true" className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(139,92,246,.7)] to-transparent" />
         <div className="stagger-item mb-8" style={{ animationDelay: "60ms" }}>
           <ClubLogo size="lg" />

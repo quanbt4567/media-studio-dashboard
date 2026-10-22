@@ -31,6 +31,79 @@
   --brand: #3ecf74;        /* success */
   --orange: #fb923c;       /* scheduled / warning signal */
   --danger: #f28b82;
+
+  /* Surfaces that differ structurally per theme. */
+  --glass: rgba(18, 21, 29, .80);
+  --glass-border: rgba(255, 255, 255, .10);
+  --sidebar-bg: rgba(12, 15, 22, .85);
+  --stage: #0d0f14;
+  --card-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+
+  /* Status tints + readable status text on tinted/dark surfaces. */
+  --danger-tint: #2b1a1e;
+  --amber-tint: #2b2113;
+  --green-tint: #12251a;
+  --violet-tint: #2a1f3d;
+  --cyan-tint: #12303a;
+  --blue-tint: #1a2030;
+  --danger-text: #f28b82;
+  --danger-text-2: #f0957e;
+  --green-text: #4cc26e;
+  --amber-text: #e0a93e;
+  --violet-text: #c4a7f5;
+  --cyan-text: #67d7e8;
+  --blue-text: #7ea6f8;
+  --fb-blue: #5ea0ff;
+  --danger-border: #5c2b28;
+  --green-border: #26503a;
+}
+
+/**
+ * Light theme — same design system, light surfaces. Toggled from the
+ * header (and login) via data-theme on <html>, persisted in localStorage
+ * ("msd-theme"); dark remains the default.
+ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --paper: #f2f3f7;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --fill: #e7eaef;
+  --ink: #171a21;
+  --muted: #5b6472;
+  --faint: #8a93a3;
+  --line: #e0e3ea;
+  --line-strong: #c2c8d2;
+  --accent: #8b5cf6;
+  --accent-strong: #7c4dff;
+  --accent-2: #0891b2;
+  --brand: #2f9e57;
+  --orange: #e06c1f;
+  --danger: #d64541;
+
+  --glass: rgba(255, 255, 255, .78);
+  --glass-border: rgba(20, 24, 33, .10);
+  --sidebar-bg: rgba(255, 255, 255, .82);
+  --stage: #e8ebe4;
+  --card-shadow: 0 24px 60px rgba(20, 24, 40, .16);
+
+  --danger-tint: #fdecea;
+  --amber-tint: #fdf3d8;
+  --green-tint: #e5f5e9;
+  --violet-tint: #efe7fc;
+  --cyan-tint: #dcf0ee;
+  --blue-tint: #e8effe;
+  --danger-text: #b03a30;
+  --danger-text-2: #b8543c;
+  --green-text: #28733f;
+  --amber-text: #8b5d16;
+  --violet-text: #5b2d8e;
+  --cyan-text: #28645e;
+  --blue-text: #2451a8;
+  --fb-blue: #1877f2;
+  --danger-border: #f0c0ba;
+  --green-border: #b7dfc2;
 }
 
 * { box-sizing: border-box; }
@@ -94,6 +167,17 @@ button, textarea { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .entrance, .skeleton, .stagger-item, .orb-drift-a, .orb-drift-b { animation: none; }
 }
+
+/* Theme-aware club wordmark: white version on dark, ink version on light. */
+.logo-on-light { display: none; }
+[data-theme="light"] .logo-on-light { display: block; }
+[data-theme="light"] .logo-on-dark { display: none; }
+
+/* Light theme softens the ambient login orbs + dark scrollbar thumb. */
+[data-theme="light"] .orb-drift-a,
+[data-theme="light"] .orb-drift-b { opacity: .45; }
+[data-theme="light"] * { scrollbar-color: #c3c9d4 transparent; }
+[data-theme="light"] *::-webkit-scrollbar-thumb { background: #c3c9d4; }
 
 /* Login entrance stagger + ambient orb drift. */
 .stagger-item { animation: entrance 550ms cubic-bezier(.2,.8,.2,1) both; }
