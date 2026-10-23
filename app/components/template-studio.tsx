@@ -9,7 +9,6 @@ import {
 } from "../lib/design-template-store";
 import MediaLibrary from "./media-library";
 import { popInRef } from "./fx/motion";
-import ImageCropper from "./image-cropper";
 
 const SIZE = 1080;
 
@@ -1099,6 +1098,39 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
     if (!canDesign || editingId === el.id || el.locked) return;
     e.stopPropagation();
     setSelectedId(el.id);
+    // In-place crop mode: dragging the photo being cropped pans the image
+    // inside its frame (focal point) — the frame itself never moves, and
+    // the crop happens right on the template instead of in a center modal.
+    if (cropElId === el.id && el.type === "image") {
+      const img = e.currentTarget.querySelector("img");
+      const natW = img?.naturalWidth ?? 0;
+      const natH = img?.naturalHeight ?? 0;
+      if (!natW || !natH) return;
+      const cover = Math.max(el.w / natW, el.h / natH);
+      const overflowX = el.w - natW * cover;
+      const overflowY = el.h - natH * cover;
+      const startFx = el.focalX ?? 0.5;
+      const startFy = el.focalY ?? 0.5;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const move = (ev: PointerEvent) => {
+        const sc = scaleRef.current;
+        const dx = (ev.clientX - startX) / sc;
+        const dy = (ev.clientY - startY) / sc;
+        updateEl(el.id, {
+          focalX: overflowX < -0.5 ? Math.min(1, Math.max(0, (overflowX * startFx + dx) / overflowX)) : startFx,
+          focalY: overflowY < -0.5 ? Math.min(1, Math.max(0, (overflowY * startFy + dy) / overflowY)) : startFy,
+        });
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+      return;
+    }
+    if (cropElId) setCropElId(null);
     // Geometry-locked template parts: selectable (content stays editable)
     // but never draggable — the layout can't be broken by accident.
     if (el.geometryLocked) return;
@@ -1153,7 +1185,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         const tag = (document.activeElement?.tagName ?? "").toLowerCase();
         if (tag !== "input" && tag !== "textarea") deleteSelected();
       }
-      if (e.key === "Escape") { setSelectedId(null); setEditingId(null); }
+      if (e.key === "Escape") { setSelectedId(null); setEditingId(null); setCropElId(null); }
     // Undo/redo via refs so the handler never goes stale.
     const tag2 = (document.activeElement?.tagName ?? "").toLowerCase();
     const typing = tag2 === "input" || tag2 === "textarea";
@@ -1901,7 +1933,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
           </button>
         </div>
 
-        <div ref={stageWrapRef} className="relative w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--stage)]" style={{ aspectRatio: `1080 / ${canvasH}` }} onPointerDown={() => { setSelectedId(null); setEditingId(null); }}>
+        <div ref={stageWrapRef} className="relative w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--stage)]" style={{ aspectRatio: `1080 / ${canvasH}` }} onPointerDown={() => { setSelectedId(null); setEditingId(null); setCropElId(null); }}>
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: SIZE, height: canvasH, transform: `scale(${scale})` }}>
             {bg.kind === "gradient" ? (
               <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${bg.from}, ${bg.to})` }} />
@@ -1918,7 +1950,7 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                   onPointerDown={(e) => { if (!el.locked) onElPointerDown(e, el); }}
                   onDoubleClick={(e) => { e.stopPropagation(); if (el.type === "text" && !el.locked) { pushHistory(); setEditingId(el.id); } }}
                   className="absolute"
-                  style={{ left: el.x, top: el.y, width: el.w, cursor: el.locked ? "default" : "move", outline: isSel ? "2px solid #1877F2" : overflowIds.has(el.id) ? "2px dashed #F87171" : "none", outlineOffset: 2 }}
+                  style={{ left: el.x, top: el.y, width: el.w, cursor: cropElId === el.id ? "grab" : el.locked ? "default" : "move", outline: cropElId === el.id ? "2px solid #A78BFA" : isSel ? "2px solid #1877F2" : overflowIds.has(el.id) ? "2px dashed #F87171" : "none", outlineOffset: 2 }}
                 >
                   {el.type === "text" ? (
                     isEditing ? (
@@ -1941,6 +1973,13 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                       {el.overlay && (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={el.overlay} alt="" draggable={false} className="pointer-events-none absolute inset-0 block h-full w-full" style={{ objectFit: "fill", userSelect: "none", borderRadius: el.radius ?? 0 }} />
+                      )}
+                      {cropElId === el.id && (
+                        <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3" style={{ borderRadius: el.radius ?? 0 }}>
+                          {Array.from({ length: 9 }).map((_, i) => (
+                            <div key={i} className="border border-white/25" />
+                          ))}
+                        </div>
                       )}
                     </>
                   )}
@@ -2012,11 +2051,12 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
                     <button
                       type="button"
                       onClick={() => {
+                        if (cropElId === selected.id) { setCropElId(null); return; }
                         pushHistory();
                         setCropElId(selected.id);
                       }}
-                      title="Kéo để chọn vùng ảnh hiển thị trong khung"
-                      className="flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]"
+                      title="Căn ảnh ngay trên khung: kéo ảnh để chọn vùng hiển thị"
+                      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-bold hover:border-[var(--accent)] ${cropElId === selected.id ? "border-[var(--accent)] bg-[var(--fill)]" : "border-[var(--line)]"}`}
                     >
                       <Crop size={12} /> Căn ảnh
                     </button>
@@ -2240,15 +2280,16 @@ export default function TemplateStudio({ postContent, postImage, canDesign, onSa
         const cropEl = cropElId ? elements.find((el) => el.id === cropElId) : null;
         if (!cropEl || cropEl.type !== "image" || !cropEl.src) return null;
         return (
-          <ImageCropper
-            src={cropEl.src}
-            frameW={cropEl.w}
-            frameH={cropEl.h}
-            focalX={cropEl.focalX ?? 0.5}
-            focalY={cropEl.focalY ?? 0.5}
-            onChange={(fx, fy) => updateEl(cropEl.id, { focalX: fx, focalY: fy })}
-            onClose={() => setCropElId(null)}
-          />
+          <div className="absolute right-0 top-0 z-40 w-[min(480px,95vw)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3.5 shadow-[0_24px_60px_rgba(20,30,25,.28)]">
+            <div className="flex items-center justify-between gap-3">
+              <p className="flex items-center gap-1.5 text-xs font-extrabold"><Crop size={13} /> Căn ảnh trong khung</p>
+              <div className="flex shrink-0 gap-1.5">
+                <button type="button" onClick={() => updateEl(cropEl.id, { focalX: 0.5, focalY: 0.5 })} className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-[11px] font-bold hover:border-[var(--accent)]">Về giữa</button>
+                <button type="button" onClick={() => setCropElId(null)} className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[11px] font-bold text-white">Xong</button>
+              </div>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--muted)]">Kéo trực tiếp trên ảnh trong khung template để chọn vùng hiển thị — khung giữ nguyên, bản xuất ra đúng vùng đã căn.</p>
+          </div>
         );
       })()}
       {showTplPicker && (
